@@ -1,0 +1,51 @@
+\documentclass[a4paper]{llncs}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage[british]{babel}
+\usepackage[strict]{csquotes}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage[natbib,style=lncs,backend=biber]{biblatex}
+\addbibresource{anobe.bib}
+\addbibresource{anon.bib}
+\addbibresource{crypto.bib}
+\addbibresource{surveillance.bib}
+
+\usepackage{prettyref}
+\usepackage{varioref}
+
+\usepackage{enumitem}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+% crypto
+\DeclareMathOperator{\Sign}{\mathrm{Sign}}
+\DeclareMathOperator{\Enc}{\mathrm{Enc}}
+\DeclareMathOperator{\Dec}{\mathrm{Dec}}
+\DeclareMathOperator{\Hash}{\mathrm{Hash}}
+\DeclareMathOperator{\MAC}{\mathrm{MAC}}
+
+% general maths
+\newcommand{\ord}[1]{|#1|}
+\DeclareMathOperator{\Z}{\mathbb Z}
+\DeclareMathOperator{\K}{\mathcal K}
+\DeclareMathOperator{\textand}{\qquad and\qquad}
+
+% Galois fields (finite fields)
+\DeclareMathOperator{\GF}{\mathrm{GF}}
+\DeclareMathOperator{\F}{\mathbb{F}}
+
+\usepackage[binary,amssymb]{SIunits}
+
+\usepackage{acronym}
+\input{ac.acr}
+\input{crypto.acr}
+\input{surveillance.acr}
+\input{stdterm.acr}
+
+\pagestyle{plain}
+
+\begin{document}
+\input{anobe-content.tex}
+\end{document}
