@@ -1,3 +1,8 @@
+\title{%
+  Privacy-Preserving Access Control in
+  Decentralized Online Social Networks using
+  Anonymous Broadcast Encryption
+}
 \author{%
   Daniel Bosk \and
   Oleksandr Bodriagov \and
@@ -9,17 +14,12 @@
     KTH Royal Institute of Technology\\
     Email: \email{\{dbosk,obo,gkreitz,buc\}@kth.se}%
 }
-\title{%
-  Access Control in
-  Decentralized Online Social Networks using
-  Anonymous Broadcast Encryption
-}
-%\date{17th February 2015}
+%\date{24th March 2015}
 
 \maketitle
-\begin{abstract}
-  \dots
-\end{abstract}
+%\begin{abstract}
+%  \dots
+%\end{abstract}
 
 \acresetall
 \section{Introduction}
@@ -27,69 +27,159 @@
 Centralized \ac{OSN} collect and store private data.
 They are thus a risk for privacy violations, e.g.~data mining for 
 advertisements or transferring data to third parties.
-We have learned that the spy agencies, like the \ac{NSA}, are very interested 
-in the data found in such centralized storage \cite{prism}.
+We have learned that the spy agencies, like the \ac{NSA} and \ac{GCHQ}, are 
+very interested in the data found in such centralized storage \cite{prism}.
 
 As a response to this \acp{DOSN} have been suggested.
 Among the benefits of these are that users can keep control of their data, 
 there is no central provider where third parties easily can access it, and it 
 is more difficult to censor.
 
-As such, \ac{AC} is an important part in these systems.
+\subsection{\acs{DOSN} model}
+
+For this work, we make some assumptions about the mechanisms available in the 
+\ac{DOSN}.
+First, we assume that there exists a distributed storage scheme with some 
+desirable properties.
+In this storage scheme all users can create objects with unique names.
+These names can be modelled as a randomly chosen bit-strings \(s\in \{0, 
+1\}^l\) of sufficient length \(l\).
+As such the object names are not associated with the user who created it, 
+i.e.~there is nothing similar to a namespace in which all the user's objects 
+are located.
+A user who knows the name of an object can read that object, thus all objects 
+are world-readable.
+Further, only the owner of an object can modify it.
+But we can allow for an append operation which is available to all users 
+knowing the name of the object.
+
+Second, the underlying communication is run on top of an anonymization network, 
+such as Tor \cite{tor}, and the storage nodes are run as Tor hidden-services.
+This way we can assume that the users and storage node operators remain 
+anonymous.
+This is a reasonable assumption since leaked documents 
+\cite{spiegelhiddenservices} suggest that the \ac{NSA} and \ac{GCHQ} cannot 
+break Tor's hidden services.
+
+With the assumptions made so far the users and storage nodes must use some 
+digital-signature scheme for authentication.
+Also the users must have limited trust in the storage nodes.
+We can trust that the storage node will have the data available 
+\cite{dataavailability,replicaplacement}, but we do not want to trust the node 
+more than that.
+We can use the signature scheme to detect changes to an object made by someone 
+other than the owner.
+
+Every user in the \ac{DOSN} has a profile and each user knows the name of the 
+objects which hold the profiles of their friends.
+From this profile a friend can find the names of other related objects, 
+e.g.~posts and comments.
+This work focuses on achieving efficient privacy-preserving access control in 
+this setting.
+
+
+\subsection{Access control}
+
+The main aim of \ac{AC} is to provide confidentiality for the user data.
+We want to allow only authorized users to read this data.
+Due to our given setting we must construct this \ac{AC} mechanism 
+cryptographically.
+Beyond confidentiality, we want the \ac{AC} mechanism to provide some 
+privacy-preserving properties.
+% XXX what's the problem?
+Specifically, we want hidden-credentials, hidden-policy and hidden-decisions as 
+defined in the literature, e.g.~\cite{ppac}.
+
+The hidden-credentials property is trivially achieved in our cryptographical 
+setting: the user's secret key serves as a credential to allow access.
+As all users who know the name of an object can read it and every user is 
+anonymous, then there is no need for a user to show any type of credential to 
+the storage provider and the storage provider cannot identify any of the users.
+Thus the access credentials are hidden.
+
+The hidden-decision property is also trivially achieved in our cryptographical 
+setting: a user requests a ciphertext, the storage provider does not learn 
+whether the user can decrypt it or not.
+Thus the access decisions are hidden.
+
+% XXX what properties do we need?
+The difficult property to achieve efficiently is the hidden-policy property.
+This means that no user shall learn anything about who else is authorized or 
+unauthorized to access a certain object.
+This can be solved by encrypting for every authorized user and sending them the 
+resultant ciphertext.
+This way no user can see whether another is granted access or not.
+The problem is that this scheme has a storage complexity linear in the number 
+of users: first one key per user and then one ciphertext per user.
+The computational complexity is also linear in the number of users as we have 
+to do one encryption per recipient.
+This paper focuses on finding a more efficient solution to this problem.
+
+
+% XXX focus on the scientific problem, why is this an important problem to 
+% solve?
+% XXX why is this not completely solved?
+% XXX we have simplicity, more performance?
+% XXX PE has more flexibility but less scalability
+\section{Related work}
+
 There are several \acp{DOSN} available, both as research projects and 
 implementations.
 Currently their \ac{AC} mechanisms focus on providing confidentiality for the 
 data.
-However, there is a lack of privacy for the \ac{AC} policies, meaning that 
-anyone can see who may access what data.
-\citet{predicateac} adapted predicate encryption for \ac{AC} and measured its 
-performance.
-In the present work, we continue along this line by exploring the benefits of 
-using \ac{ANOBE}.
-
-\subsection{\acs{DOSN} model}
-
-Distributed untrusted storage.
-The storage nodes run on top of Tor \cite{tor} as hidden services.
-
-All encrypted objects are world-readable.
-
-The profile-owner generates and distributes keys to all friends.
-
-A user can decrypt a ciphertext if her key satisfies the access policy.
-
-Each user has a private key for signing.
-
-\subsection{Our contributions}
+Unfortunately, this yields a lack of privacy as anyone can read the \ac{AC} 
+policies and see who may access what data.
 
 \dots
 
-\subsection{Paper outline}
+\citet{predicateac} adapted \ac{PE} for \ac{AC} and measured its performance.
+The storage complexity for keys are exponential for the \ac{PE} scheme, it 
+requires \(O(2^g)\), where \(g\) is the number of groups a user is a member of.
+The key size is also bound to the expressibility of the policy, e.g.~I can 
+estimate from the size of my key how many other individuals and groups are 
+accounted for in the policy.
 
-\dots
+The purpose of \ac{BE} \cite{broadcastenc} was to develop methods to 
+efficiently transmit data to a dynamically changing target audience \(S\) who 
+are allowed to read the data.
+This suits us well.
+However, most \ac{BE} schemes requires that the set \(S\) is revealed, it is 
+usually required for the members \(s\in S\) to know \(S\) for decryption.
+For this reason \citet{anobe} developed \ac{ANOBE}, where the goal is to allow 
+decryption without knowing \(S\).
+The complexity of the scheme is usually linear in the size of the recipient 
+set, i.e.~\(O(|S|)\), but some large constant factors make it expensive to use 
+straight away in practice.
 
-
-\section{Related work}
-
-\dots
-
-
-\section{Anonymous broadcast encryption}
+\subsection{Anonymous broadcast encryption}
 
 The main idea of \ac{ANOBE} is to distribute keys to to a subset of users, such 
 that they can decrypt the broadcast message but no one else can.
+Also, the users who can decrypt the broadcast message should not be able to 
+figure out who else can decrypt it and who cannot.
 This is a suitable mechanism for \ac{DOSN} as user updates are basically 
 broadcasts to all or a subset of friends in the network.
 
+% XXX do we need anonymity?
+% XXX can we make a trade-off which is good enough?
 \ac{ANOBE} was specifically designed to hide the recipient set.
 This is an important property as all ciphertexts are world-readable.
-If we did not have this property someone who is not an intended recipient can 
-learn who is a valid recipient, perhaps making that subset of users targets to 
-learn the broadcast data.
+If we did not have this property a user \(u\notin S\) who is not an intended 
+recipient can learn who is a valid recipient, perhaps making that subset \(S\) 
+of users targets to learn the broadcast data.
+It is also of interest that the privileged users \(s\in S\) cannot see who else 
+is in \(S\) either, because then that user might tell about the message to 
+\(u\notin S\) and blame a user \(s^\prime\in S\).
+Hence, if \(s\in S\) might be the only person to learn the broadcast message, 
+he might be discouraged to tell \(u\notin S\) as it would be obvious who told 
+\(u\).
 
-The \ac{ANOBE} scheme of \cite{anobe} \dots
+In the present work, we adapt \ac{ANOBE}, explore its advantages for 
+constructing an \ac{AC} scheme for \acp{DOSN} and we evaluate its performance.
 
 
+% XXX what's our approach?
+% XXX if we simplify like this, then we get these problems
 \section{Use in a \acs{DOSN}}
 
 There are several uses of \ac{ANOBE} in \acp{DOSN}.
@@ -97,21 +187,45 @@ First, there is the pull model: all friends pull updates from a user's profile.
 Second, there is the push model: the user pushes changes to all friends' 
 inboxes whenever something is updated in the profile.
 
-The \ac{PE} variant constructed in \cite{predicateac} is suitable for the pull 
-model, but not for the push model.
-However, an \ac{ANOBE} scheme can probably more easily be used in the push 
-model.
-(This relates at bit to FAFA.)
+The \ac{ANOBE} scheme probably has some advantage when used in the push model.
+(Generally a push model should be more privacy preserving.)
+We can use the push model instead of the anonymous tag-hint system suggested in 
+\cite{anobe}.
+We can use the anonymous tag-hint system in the pull model, which should be 
+used more rarely (users who are not subscribed, but rather do some casual 
+exploring).
 
+For performance reasons, we also look into a trade-off between using an 
+IND-CCA2 \ac{PKE} scheme and a semantically secure symmetric encryption scheme 
+in the \ac{ANOBE} construction.
+
+Furthermore, \ac{BE} is designed to broadcast a message to a dynamically 
+changing group.
+However, when we a new user \(u\) to the group in a \ac{DOSN} we might want to 
+give \(u\) access to old messages.
+Similarly, when we remove a user \(u^\prime\) from a group, we might want to 
+remove \(u^\prime\)'s access rights.
+We want to solve this as efficiently as possible, we do not want to reencrypt 
+everything when we add or remove a friend to or from our network.
+
+
+% no need to over-promise. Good synonyms for "looking at":            
+% investigating, exploring, evaluating, researching,
+% additionally, if in relation to something else: contrasting, comparing
 
 \section{Performance evaluation}
 
-\dots
+We compare the complexity of the different approaches and evaluate their 
+performance from different perspectives.
 
+From the publisher's (profile owner's) perspective, it is interesting to look 
+at the complexity of key-storage size and publication and encryption of new 
+material.
 
-\section{Conclusion}
-
-\dots
+From the subscriber's (friend's) perspective it is also interesting to look at 
+the complexity of key-storage size.
+It is also interesting to look at the complexity of aggregating the newest 
+published messages.
 
 
 \section*{Acknowledgements}
