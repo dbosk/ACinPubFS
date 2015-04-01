@@ -15,7 +15,7 @@ USE_BIBLATEX= 		yes
 
 anobe.pdf: anobe.tex anobe.bib llncs biblatex-lncs
 anobe.pdf: anobe-content.tex
-anobe.pdf: anon.bib crypto.bib surveillance.bib
+anobe.pdf: anon.bib crypto.bib meta.bib osn.bib surveillance.bib
 anobe.pdf: ac.acr crypto.acr surveillance.acr stdterm.acr
 
 makefiles libbib:
