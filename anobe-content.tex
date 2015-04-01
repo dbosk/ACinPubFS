@@ -18,9 +18,27 @@
 %\date{24th March 2015}
 
 \maketitle
-%\begin{abstract}
-%  \dots
-%\end{abstract}
+\begin{abstract}
+  Online social networks collect and store large amounts of private data.
+  Trusting too much data with third parties is a privacy risk.
+  For this reason \acp{DOSN} was proposed.
+  The current research on access control in \acp{DOSN} has focused on 
+  efficiently achieving confidentiality for data.
+  We focus on achieving efficient privacy-preserving access control mechanisms 
+  for the \ac{DOSN} setting, i.e.~hidden policies, hidden credentials and 
+  hidden decisions.
+  We leverage the \ac{DOSN} setting to adapt \ac{ANOBE} for better performance.
+  In this work we evaluate the privacy properties and the complexity of 
+  different trade-offs.
+
+  \keywords{%
+    decentralized online social networks,
+    access control,
+    distributed storage,
+    anonymous broadcast encryption,
+    hidden policies
+  }
+\end{abstract}
 
 \acresetall
 \section{Introduction}
@@ -28,12 +46,14 @@
 Online social networks collect and store large amounts of private data.
 Data mining is used to monetize these data through user profiling for directed 
 advertisements or selling to third parties.
-We have learned that government agencies, like the \ac{NSA} and \ac{GCHQ}, are 
-interested in the data found in such centralized storage \cite{prism}.
-We also know that this data is sensitive, even its meta-data, can tell a lot 
+We know that this data is sensitive, even its meta-data, and can tell a lot 
 about us \cite[e.g.][]{pregnancy}.
+We have later learned that government agencies, like the \ac{NSA} and 
+\ac{GCHQ}, are interested in the data found in such centralized storage 
+\cite{prism}.
 Keeping this data out of our own control is thus a risk for privacy violations.
-As a response to this, \acp{DOSN} have been suggested.
+These risks were considered already in 2009 and \acp{DOSN} were suggested 
+\cite[e.g.][]{peerson}.
 Among the benefits of these are that users can keep control of their data, 
 there is no central provider through which third parties (by force) can access 
 it, and it is more difficult to censor.
@@ -55,15 +75,18 @@ Previous research has already identified many pitfalls in this approach,
 e.g.~\cite{metadata}, thus the purpose is not to find pitfalls, but to find 
 efficient mechanisms which avoid them.
 
-In this extended abstract we describe our approach and the methodology used for 
-evaluating this approach.
+In this extended abstract we ourline our solution using \ac{ANOBE} and the 
+methodology for evaluating the different designs.
 In Sect.~\ref{sec:SystemModel} we describe our model, i.e.~the assumptions 
 about the underlying systems.
 In light of this model we present the problem in more detail in 
 Sect.~\ref{sec:ProblemStatement} and in Sect.~\ref{sec:RelatedWork} we present 
 related work.
-Section \ref{sec:ANOBE} outlines our solutions and Sect.~\ref{sec:Evaluation} 
-treats how we evaluate these.
+Section \ref{sec:ANOBE} gives an overview of the desirable properties of the 
+\ac{ANOBE} scheme \cite{anobe}, motivating our adoption for the \ac{DOSN} 
+setting.
+Section \ref{sec:Contribution} outlines our approach to solutions and 
+Sect.~\ref{sec:Evaluation} treats how we plan to evaluate these.
 
 
 \section{System Model}\label{sec:SystemModel}
@@ -110,7 +133,7 @@ each group a different version of the profile, e.g.~one for private relations
 and one for professional ones.
 
 
-\section{Access Control}\label{sec:ProblemStatement}
+\section{Problem Statement}\label{sec:ProblemStatement}
 
 The main aim of access control is to provide confidentiality for the user data.
 We want to allow only authorized users to read this data.
@@ -193,36 +216,37 @@ set, i.e.~\(O(|S|)\), but for the schemes in \cite{anobe} some large constant
 factors make them expensive to use straight away in practice.
 % XXX why is ANOBE expensive?
 
+\subsection{Anonymous Broadcast Encryption}\label{sec:ANOBE}
 
-\section{Anonymous Broadcast Encryption and \acsp{DOSN}}\label{sec:ANOBE}
-
-The main idea of \ac{ANOBE} is to distribute a key \(k\) to to a subset of 
-users, such that they can decrypt the broadcast message encrypted with \(k\) 
-but no one else can.
+The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
+such that they can decrypt the broadcast message encrypted with \(k\) but no 
+one else can.
 Also, the users who receive \(k\) should not be able to figure out who else 
 received \(k\) and who did not.
-This is a suitable mechanism for \ac{DOSN} as user updates are basically 
-broadcasts to all or a subset of friends in the network.
+This is a suitable mechanism for \ac{DOSN} as a user update is basically 
+a broadcast to all or a subset of friends in the network.
 
 % XXX do we need anonymity?
 % XXX can we make a trade-off which is good enough?
 The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
 This is an important property as all ciphertexts are world-readable.
-If we did not have this property a user \(u\notin S\) who is not an intended 
-recipient can learn who is a valid recipient, perhaps making that subset \(S\) 
-of users targets to learn the broadcast data.
+If we did not have this property, then a non-intended recipient \(u\notin S\) 
+can learn who is a valid recipient.
+If \(u\) learns the recipient set \(S\), then \(u\) might target the users in 
+\(S\) to learn the broadcast data.
 It is also of interest that the privileged users \(s\in S\) cannot see who else 
-is in \(S\) either, because then that user might tell about the message to 
-\(u\notin S\) and blame a user \(s^\prime\in S\).
-Hence, if \(s\in S\) might be the only person to learn the broadcast message, 
-he might be discouraged to tell \(u\notin S\) as he might be the only one to 
-blame.
+is in \(S\).
+In this case, that user \(s\) might tell \(u\notin S\) about the message and 
+blame a user \(s^\prime\in S\).
+But if \(s\in S\) might be the only person to learn the broadcast message, he 
+might be discouraged to tell \(u\) as he might be the only one to blame.
 %In the present work, we adapt \ac{ANOBE} and explore its advantages for 
 %constructing an access control scheme for \acp{DOSN}.
 
+
 % XXX what's our approach?
 % XXX if we simplify like this, then we get these problems
-\subsection{Use in a \acs{DOSN}}
+\section{Our Contribution}\label{sec:Contribution}
 
 There are several ways to distribute messages in \acp{DOSN}.
 We can broadly categorize them as either a pull or a push model.
@@ -247,35 +271,35 @@ when a user comes online.
 
 Furthermore, \ac{BE} is designed to broadcast a message to a dynamically 
 changing group.
-However, when we a new user \(u\) is added to the group, we might want to give 
+However, when a new user \(u\) is added to the group, we might want to give 
 \(u\) access to old messages.
 Similarly, when we remove a user \(u^\prime\) from a group, we might want to 
-remove \(u^\prime\)'s access rights.
-We want to solve this as efficiently as possible, we do not want to reencrypt 
+remove the access rights of \(u^\prime\).
+We want to solve this as efficiently as possible, we do not want to re-encrypt 
 unnecessarily much when we add or remove a friend to or from our network.
 
-
+\subsection{Evaluation}\label{sec:Evaluation}
 % no need to over-promise. Good synonyms for "looking at":            
 % investigating, exploring, evaluating, researching,
 % additionally, if in relation to something else: contrasting, comparing
 
+To evaluate our work, we first apply the \ac{ANOBE} scheme without 
+modifications in our access control setting.
+We evaluate its performance and compare that to the constructions mentioned as 
+related work (Sect.~\ref{sec:RelatedWork}).
+We then adapt the \ac{ANOBE} scheme to improve performance in the \ac{DOSN} 
+context.
+We prove the security properties of our constructions and evaluate their 
+complexity.
 
-\section{Evaluation}\label{sec:Evaluation}
-
-To evaluate our work, we show that we do not reduce the security of the 
-mechanisms we adapt, and in the cases we do, we show by how much we reduce 
-security.
-We also compare the complexity of the different approaches and their 
-performance from two perspectives: the publisher's (profile owner's) and the 
-subscriber's (friend's).
-
-From the publisher's perspective it is interesting to look at the complexity of 
-key-storage size, communication complexity for publication and time complexity 
-for encryption of new material.
-
-From the subscriber's perspective it is interesting to look at the complexity 
-of key-storage size and the time-complexity of aggregating the newest published 
-messages.
+The complexity is interesting to evaluate from two perspectives: the 
+publisher's (profile owner's) and the subscriber's (friend's).
+From the publisher's perspective it is interesting to investigate the 
+complexity of key-storage size, communication complexity for publication and 
+time complexity for encryption of new material.
+From the subscriber's perspective the complexity of key-storage size and the 
+time-complexity of aggregating the newest published messages are the most 
+interesting aspects.
 
 
 \subsubsection{Acknowledgements}
