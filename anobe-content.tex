@@ -27,7 +27,7 @@ decentralized structure opens up for other risks---even when data is encrypted.
 
 The current research on access control in \acp{DOSN} has focused on 
 efficiently achieving confidentiality for data.
-Although the data receives privacy, the access-control stuctures and patterns 
+Although the data receives privacy, the access-control structures and patterns 
 do not.
 We focus on achieving efficient privacy-preserving access control mechanisms 
 for the \ac{DOSN} setting, i.e.~hidden policies, hidden credentials and 
@@ -36,26 +36,26 @@ hidden decisions.
 %(the policy), who wants to access an object (the credential) or whether 
 %a subject is granted access to an object or not (the decision).
 
-We leverage the \ac{DOSN} setting to adapt \ac{ANOBE} for better performance.
+We use the \ac{DOSN} setting to adapt \acl{ANOBE} for better performance.
 There are some properties of the underlying distributed storage structure which 
-can be leveraged for better efficiency and privacy properties.
+can be utilized for better efficiency and privacy properties.
 However, there is usually a trade-off between privacy and efficiency.
 In this work we evaluate the privacy properties and the complexity of different 
 trade-offs.
-One trade-off we explore is to leverage the push model for a replacement of the 
-storage expensive anonymous tag-hint system suggested for \ac{ANOBE}.
+One trade-off we explore is to use the push model for a replacement of the 
+storage expensive anonymous tag-hint system suggested for \acl{ANOBE}.
 This way a subscriber knows which ciphertext is meant for her, since all 
 ciphertexts pushed to her inbox are for her.
 This has the further advantage of hiding the size of the recipient set.
 
 Another trade-off investigated is to use a semantically secure symmetric cipher 
-instead of an IND-CCA2 \ac{PKE}.
-The original \ac{ANOBE} scheme was constructed for an IND-CCA2 \ac{PKE} scheme, 
-but to scale better for \acp{DOSN} we look into using a less computationally 
-complex scheme, like a semantically secure symmetric cipher.
+instead of an IND-CCA2 \acl{PKE}.
+The original \acl{ANOBE} scheme was constructed for an IND-CCA2 \acl{PKE} 
+scheme, but to scale better for \acp{DOSN} we look into using a less 
+computationally complex scheme, like a semantically secure symmetric cipher.
 
 There are also other problems to consider.
-For example, \ac{BE} was designed to broadcast a message to a dynamically 
+For example, \acl{BE} was designed to broadcast a message to a dynamically 
 changing group.
 As such, changing access policies for already existing objects requires only 
 one re-encryption of the object and a re-broadcast to the new set of authorized 
