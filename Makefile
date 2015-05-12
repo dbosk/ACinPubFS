@@ -23,7 +23,9 @@ makefiles libbib:
 
 ### INCLUDES ###
 
-include libbib/libbib.mk
-include makefiles/depend.mk
-include makefiles/tex.mk
-include makefiles/pub.mk
+INCLUDE_MAKEFILES=makefiles
+include ${INCLUDE_MAKEFILES}/tex.mk
+include ${INCLUDE_MAKEFILES}/pub.mk
+
+INCLUDE_LIBBIB=libbib
+include ${INCLUDE_LIBBIB}/libbib.mk
