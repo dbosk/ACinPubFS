@@ -6,3 +6,7 @@
 	path = libbib
 	url = git@priv-git.csc.kth.se:utilities/libbib.git
 	branch = master
+[submodule "biblatex-lncs"]
+	path = biblatex-lncs
+	url = https://github.com/neapel/biblatex-lncs.git
+	branch = master
