@@ -1,11 +1,12 @@
-\documentclass{llncs}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{fixltx2e}
 \usepackage[british]{babel}
+
 \usepackage[strict]{csquotes}
-\usepackage[hyphens]{url}
-\usepackage[hidelinks]{hyperref}
+\MakeBlockQuote{<}{|}{>}
+\EnableQuotes
+
 \usepackage[natbib,style=lncs,backend=biber]{biblatex}
 \addbibresource{anobe.bib}
 \addbibresource{anon.bib}
@@ -14,13 +15,11 @@
 \addbibresource{osn.bib}
 \addbibresource{surveillance.bib}
 
-\usepackage{prettyref}
-\usepackage{varioref}
-
-\usepackage{enumitem}
+%\usepackage{enumitem}
 
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{amsthm}
 % crypto
 \DeclareMathOperator{\Sign}{\mathrm{Sign}}
 \DeclareMathOperator{\Enc}{\mathrm{Enc}}
@@ -45,9 +44,3 @@
 \input{crypto.acr}
 \input{surveillance.acr}
 \input{stdterm.acr}
-
-%\pagestyle{plain}
-
-\begin{document}
-\input{anobe-content.tex}
-\end{document}
