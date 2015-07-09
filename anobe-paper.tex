@@ -1,30 +1,14 @@
-\documentclass{llncs}
+\documentclass[a4paper,draft]{llncs}
+\pagestyle{plain}
 
 \usepackage[hyphens]{url}
 \usepackage[hidelinks]{hyperref}
 
-% XXX bug: should use noamsthm and notheorem instead
-\makeatletter
-\let\proof\relax
-\let\endproof\relax
-\let\theorem\relax
-\let\endtheorem\relax
-\let\c@theorem\relax
-\let\corollary\relax
-\let\endcorollary\relax
-\let\lemma\relax
-\let\endlemma\relax
-\let\problem\relax
-\let\endproblem\relax
-\let\solution\relax
-\let\endsolution\relax
-\let\definition\relax
-\let\enddefinition\relax
-\let\example\relax
-\let\endexample\relax
-\makeatother
+\input{anobe-preamble.tex}
 
-\usepackage{beamerarticle}
+\usepackage[noamsthm,notheorems]{beamerarticle}
 \setjobnamebeamerversion{anobe-slides}
 
-\input{anobe.tex}
+\begin{document}
+\include{anobe-content}
+\end{document}
