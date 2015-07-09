@@ -5,19 +5,27 @@
 }
 \author{%
   Daniel Bosk \and
-%  Oleksandr Bodriagov \and
-%  Gunnar Kreitz \and
   Sonja Buchegger
 }
 \institute{%
   School of Computer Science and Communication\\
   KTH Royal Institute of Technology, Stockholm, Sweden\\
-  %Email: \email{\{dbosk,obo,gkreitz,buc\}@kth.se}%
   Email: \email{\{dbosk,buc\}@kth.se}%
 }
 %\date{24th March 2015}
 
-\maketitle
+\mode<presentation>{%
+  \begin{frame}<presentation>
+    \titlepage{}
+  \end{frame}
+  \begin{frame}<presentation>{Overview}
+    \tableofcontents
+  \end{frame}
+}
+\mode<article>{\maketitle}
+
+\mode* % required for slides to compile without non-frame text
+
 \begin{abstract}
   Online social networks collect and store large amounts of private data.
   Trusting too much data with third parties is a privacy risk.
@@ -40,14 +48,47 @@
   }
 \end{abstract}
 
-\acresetall
+\acresetall{}
 \section{Introduction}
+
+\subsection<presentation>{Problem Setting}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item \acp{OSN} collect and store large amounts of private data.
+
+    \item This data can reveal sensitive information.
+
+    \item Even its meta-data can reveal a lot of information.
+
+    \item Keeping this data out of our own control is thus a risk for privacy 
+      violations.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item In our work we want to decentralize the \ac{OSN}
+      \begin{itemize}
+        \item to get away from a central provider,
+        \item to keep the users in control of their data.
+      \end{itemize}
+
+    \item This way the users will control their data.
+
+    %\item The system gets increased censorship resistance.
+
+  \end{itemize}
+\end{frame}
 
 Online social networks collect and store large amounts of private data.
 Data mining is used to monetize these data through user profiling for directed 
 advertisements or selling to third parties.
 We know that this data is sensitive, even its meta-data, and can tell a lot 
-about us \cite[e.g.][]{pregnancy}.
+about us~\cite[e.g.][]{pregnancy}.
 We have later learned that government agencies, like the \ac{NSA} and 
 \ac{GCHQ}, are interested in the data found in such centralized storage 
 \cite{prism}.
@@ -66,7 +107,7 @@ data.
 There are several approaches to implementations: relying on a \ac{TTP} is one, 
 using cryptographic mechanisms is another.
 Centralized \acp{OSN} is one example of using a \ac{TTP}, and the Snowden 
-revelations \cite{prism} have proved that a risk.
+revelations~\cite{prism} have proved that a risk.
 Cryptography is one way to remove this need for trust.
 This way anyone may read the encrypted data and we can be sure only those to 
 whom we have given keys can read it.
@@ -82,15 +123,31 @@ about the underlying systems.
 In light of this model we present the problem in more detail in 
 Sect.~\ref{sec:ProblemStatement} and in Sect.~\ref{sec:RelatedWork} we present 
 related work.
-Section \ref{sec:ANOBE} gives an overview of the desirable properties of the 
-\ac{ANOBE} scheme \cite{anobe}, motivating our adoption for the \ac{DOSN} 
+Section~\ref{sec:ANOBE} gives an overview of the desirable properties of the 
+\ac{ANOBE} scheme~\cite{anobe}, motivating our adoption for the \ac{DOSN} 
 setting.
-Section \ref{sec:Contribution} outlines our approach to solutions and 
+Section~\ref{sec:Contribution} outlines our approach to solutions and 
 Sect.~\ref{sec:Evaluation} treats how we plan to evaluate these.
 
 
-\section{System Model}\label{sec:SystemModel}
+\mode<presentation>{\subsection{System Model}}
+\mode<article>{\section{System Model}\label{sec:SystemModel}}
 
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item We assume there exists a distributed storage system:
+      \begin{itemize}
+        \item All users can create new objects.
+        \item Any user can read any object.
+        \item Only the owner can modify an object.
+        \item An owner can optionally allow others to append.
+      \end{itemize}
+
+    \item Since it's distributed we have a set of distributed storage nodes.
+
+  \end{itemize}
+\end{frame}
 For this work, we make some assumptions about the mechanisms available in the 
 \ac{DOSN}.
 First, we assume that there exists a distributed storage scheme with some 
@@ -106,19 +163,37 @@ are world-readable.
 Further, only the owner of an object can modify it, but we also have an append 
 operation which is available to all users knowing the name of the object.
 
+%\begin{frame}<presentation>
+%  \begin{itemize}
+%
+%    \item We also assume that we can anonymize the users and storage nodes.
+%
+%    \item This can be accomplished using e.g.~Tor.
+%
+%  \end{itemize}
+%\end{frame}
 Second, the underlying communication is run on top of an anonymization 
 network.
 This can be accomplished by running the storage nodes as Tor hidden services 
 \cite{tor}.
 This way we assume that the users and storage node operators remain anonymous.
 
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item The users have limited trust in the storage nodes.
+
+    \item We trust the storage nodes to keep \enquote{something} online.
+
+  \end{itemize}
+\end{frame}
 Also the users have limited trust in the storage nodes.
 We can trust that the storage node will have the data available 
 \cite{dataavailability,replicaplacement}, but we do not want to trust the node 
 more than that.
 We assume that users and storage nodes set up some scheme for (possibly 
 anonymous) authentication when they agree on the \enquote{storage contract} for 
-replica placement \cite{replicaplacement}.
+replica placement~\cite{replicaplacement}.
 We can use cryptographic mechanisms to ensure integrity of the data, i.e.~that 
 we can detect if the data is modified by someone else than the owner.
 We can use the signature scheme to detect changes to an object made by someone 
@@ -135,6 +210,36 @@ and one for professional ones.
 
 \section{Problem Statement}\label{sec:ProblemStatement}
 
+\mode<presentation>{\subsection{Access Control}}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item The main aim of \ac{AC} is to provide confidentiality for the user 
+      data.
+
+    \item Remember, we do not trust the storage to enforce \ac{AC}.
+
+    \item So we rely on cryptography instead.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item But simply encrypting the data and sharing keys with authorized 
+      people is not good enough.
+
+    \item This doesn't reveal the data itself, but reveals meta-data, e.g.:
+      \begin{itemize}
+        \item who may access what,
+        \item who does access what.
+      \end{itemize}
+
+  \end{itemize}
+\end{frame}
+
 The main aim of access control is to provide confidentiality for the user data.
 We want to allow only authorized users to read this data.
 Due to our given setting we must construct this access control mechanism 
@@ -147,6 +252,34 @@ They also conjectured that these were sufficient.
 % XXX what's the problem?
 We want these properties in our scheme.
 
+\mode<presentation>{\subsection{Privacy-Preserving Access Control}}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item There are three properties we want:
+      \begin{itemize}
+        \item Hidden-Credentials,
+        \item Hidden-Policies,
+        \item Hidden-Decisions.
+      \end{itemize}
+
+  \end{itemize}
+\end{frame}
+
+%\begin{frame}<presentation>
+%  \begin{itemize}
+%
+%    \item We can achieve Hidden-Credentials since we use crypto.
+%
+%    \item I'm allowed to access the object if I have a key which can decrypt 
+%      it.
+%
+%    \item This will not reveal the credential to the storage node.
+%
+%  \end{itemize}
+%\end{frame}
+
 The hidden-credentials property is trivially achieved in our cryptographic 
 setting: the user's secret key serves as a credential to allow access.
 As all users who know the name of an object can read it and every user is 
@@ -154,10 +287,36 @@ anonymous, then there is no need for a user to show any type of credential to
 the storage provider and the storage provider cannot identify any of the users.
 Thus the access credentials are hidden.
 
+%\begin{frame}<presentation>
+%  \begin{itemize}
+%
+%    \item We similarly achieve Hidden-Decisions.
+%
+%    \item The storage node cannot tell if the \ac{AC} decision is positive or 
+%      negative.
+%
+%    \item As I alone know if I can decrypt or not.
+%
+%  \end{itemize}
+%\end{frame}
+
 The hidden-decisions property is also trivially achieved in our cryptographic 
 setting: a user requests a ciphertext, the storage provider does not learn 
 whether the user can decrypt it or not.
 Thus the access decisions are hidden.
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item The last property is the Hidden-Policies.
+      
+    \item This requires that there is no \ac{ACL} indicating who can decrypt.
+
+    \item This is a problem we need to solve, since it requires a lot of 
+      computation doing trial-and-error to see if I can decrypt or not.
+
+  \end{itemize}
+\end{frame}
 
 % XXX what properties do we need?
 The last property, hidden policies, states that no user shall learn anything 
@@ -180,13 +339,15 @@ Our work focuses on finding a more efficient solution to this problem.
 % XXX why is this not completely solved?
 % XXX we have simplicity, more performance?
 % XXX PE has more flexibility but less scalability
+\mode<article>{%
 \section{Related Work}\label{sec:RelatedWork}
+}
 
 There are several proposals for \acp{DOSN} available, e.g.~DECENT
-\cite{decent}, Cachet \cite{cachet} and Persona \cite{persona}.
+\cite{decent}, Cachet~\cite{cachet} and Persona~\cite{persona}.
 Their access control mechanisms focus on providing confidentiality for the 
 data.
-They use \ac{ABE} \cite{abe} to implement the access control mechanism.
+They use \ac{ABE}~\cite{abe} to implement the access control mechanism.
 Unfortunately, this yields a lack of privacy as \ac{ABE} is not policy-hiding, 
 thus anyone can read the access control policies and see who may access what 
 data.
@@ -200,23 +361,25 @@ The key size is also bound to the expressibility of the policy, e.g.~I can
 estimate from the size of my key how many other individuals and groups are 
 accounted for in the policy.
 
-The purpose of \ac{BE} \cite{broadcastenc} was to develop methods to 
+The purpose of \ac{BE}~\cite{broadcastenc} was to develop methods to 
 efficiently transmit data to a dynamically changing target audience \(S\) who 
 are allowed to read the data.
 This suits our purposes well.
 However, most \ac{BE} schemes requires that the set \(S\) is revealed, it is 
 usually required for the members \(s\in S\) to know \(S\) for decryption.
 \citet{gunther2012cryptographic} adapts a \ac{BE} scheme using pseudonyms, but 
-pseudonyms yield a limited anonymity property \cite{gunther2012cryptographic}.
+pseudonyms yield a limited anonymity property~\cite{gunther2012cryptographic}.
 
 Due to the limitation of \ac{BE} schemes, \citet{anobe} developed \ac{ANOBE}, 
 where the goal is to allow decryption without knowing \(S\).
 The complexity of the scheme is usually linear in the size of the recipient 
-set, i.e.~\(O(|S|)\), but for the schemes in \cite{anobe} some large constant 
+set, i.e.~\(O(|S|)\), but for the schemes in~\cite{anobe} some large constant 
 factors make them expensive to use straight away in practice.
 % XXX why is ANOBE expensive?
 
+\mode<article>{%
 \subsection{Anonymous Broadcast Encryption}\label{sec:ANOBE}
+}
 
 The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
 such that they can decrypt the broadcast message encrypted with \(k\) but no 
@@ -248,6 +411,18 @@ might be discouraged to tell \(u\) as he might be the only one to blame.
 % XXX if we simplify like this, then we get these problems
 \section{Our Contribution}\label{sec:Contribution}
 
+\mode<presentation>{\subsection{The Scheme}}
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item We adapt \ac{ANOBE} to hide the policy.
+
+    \item \ac{ANOBE} as it is, is inefficient.
+
+  \end{itemize}
+\end{frame}
+
 There are several ways to distribute messages in \acp{DOSN}.
 We can broadly categorize them as either a pull or a push model.
 In the pull model, all friends actively pull updates from a user's profile, 
@@ -258,8 +433,28 @@ This can be implemented by each user having a designated inbox for such
 notifications.
 
 We explore how we can use the push model as a replacement for the (storage 
-expensive) anonymous tag-hint system suggested in \cite{anobe} to make 
+expensive) anonymous tag-hint system suggested in~\cite{anobe} to make 
 decryption more efficient.
+
+\begin{frame}<presentation>
+  \begin{itemize}
+
+    \item We investigate how we can use different strategies for delivering 
+      messages to make \ac{ANOBE} more efficient:
+      \begin{itemize}
+        \item push-model,
+        \item pull-model.
+      \end{itemize}
+
+    \item \ac{ANOBE} relies on IND-CCA2 public-key encryption.
+
+    \item We also investigate in which situations we can replace it with 
+      a semantically secure symmetric scheme.
+
+    \item This would be one chance for making it more efficient.
+
+  \end{itemize}
+\end{frame}
 
 For performance reasons, we also look into a trade-off between using an 
 IND-CCA2 \ac{PKE} scheme and a semantically secure symmetric encryption scheme 
@@ -268,6 +463,19 @@ The reason for this is that symmetric decryption is faster than asymmetric
 decryption.
 This is an important factor for \acp{DOSN} during e.g.~news-feed aggregation 
 when a user comes online.
+
+\begin{frame}<presentation>
+  \begin{itemize}
+    \item \ac{BE} was designed for broadcasting a message to a dynamically 
+      changing group.
+
+    \item In these schemes any recipient can see who else can also decrypt the 
+      message.
+
+    \item The \ac{ANOBE} scheme removes this part, adding anonymity.
+
+  \end{itemize}
+\end{frame}
 
 Furthermore, \ac{BE} is designed to broadcast a message to a dynamically 
 changing group.
@@ -278,7 +486,9 @@ remove the access rights of \(u^\prime\).
 We want to solve this as efficiently as possible, we do not want to re-encrypt 
 unnecessarily much when we add or remove a friend to or from our network.
 
+\mode<article>{%
 \subsection{Evaluation}\label{sec:Evaluation}
+}
 % no need to over-promise. Good synonyms for "looking at":            
 % investigating, exploring, evaluating, researching,
 % additionally, if in relation to something else: contrasting, comparing
@@ -302,7 +512,9 @@ time-complexity of aggregating the newest published messages are the most
 interesting aspects.
 
 
-\subsubsection{Acknowledgements}
+\mode<article>{%
+\subsubsection{\ackname}
+}
 
 This work is based on the initial ideas of Oleksandr Bodriagov and Gunnar 
 Kreitz.
@@ -311,4 +523,12 @@ FFL09-0086 and the Swedish Research Council grand VR 2009-3793.
 Finally, we would like to thank the anonymous reviewer for valuable feedback.
 
 
-\printbibliography
+%\begin{frame}<presentation>
+%\printbibliography
+%\end{frame}
+
+\begin{frame}<presentation>
+  \begin{center}
+    Questions?
+  \end{center}
+\end{frame}
