@@ -16,17 +16,18 @@ USE_BIBLATEX= 		yes
 .PHONY: all
 all: anobe-paper.pdf anobe-slides.pdf
 
-anobe-paper.pdf: anobe-paper.tex anobe.tex anobe.bib
-anobe-paper.pdf: llncs biblatex-lncs
-anobe-paper.pdf: anobe-content.tex
-anobe-paper.pdf: anon.bib crypto.bib meta.bib osn.bib surveillance.bib
-anobe-paper.pdf: ac.acr crypto.acr surveillance.acr stdterm.acr
+ANOBE_DEPENDS= 		anobe-content.tex anobe.bib
+ANOBE_DEPENDS+= 	anon.bib
+ANOBE_DEPENDS+= 	crypto.bib crypto.acr
+ANOBE_DEPENDS+= 	meta.bib osn.bib
+ANOBE_DEPENDS+= 	surveillance.bib surveillance.acr
+ANOBE_DEPENDS+= 	ac.acr ac.bib
+ANOBE_DEPENDS+= 	stdterm.acr
 
-anobe-slides.pdf: anobe-slides.tex anobe.tex anobe.bib
-anobe-slides.pdf: llncs biblatex-lncs
-anobe-slides.pdf: anobe-content.tex
-anobe-slides.pdf: anon.bib crypto.bib meta.bib osn.bib surveillance.bib
-anobe-slides.pdf: ac.acr crypto.acr surveillance.acr stdterm.acr
+anobe-paper.pdf: anobe-paper.tex ${ANOBE_DEPENDS}
+anobe-paper.pdf: llncs biblatex-lncs
+
+anobe-slides.pdf: anobe-slides.tex ${ANOBE_DEPENDS}
 
 makefiles libbib:
 	git submodule update --init $@
