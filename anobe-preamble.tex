@@ -2,10 +2,12 @@
 \usepackage[T1]{fontenc}
 \usepackage{fixltx2e}
 \usepackage[british]{babel}
+\usepackage[defblank]{paralist}
+\usepackage[fulladjust]{marginnote}
 
 \usepackage[strict]{csquotes}
-\MakeBlockQuote{<}{|}{>}
-\EnableQuotes
+%\MakeBlockQuote{|}{§}{|}
+%\EnableQuotes{}
 
 \usepackage[natbib,style=lncs,backend=biber]{biblatex}
 \addbibresource{anobe.bib}
@@ -15,6 +17,7 @@
 \addbibresource{osn.bib}
 \addbibresource{surveillance.bib}
 \addbibresource{ac.bib}
+\addbibresource{rfc.bib}
 
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -28,8 +31,8 @@
 
 % general maths
 \newcommand{\ord}[1]{|#1|}
-\DeclareMathOperator{\Z}{\mathbb Z}
-\DeclareMathOperator{\K}{\mathcal K}
+\DeclareMathOperator{\Z}{\mathbb{Z}}
+\DeclareMathOperator{\K}{\mathcal{K}}
 \DeclareMathOperator{\textand}{\qquad and\qquad}
 
 % Galois fields (finite fields)

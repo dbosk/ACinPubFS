@@ -23,6 +23,7 @@ ANOBE_DEPENDS+= 	meta.bib osn.bib
 ANOBE_DEPENDS+= 	surveillance.bib surveillance.acr
 ANOBE_DEPENDS+= 	ac.acr ac.bib
 ANOBE_DEPENDS+= 	stdterm.acr
+ANOBE_DEPENDS+= 	rfc.bib
 
 anobe-paper.pdf: anobe-paper.tex ${ANOBE_DEPENDS}
 anobe-paper.pdf: llncs biblatex-lncs
