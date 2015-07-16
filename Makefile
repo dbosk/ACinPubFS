@@ -10,19 +10,14 @@ PUB_SERVER-sys= 	sftp.sys.kth.se
 PUB_METHOD-sys= 	ssh
 PUB_DIR-sys= 		~/public_html
 
-USE_LATEXMK= 		yes
-USE_BIBLATEX= 		yes
-
 .PHONY: all
 all: anobe-paper.pdf anobe-slides.pdf
 
 ANOBE_DEPENDS= 		anobe-content.tex anobe.bib
-ANOBE_DEPENDS+= 	anon.bib
-ANOBE_DEPENDS+= 	crypto.bib crypto.acr
-ANOBE_DEPENDS+= 	meta.bib osn.bib
-ANOBE_DEPENDS+= 	surveillance.bib surveillance.acr
-ANOBE_DEPENDS+= 	ac.acr ac.bib
-ANOBE_DEPENDS+= 	stdterm.acr
+ANOBE_DEPENDS+= 	libbib.sty
+ANOBE_DEPENDS+= 	anon.bib crypto.bib
+ANOBE_DEPENDS+= 	meta.bib surveillance.bib osn.bib
+ANOBE_DEPENDS+= 	ac.bib
 ANOBE_DEPENDS+= 	rfc.bib
 
 anobe-paper.pdf: anobe-paper.tex ${ANOBE_DEPENDS}

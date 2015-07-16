@@ -9,6 +9,8 @@
 %\MakeBlockQuote{|}{§}{|}
 %\EnableQuotes{}
 
+\usepackage[crypto,stdmaths,algebra,ac,surveillance,stdterm]{libbib}
+
 \usepackage[natbib,style=lncs,backend=biber]{biblatex}
 \addbibresource{anobe.bib}
 \addbibresource{anon.bib}
@@ -22,27 +24,5 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 %\usepackage{amsthm}
-% crypto
-\DeclareMathOperator{\Sign}{\mathrm{Sign}}
-\DeclareMathOperator{\Enc}{\mathrm{Enc}}
-\DeclareMathOperator{\Dec}{\mathrm{Dec}}
-\DeclareMathOperator{\Hash}{\mathrm{Hash}}
-\DeclareMathOperator{\MAC}{\mathrm{MAC}}
-
-% general maths
-\newcommand{\ord}[1]{|#1|}
-\DeclareMathOperator{\Z}{\mathbb{Z}}
-\DeclareMathOperator{\K}{\mathcal{K}}
-\DeclareMathOperator{\textand}{\qquad and\qquad}
-
-% Galois fields (finite fields)
-\DeclareMathOperator{\GF}{\mathrm{GF}}
-\DeclareMathOperator{\F}{\mathbb{F}}
 
 \usepackage[binary,amssymb]{SIunits}
-
-\usepackage{acronym}
-\input{ac.acr}
-\input{crypto.acr}
-\input{surveillance.acr}
-\input{stdterm.acr}
