@@ -118,26 +118,26 @@ there is no central provider through which third parties (by force) can access
 it, and it is more difficult to censor.
 However, such systems require more research to ensure security and privacy, as 
 the decentralized structure opens up for other risks---even when data is 
-encrypted~\cite{metadata}.
+encrypted~\cite{DevilInMetadata}.
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
 The main aim of \ac{AC} is to provide confidentiality for the user data.
 There are several approaches to implementations, the classical approach is to 
 rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}.
-Centralized \acp{OSN} is one example of using a \ac{TTP}, and the Snowden 
-revelations~\cite{prism} have proved that a risk.
+Centralized \acp{OSN} such as Facebook or Google+ are examples of using 
+a \ac{TTP}, and the Snowden revelations~\cite{prism} have proved that a risk.
 Another way to implement the reference monitor is through cryptography.
-With cryptography we can remove the need for trust.
-This way anyone may read the encrypted data and we can be sure only those to 
-whom we have given the proper keys can read it.
+With cryptography we remove the need for trust.
+This way anyone may read the encrypted data and we can be sure that only those 
+to whom we have given the proper keys can read it.
 This is the approach we explore in this paper.
 Previous research has already identified many pitfalls in this approach, 
-e.g.~\cite{metadata}, thus the purpose is not to find pitfalls, but to find 
-efficient mechanisms which avoid them.
+e.g.~\cite{DevilInMetadata}, thus the purpose is not to find pitfalls, but to 
+find efficient mechanisms to avoid them.
 
 \citet{TowardsPPACwHPHCHD} identified three desirable properties for 
-a privacy-preserving \ac{AC} mechanism and they also conjectured that these are 
+a privacy-preserving \ac{AC} mechanism, they also conjectured that these are 
 sufficient.
 The properties are:
 \begin{description}
@@ -152,13 +152,7 @@ The properties are:
     access decision, but the policy is still enforced.
 \end{description}
 
-\subsection{Problem Statement}\label{sec:ProblemStatement}
-% XXX Improve the problem statement
-% - Clearly describe the problem before any solution
-% - What functional and security properties do we want?
-% - What properties do we need?
-%   - Do we need anonymity?
-%   - Can we make a trade-off which is good enough?
+\subsection{Our Contributions}
 \mode<presentation>{%
 \begin{frame}
   \begin{itemize}
@@ -189,24 +183,26 @@ The properties are:
 \end{frame}
 }
 
+% XXX Improve the problem statement
+% - Clearly describe the problem before any solution
+% - What functional and security properties do we want?
+% - What properties do we need?
+%   - Do we need anonymity?
+%   - Can we make a trade-off which is good enough?
 As mentioned above, we want to create an \ac{AC} mechanism for a decentralized 
 storage system, with minimal trust in other entities.
-Naturally, the first property we want is confidentiality.
+Naturally, the first property we want is confidentiality for the data.
 Beyond confidentiality, we want the \ac{AC} mechanism to provide the 
 privacy-preserving properties given above:
 \begin{inparablank}
-\item hidden credentials,
-\item hidden policies, and
+\item hidden policies,
+\item hidden credentials, and
 \item hidden decisions.
 \end{inparablank}
 
-\subsection{Our Contributions}
-
-\marginnote{\raggedright%
-  This is just a place-holder, it needs to be totally rewritten.
-}
-% XXX Rewrite the paper outline!
-% - Make it part of the contributions
+% XXX Write an overview of our contributions and outline the paper
+% - We have simplicity, more performance?
+% - What are the benefits of our scheme?
 In this extended abstract we outline our solution using \ac{ANOBE} and the 
 methodology for evaluating the different designs.
 In Sect.~\ref{sec:SystemModel} we describe our model, i.e.~the assumptions 
@@ -221,59 +217,109 @@ Section~\ref{sec:Contribution} outlines our approach to solutions and
 Sect.~\ref{sec:Evaluation} treats how we plan to evaluate these.
 
 
-% XXX Why is the problem not completely solved yet?
-% - We have simplicity, more performance?
-% - PE has more flexibility but less scalability
 \section{Related Work}\label{sec:RelatedWork}
-
-The work of \citet{TowardsPPACwHPHCHD} focused on a general solution which 
-built on fully homomorphic encryption.
-As such, the scheme is not yet practically feasible.
-However, there is a body of work which is practically feasible.
+% XXX Add a summarizing intro paragraph to Related Work
+The work of \citet{TowardsPPACwHPHCHD} focused on a general solution for 
+privacy-preserving \ac{AC}.
+They built their solution on fully homomorphic encryption, and, as such, the 
+scheme is not yet practically feasible.
+However, there is also a body of work which is practically feasible and applied 
+in our setting.
 There are several proposals for \acp{DOSN} available, e.g.~DECENT
 \cite{decent}, Cachet~\cite{cachet} and Persona~\cite{persona}.
 Their \ac{AC} mechanisms focus on providing confidentiality for the 
 data.
-They use \ac{ABE}~\cite{abe} to implement the \ac{AC} mechanism.
-Unfortunately, this yields a lack of privacy as \ac{ABE} is not policy-hiding, 
-thus anyone can read the \ac{AC} policies and see who may access what 
-data.
+For this they use \ac{ABE}~\cite{abe} to implement the \ac{AC} mechanism.
+Unfortunately, this yields lacking privacy as \ac{ABE} is not policy-hiding, 
+thus anyone can read the \ac{AC} policies and see who may access what data.
 
-\citet{predicateac} adapted \ac{PE} for the \ac{AC} mechanism.
+\citet{predicateac} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
 % XXX What properties did the PE scheme achieve?
 The scheme achieved properties X.
+% XXX What are the problems with the PE scheme?
+% - More flexibility but less scalability?
 The storage complexity for keys is exponential for the \ac{PE} scheme, it 
 requires \(O(2^g)\) keys, where \(g\) is the number of groups a user is 
 a member of.
 The key size is also bound to the expressibility of the policy, e.g.\ I can 
 estimate from the size of my key how many other individuals and groups are 
 accounted for in the policy.
+As this scheme reveals such meta-information, it is not satisfactory.
+
+\subsection{Broadcast Encryption}\label{sec:BE}
 
 The purpose of \ac{BE}~\cite{broadcastenc} was to develop methods to 
-efficiently transmit data to a dynamically changing target audience \(S\) who 
-are allowed to read the data.
-This suits our purposes well.
-However, most \ac{BE} schemes requires that the set \(S\) is revealed as it is 
-required for the members \(s\in S\) to know \(S\) for decryption.
-\citet{gunther2012cryptographic} adapts a \ac{BE} scheme using pseudonyms, but 
+efficiently transmit data to a dynamically changing target audience 
+\(S\subseteq U\) who are allowed to read the data, whereas the remaining users 
+\(U\setminus S\) are not.
+This fits our use-case well.
+However, most research in \ac{BE} has focused on efficiency and not privacy.
+Thus schemes usually require that the set \(S\) is revealed as it is required 
+for the members \(s\in S\) to know \(S\) for decryption.
+\citet{gunther2012cryptographic} adapted a \ac{BE} scheme using pseudonyms, but 
 pseudonyms yield a limited anonymity property~\cite{gunther2012cryptographic}.
-
-Due to the limitation of \ac{BE} schemes, \citet{anobe} developed \ac{ANOBE}, 
+Due to this limitation of \ac{BE} schemes, \citet{anobe} developed \ac{ANOBE}, 
 where the goal is to allow decryption without knowing \(S\).
 % XXX Why is ANOBE expensive?
-The complexity of the scheme is usually linear in the size of the recipient 
-set, i.e.~\(O(|S|)\), but for the schemes in~\cite{anobe} some large constant 
-factors make them expensive to use straight away in practice.
+The complexity of the \ac{ANOBE} scheme is linear in the size of the recipient 
+set, i.e.~\(O(|S|)\), whereas constant-size ciphertexts\footnote{%
+  This does not include the description of the set \(S\), which is needed for 
+  decryption.
+  So we should add another \(|S|\) bits per ciphertext (if we do not use any 
+  type of coding scheme to reduce it further).
+}, \(O(1)\), has been achieved for non-anonymous \ac{BE}.
+
+\subsection{Anonymous Broadcast Encryption}\label{sec:ANOBE}
+% XXX Describe ANOBE properly
+% - How is the key \(k\) distributed?
+The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
+such that they can decrypt the broadcast message encrypted with \(k\) but no 
+one else can.
+The users who receive \(k\) should not be able to figure out who else received 
+\(k\) and who did not.
+This is a suitable mechanism for \ac{DOSN} as publishing a message to all 
+friends is basically a broadcast to all or a subset of friends in the network.
+
+The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
+This is an important property as all ciphertexts are world-readable.
+If we do not have this property, then a non-intended recipient \(u\notin S\) 
+can learn who is a valid recipient.
+If \(u\notin S\) learns the recipient set \(S\), then \(u\) might target the 
+users in \(S\) to learn the broadcast data.
+It is also of interest that the privileged users \(s\in S\) cannot see who else 
+is in \(S\).
+In this case, a user \(s\in S\) might tell \(u\notin S\) about the message and 
+blame another user \(s^\prime\in S\) for leaking.
+But if \(s\in S\) might be the only person to learn the broadcast message, he 
+might be discouraged to tell \(u\) as he might be the only one to blame.
+
+For \ac{ANOBE} to accomplish this, we require an encryption scheme which is 
+key-private~\cite{KeyPrivacy}.
+This property ensures that, given a ciphertext, an eavesdropper cannot tell 
+which public key, out of a set of public keys, was used to generate the 
+ciphertext.
+Another property we need for the encryption scheme is 
+robustness~\cite{RobustEncryption}.
+Robust encryption ensures that we cannot create a ciphertext which is valid for 
+two different recipients:
+if we have a set of possible recipients \(R\), we encrypt a message for one of 
+them, \(r\in R\), then all \(r^\prime\neq r\) must decrypt the ciphertext to an 
+invalid message under their keys.
 
 
 \section{System Model}\label{sec:SystemModel}
-% XXX Improve the system model
-% - Which entities?
-% - What properties does each entity have?
-% - Clarify the adversary model
-% - Clarify the set-up assumptions, how do the user get the encrypted data?
+% XXX Improve the summarizing intro paragraph in System Model
+The system model we work in will be relevant to our design.
+Thus we need to make some assumptions about the entities and their 
+properties.
+We also need to make assumptions about the properties of the underlying 
+communication system.
+Finally, there are different ways to implement the \ac{DOSN} architecture, and 
+we cover the two extremes.
+
+\subsection{The Entities and Their Properties}
+% XXX Clarify the entities and their properties
 \mode<presentation>{%
-\subsection{Storage}
 \begin{frame}<presentation>
   \begin{itemize}
 
@@ -291,44 +337,22 @@ factors make them expensive to use straight away in practice.
 \end{frame}
 }
 
-The system model we work in will be relevant to our design.
-Thus we need to make some assumptions about the mechanisms available in the 
-\ac{DOSN}.
-First, we assume that there exists a distributed storage scheme with some 
-desirable properties.
-In essence, the storage scheme can be thought of as the \ac{WWW} without any 
-scripting, with servers (storage nodes) containing static files (objects).
-But more specifically, we want the following properties.
-In this storage scheme all users can create objects with unique names, i.e.\ 
-analogous publishing static content on the \ac{WWW}.
+The main entities are users (or \emph{subjects}) who want to access 
+\emph{objects} stored on different \emph{storage nodes}.
+In essence, the storage nodes can be thought of as \ac{WWW} servers which serve 
+only static objects, ciphertexts in our case.
+More specifically, we want the following properties.
+All users can create objects with unique names, i.e.\ analogous publishing 
+static content on the \ac{WWW}.
 The object name is actually a \ac{URI}~\cite{rfc3986}:
 one part of the name indicates the address of the object, i.e.\ which storage 
-node in the distributed system that holds the object;
+node that holds the object;
 the remaining part of the name makes the object uniquely identifiable in the 
 storage node.
 All objects are world readable and only the owner of an object can modify it.
 However, we optionally have an append operation which is available to all 
 users, provided that the owner has enabled it for the object in question.
-
-\mode<presentation>{%
-\subsection{Communication}
-\begin{frame}<presentation>
-  \begin{itemize}
-
-    \item We also assume that we can anonymize the users and storage nodes.
-
-    \item This can be accomplished using e.g.~Tor.
-
-  \end{itemize}
-\end{frame}
-}
-
-Second, we assume that the underlying communication is run on top of an 
-anonymization network, e.g.\ using onion routing as in Tor~\cite{Tor}.
-This way we can assume that the users and storage node operators remain 
-anonymous.
-More specifically, we assume that the origin of two requests to a storage node 
-are indistinguishable to the storage operator.
+% XXX Put a good reference to NebuloStore here
 
 \mode<presentation>{%
 \subsection{Trust}
@@ -343,38 +367,44 @@ are indistinguishable to the storage operator.
 \end{frame}
 }
 
-Finally, the users have limited trust in the storage nodes.
-We can trust that the storage node will keep the data available 
-\cite{dataavailability,replicaplacement}, but we do not want to trust the node 
-more than that.
+We want the users to have limited trust in the storage nodes.
+Users can trust that the storage node will keep the data available 
+\cite{dataavailability,replicaplacement}, but we do not want them to trust the 
+nodes more than that.
 We assume that users and storage nodes set up some scheme for (possibly 
 anonymous) authentication when they agree on the \enquote{storage contract} for 
 replica placement~\cite{replicaplacement}.
 
+\subsection{The Underlying Communication}
 
-\section{Anonymous Broadcast Encryption}\label{sec:ANOBE}
-% XXX Describe ANOBE properly
-% - How is the key \(k\) distributed?
-The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
-such that they can decrypt the broadcast message encrypted with \(k\) but no 
-one else can.
-Also, the users who receive \(k\) should not be able to figure out who else 
-received \(k\) and who did not.
-This is a suitable mechanism for \ac{DOSN} as a user update is basically 
-a broadcast to all or a subset of friends in the network.
+\mode<presentation>{%
+\begin{frame}<presentation>
+  \begin{itemize}
 
-The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
-This is an important property as all ciphertexts are world-readable.
-If we did not have this property, then a non-intended recipient \(u\notin S\) 
-can learn who is a valid recipient.
-If \(u\) learns the recipient set \(S\), then \(u\) might target the users in 
-\(S\) to learn the broadcast data.
-It is also of interest that the privileged users \(s\in S\) cannot see who else 
-is in \(S\).
-In this case, that user \(s\) might tell \(u\notin S\) about the message and 
-blame a user \(s^\prime\in S\).
-But if \(s\in S\) might be the only person to learn the broadcast message, he 
-might be discouraged to tell \(u\) as he might be the only one to blame.
+    \item We also assume that we can anonymize the users and storage nodes.
+
+    \item This can be accomplished using e.g.~Tor.
+
+  \end{itemize}
+\end{frame}
+}
+
+We assume that the underlying communication is run on top of an anonymization 
+network, e.g.\ using onion routing as in Tor~\cite{Tor}.
+This way we can assume that the users and storage nodes remain anonymous.
+More specifically, we want the origin of two requests to be
+indistinguishable to the storage node, so the storage node cannot differentiate 
+between the same user making two requests or two users making one request each.
+
+\subsection{The \acs{DOSN} Architecture}
+% XXX Describe the DOSN architecture, push vs pull
+% - Clarify the set-up assumptions, how do the user get the encrypted data?
+There is the push model and the pull model.
+
+
+\section{Adversary Model}
+% XXX Describe the adversary model
+\dots
 
 
 \section{Our Construction}\label{sec:Contribution}
@@ -545,9 +575,8 @@ remove the access rights of \(u^\prime\).
 We want to solve this as efficiently as possible, we do not want to re-encrypt 
 unnecessarily much when we add or remove a friend to or from our network.
 
-\mode<article>{%
-\subsection{Evaluation}\label{sec:Evaluation}
-}
+
+\section{Evaluation}\label{sec:Evaluation}
 % - No need to over-promise.
 % - Good synonyms for "looking at":
 %   - investigating, exploring, evaluating, researching, additionally;
