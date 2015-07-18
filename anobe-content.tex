@@ -272,8 +272,7 @@ set, i.e.~\(O(|S|)\), whereas constant-size ciphertexts\footnote{%
 }, \(O(1)\), has been achieved for non-anonymous \ac{BE}.
 
 \subsection{Anonymous Broadcast Encryption}\label{sec:ANOBE}
-% XXX Describe ANOBE properly
-% - How is the key \(k\) distributed?
+
 The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
 such that they can decrypt the broadcast message encrypted with \(k\) but no 
 one else can.
@@ -308,6 +307,12 @@ if we have a set of possible recipients \(R\), we encrypt a message for one of
 them, \(r\in R\), then all \(r^\prime\neq r\) must decrypt the ciphertext to an 
 invalid message under their keys.
 
+It is worth noting that both of the above properties, key-privacy and 
+robustness, are defined for \ac{PKE}, and \ac{ANOBE} is designed around 
+different \ac{PKE} and \ac{IBE} schemes.
+In our setting it might not be necessary to use \ac{PKE}, but we will cover 
+that later.
+
 
 \section{System Model}\label{sec:SystemModel}
 % XXX Improve the summarizing intro paragraph in System Model
@@ -317,9 +322,9 @@ properties.
 We also need to make assumptions about the properties of the underlying 
 communication system.
 Finally, there are different ways to implement the \ac{DOSN} architecture, and 
-we cover the two extremes.
+we cover two dichotomous models.
 
-\subsection{The Entities and Their Properties}
+\subsection{The Entities and Their Properties}\label{sec:EntitiesProperties}
 % XXX Clarify the entities and their properties
 \mode<presentation>{%
 \begin{frame}<presentation>
@@ -377,7 +382,7 @@ We assume that users and storage nodes set up some scheme for (possibly
 anonymous) authentication when they agree on the \enquote{storage contract} for 
 replica placement~\cite{replicaplacement}.
 
-\subsection{The Underlying Communication}
+\subsection{The Underlying Communication}\label{sec:CommModel}
 
 \mode<presentation>{%
 \begin{frame}<presentation>
@@ -399,22 +404,70 @@ indistinguishable to the storage node, so the storage node cannot differentiate
 between the same user making two requests or two users making one request each.
 
 \subsection{The \acs{DOSN} Architecture}
-% XXX Describe the DOSN architecture, push vs pull
-% - Clarify the set-up assumptions, how do the user get the encrypted data?
-There is the push model and the pull model.
+
+There are several ways to implement the message passing for the social 
+communication in the \ac{DOSN}.
+We will focus on two models of this communication: the push model and the pull 
+model.
+
+The pull model is similar to the \ac{WWW} analogy given above.
+In this model, each user has an \emph{index} (e.g.\ user profile) stored in an 
+object.
+In the set-up phase, when Alice makes friends with other users, she gives her 
+new friend Bob the object-name of her index and they agree on a key.
+This key can be either Bob's public key or they generate and agree on 
+a symmetric key.
+(We will elaborate on the needed properties of the encryption scheme below.)
+When Alice wants to publish new material, she updates her index.
+Later, whenever Bob is interested in seeing new posts by Alice, he can read her 
+index, i.e.\ pull new content from Alice's index.
+
+The push model is the converse of the pull model.
+The set-up phase is similar, the difference is that Bob will give Alice the 
+object name of an \emph{inbox} and ask her to put all her new posts there.
+When Alice wants to publish new content, she knows that Bob is interested, so 
+she appends a copy to his inbox object.
+(Note that this is why we want the append functionality mentioned earlier in 
+Sect.~\ref{sec:EntitiesProperties}.)
 
 
 \section{Adversary Model}
-% XXX Describe the adversary model
-\dots
+
+The adversary Eve wants to learn any information about the users.
+Thus Eve will control one or more of the storage nodes in the network.
+As a storage node operator, Eve will monitor the interactions with different 
+users.
+Further, she is active, but she will only modify objects: either by appending 
+them or removing parts of them.
+Eve will not make any modification to the objects which is detectable by the 
+user.
+The reason for this is that once a user detects that the storage node is 
+malicious, then all users will stop using that storage node.
+And Eve's goal is to learn information about the users, so that will not 
+benefit her.
+Hence she is not interested in denying service either.
+
+Eve will also act as a user.
+She will try to make friends with other users, to gain access to plaintexts of 
+their messages and to be able to post messages to them.
 
 
-\section{Our Construction}\label{sec:Contribution}
+\section{The Access Control Mechanism}\label{sec:Contribution}
 % XXX Describe our approach
 % - "If we simplify like this, then we get these problems"
 % - Recap what functional and security properties we want.
 % - How can we achieve these properties?
 % - Be careful with the trivial.
+
+\subsection{Access Control in the Pull Model}
+
+\dots
+
+\subsection{Access Control in the Push Model}
+
+\dots
+
+\subsection{Whatever \dots}
 
 We can use cryptographic mechanisms to ensure integrity of the data, i.e.\ that 
 we can detect if the data is modified by someone else than the owner.
@@ -578,7 +631,13 @@ We want to solve this as efficiently as possible, we do not want to re-encrypt
 unnecessarily much when we add or remove a friend to or from our network.
 
 
-\section{Evaluation}\label{sec:Evaluation}
+\section{Security}
+\label{sec:Security}
+
+\dots
+
+
+\section{Performance Evaluation}\label{sec:Evaluation}
 % - No need to over-promise.
 % - Good synonyms for "looking at":
 %   - investigating, exploring, evaluating, researching, additionally;
