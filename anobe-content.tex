@@ -122,7 +122,8 @@ encrypted~\cite{DevilInMetadata}.
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
-The main aim of \ac{AC} is to provide confidentiality for the user data.
+The main aim of \ac{AC} is to ensure confidentiality and integrity for the user 
+data.
 There are several approaches to implementations, the classical approach is to 
 rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}.
 Centralized \acp{OSN} such as Facebook or Google+ are examples of using 
@@ -130,7 +131,8 @@ a \ac{TTP}, and the Snowden revelations~\cite{prism} have proved that a risk.
 Another way to implement the reference monitor is through cryptography.
 With cryptography we remove the need for trust.
 This way anyone may read the encrypted data and we can be sure that only those 
-to whom we have given the proper keys can read it.
+to whom we have given the proper keys can read it, and they can also verify who 
+is the author.
 This is the approach we explore in this paper.
 Previous research has already identified many pitfalls in this approach, 
 e.g.~\cite{DevilInMetadata}, thus the purpose is not to find pitfalls, but to 
