@@ -134,3 +134,40 @@ sympy-plots-for-*.tex/
 # WinEdt
 *.bak
 *.sav
+
+# LaTeX-Box
+*.latexmain
+
+# libbib: general
+libbib.sty
+
+# libbib: bib-files
+ac.bib
+anon.bib
+crypto.bib
+meta.bib
+nfc.bib
+osn.bib
+otpkx.bib
+otrmsg.bib
+ppes.bib
+privacy.bib
+rfc.bib
+surveillance.bib
+
+# libbib: lncs
+aliascnt.sty
+llncs.cls
+llncs2e.zip
+lncs.bbx
+lncs.cbx
+lncs.dbx
+remreset.sty
+splncs03.bst
+sprmindx.sty
+
+# libbib: biblatex
+biblatex-lncs-src
+
+# we don't use PDF figures
+*.pdf
