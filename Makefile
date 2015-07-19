@@ -13,11 +13,11 @@ PUB_DIR-sys= 		~/public_html
 .PHONY: all
 all: anobe-paper.pdf anobe-slides.pdf
 
-ANOBE_DEPENDS= 		anobe-content.tex anobe.bib
+ANOBE_DEPENDS= 		anobe-content.tex
 ANOBE_DEPENDS+= 	libbib.sty
 ANOBE_DEPENDS+= 	anon.bib crypto.bib
 ANOBE_DEPENDS+= 	meta.bib surveillance.bib osn.bib
-ANOBE_DEPENDS+= 	ac.bib
+ANOBE_DEPENDS+= 	ac.bib be.bib
 ANOBE_DEPENDS+= 	rfc.bib
 
 anobe-paper.pdf: anobe-paper.tex ${ANOBE_DEPENDS}

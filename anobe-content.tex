@@ -112,7 +112,7 @@ Keeping this data out of our own control is thus a risk for privacy violations.
 \end{frame}
 
 These risks were considered already in 2009 and to provide against these 
-\acp{DOSN} were suggested~\cite[e.g.][]{peerson}.
+\acp{DOSN} were suggested~\cite[e.g.][]{Peerson}.
 \ac{DOSN} come with the benefits that users can keep control of their data, 
 there is no central provider through which third parties (by force) can access 
 it, and it is more difficult to censor.
@@ -213,7 +213,7 @@ In light of this model we present the problem in more detail in
 Sect.~\ref{sec:ProblemStatement} and in Sect.~\ref{sec:RelatedWork} we present 
 related work.
 Section~\ref{sec:ANOBE} gives an overview of the desirable properties of the 
-\ac{ANOBE} scheme~\cite{anobe}, motivating our adoption for the \ac{DOSN} 
+\ac{ANOBE} scheme~\cite{ANOBE}, motivating our adoption for the \ac{DOSN} 
 setting.
 Section~\ref{sec:Contribution} outlines our approach to solutions and 
 Sect.~\ref{sec:Evaluation} treats how we plan to evaluate these.
@@ -228,14 +228,14 @@ scheme is not yet practically feasible.
 However, there is also a body of work which is practically feasible and applied 
 in our setting.
 There are several proposals for \acp{DOSN} available, e.g.~DECENT
-\cite{decent}, Cachet~\cite{cachet} and Persona~\cite{persona}.
+\cite{DECENT}, Cachet~\cite{Cachet} and Persona~\cite{Persona}.
 Their \ac{AC} mechanisms focus on providing confidentiality for the 
 data.
 For this they use \ac{ABE}~\cite{abe} to implement the \ac{AC} mechanism.
 Unfortunately, this yields lacking privacy as \ac{ABE} is not policy-hiding, 
 thus anyone can read the \ac{AC} policies and see who may access what data.
 
-\citet{predicateac} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
+\citet{PEAC} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
 % XXX What properties did the PE scheme achieve?
 The scheme achieved properties X.
 % XXX What are the problems with the PE scheme?
@@ -258,9 +258,9 @@ This fits our use-case well.
 However, most research in \ac{BE} has focused on efficiency and not privacy.
 Thus schemes usually require that the set \(S\) is revealed as it is required 
 for the members \(s\in S\) to know \(S\) for decryption.
-\citet{gunther2012cryptographic} adapted a \ac{BE} scheme using pseudonyms, but 
-pseudonyms yield a limited anonymity property~\cite{gunther2012cryptographic}.
-Due to this limitation of \ac{BE} schemes, \citet{anobe} developed \ac{ANOBE}, 
+\citet{PseudonymousBE} adapted a \ac{BE} scheme using pseudonyms, but 
+pseudonyms yield a limited anonymity property~\cite{PseudonymousBE}.
+Due to this limitation of \ac{BE} schemes, \citet{ANOBE} developed \ac{ANOBE}, 
 where the goal is to allow decryption without knowing \(S\).
 % XXX Why is ANOBE expensive?
 The complexity of the \ac{ANOBE} scheme is linear in the size of the recipient 
@@ -376,11 +376,11 @@ users, provided that the owner has enabled it for the object in question.
 
 We want the users to have limited trust in the storage nodes.
 Users can trust that the storage node will keep the data available 
-\cite{dataavailability,replicaplacement}, but we do not want them to trust the 
+\cite{DataAvailability,ReplicaPlacement}, but we do not want them to trust the 
 nodes more than that.
 We assume that users and storage nodes set up some scheme for (possibly 
 anonymous) authentication when they agree on the \enquote{storage contract} for 
-replica placement~\cite{replicaplacement}.
+replica placement~\cite{ReplicaPlacement}.
 
 \subsection{The Underlying Communication}\label{sec:CommModel}
 
@@ -574,7 +574,7 @@ This can be implemented by each user having a designated inbox for such
 notifications.
 
 We explore how we can use the push model as a replacement for the (storage 
-expensive) anonymous tag-hint system suggested in~\cite{anobe} to make 
+expensive) anonymous tag-hint system suggested in~\cite{ANOBE} to make 
 decryption more efficient.
 
 \begin{frame}<presentation>
