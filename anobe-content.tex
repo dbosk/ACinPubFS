@@ -29,16 +29,18 @@
 \begin{abstract}
   % XXX Update the abstract
   Online social networks collect and store large amounts of private data.
-  Trusting too much data with third parties is a privacy risk.
+  Trusting third parties with too much data is a privacy risk.
   For this reason \acp{DOSN} was proposed.
   The current research on access control in \acp{DOSN} has focused on 
   efficiently achieving confidentiality for data.
   We focus on achieving efficient privacy-preserving access control mechanisms 
   for the \ac{DOSN} setting, i.e.~hidden policies, hidden credentials and 
   hidden decisions.
-  We utilize the \ac{DOSN} setting to adapt \ac{ANOBE} for better performance.
-  In this work we evaluate the privacy properties and the complexity of 
-  different trade-offs.
+  We design an access control scheme for two models of communication, the pull 
+  model and the push model.
+  These models yield different privacy properties and requirements on the 
+  underlying system.
+  We finally evaluate the asymptotic complexity of the two approaches.
 
   \keywords{%
     decentralized online social networks,
@@ -91,7 +93,7 @@
 Online social networks collect and store large amounts of private data.
 Data mining is used to monetize these data through user profiling for directed 
 advertisements or selling to third parties.
-We know that this data is sensitive, even its meta-data, and can tell a lot 
+We know that this data, or even its meta-data, is sensitive and can tell a lot 
 about us~\cite[e.g.][]{pregnancy}.
 We have later learned that government agencies, like the \ac{NSA} and 
 \ac{GCHQ}, are interested in the data found in such centralized storage 
@@ -114,14 +116,15 @@ Keeping this data out of our own control is thus a risk for privacy violations.
   \end{itemize}
 \end{frame}
 
-These risks were considered already in 2009 and to provide against these 
-\acp{DOSN} were suggested~\cite[e.g.][]{Peerson}.
+These risks were considered already in 2009 and \acp{DOSN} were suggested to 
+provide against these~\cite[e.g.][]{Peerson}.
 \ac{DOSN} come with the benefits that users can keep control of their data, 
 there is no central provider through which third parties (by force) can access 
 it, and it is more difficult to censor.
 However, such systems require more research to ensure security and privacy, as 
-the decentralized structure opens up for other risks---even when data is 
-encrypted~\cite{DevilInMetadata}.
+the decentralized structure opens up for other risks---even when the data is 
+encrypted~\cite{DevilInMetadata}, we will see an example in 
+Sect.~\ref{sec:PullModelAC}.
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
@@ -131,11 +134,11 @@ There are several approaches to implementations, the classical approach is to
 rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}.
 Centralized \acp{OSN} such as Facebook or Google+ are examples of using 
 a \ac{TTP}, and the Snowden revelations~\cite{prism} have proved that a risk.
-Another way to implement the reference monitor is through cryptography.
-With cryptography we remove the need for trust.
+Another way to implement the reference monitor is through cryptography, and 
+with cryptography we can remove the need for trust.
 This way anyone may read the encrypted data and we can be sure that only those 
-to whom we have given the proper keys can read it, and they can also verify who 
-is the author.
+to whom we have given the proper keys can read it, also they can verify who is 
+the author.
 This is the approach we explore in this paper.
 Previous research has already identified many pitfalls in this approach, 
 e.g.~\cite{DevilInMetadata}, thus the purpose is not to find pitfalls, but to 
@@ -158,68 +161,35 @@ The properties are:
 \end{description}
 
 \subsection{Our Contributions}
-\mode<presentation>{%
-\begin{frame}
-  \begin{itemize}
-
-    \item The main aim of \ac{AC} is to provide confidentiality for the user 
-      data.
-
-    \item Remember, we do not trust the storage to enforce \ac{AC}.
-
-    \item So we rely on cryptography instead.
-
-  \end{itemize}
-\end{frame}
-
-\begin{frame}<presentation>
-  \begin{itemize}
-
-    \item But simply encrypting the data and sharing keys with authorized 
-      people is not good enough.
-
-    \item This doesn't reveal the data itself, but reveals meta-data, e.g.:
-      \begin{itemize}
-        \item who may access what,
-        \item who does access what.
-      \end{itemize}
-
-  \end{itemize}
-\end{frame}
-}
-
 % XXX Improve the problem statement
 % - Clearly describe the problem before any solution
 % - What functional and security properties do we want?
 % - What properties do we need?
 %   - Do we need anonymity?
 %   - Can we make a trade-off which is good enough?
-As mentioned above, we want to create an \ac{AC} mechanism for a decentralized 
-storage system, with minimal trust in other entities.
-Naturally, the first property we want is confidentiality for the data.
-Beyond confidentiality, we want the \ac{AC} mechanism to provide the 
-privacy-preserving properties given above:
-\begin{inparablank}
-\item hidden policies,
-\item hidden credentials, and
-\item hidden decisions.
-\end{inparablank}
 
 % XXX Review the overview of our contributions and outline of the paper
 % - We have simplicity, more performance?
 % - What are the benefits of our scheme?
+We have created an \ac{AC} mechanism for a decentralized storage system, 
+relying on minimal trust in other entities.
 In Sect.~\ref{sec:Design} we present two approaches which both achieve the 
 properties above:
-one approach is within the pull model and the other in the push model.
+hidden-credentials,
+hidden-policies,
+hidden-decisions.
+One approach is within the pull model and the other in the push model.
 Under the pull model subjects fetch data from an index, whereas, under the push 
 model subjects receive data through an inbox.
-We also analyse under which conditions we can achieve the different properties.
+We also analyse under which conditions we can achieve the different properties 
+and state some requirements for the system.
 In Sect.~\ref{sec:SystemModel} we outline the underlying assumptions and the 
 context for our work.
 
 We also estimate the performance of the two approaches in 
 Sect.~\ref{sec:PerformanceEvaluation}.
-% XXX Finish performance in the contributions part
+Asymptotically they have the same time and space complexities.
+However, in practice, the constants will probably make a difference.
 
 
 \section{Related Work}\label{sec:RelatedWork}
@@ -317,8 +287,8 @@ invalid message under their keys.
 It is worth noting that both of the above properties, key-privacy and 
 robustness, are defined for \ac{PKE}, and \ac{ANOBE} is designed around 
 different \ac{PKE} and \ac{IBE} schemes.
-In our setting it might not be necessary to use \ac{PKE}, but we will cover 
-that later.
+As we will see in Sect.~\ref{sec:PushModelAC}, in our setting it might not be 
+necessary to use \ac{PKE}.
 
 
 \section{System Model}\label{sec:SystemModel}
@@ -420,8 +390,8 @@ model.
 The pull model is similar to the \ac{WWW} analogy given above.
 In this model, each user has an \emph{index} (e.g.\ user profile) stored in an 
 object.
-In the set-up phase, when Alice makes friends with other users, she gives her 
-new friend Bob the object-name of her index and they agree on a key.
+In the set-up phase, when Alice becomes friends with Bob, she gives him the 
+object-name of her index and they agree on a key.
 This key can be either Bob's public key or they generate and agree on 
 a symmetric key.
 (We will elaborate on the needed properties of the encryption scheme below.)
@@ -449,7 +419,7 @@ them or removing parts of them.
 Eve will not make any modification to the objects which is detectable by the 
 user.
 The reason for this is that once a user detects that the storage node is 
-malicious, then all users will stop using that storage node.
+malicious, all users might stop using that storage node.
 And Eve's goal is to learn information about the users, so that will not 
 benefit her.
 Hence she is not interested in denying service either.
@@ -557,7 +527,7 @@ The protocol is illustrated in Fig.~\ref{fig:PullModel}, the details follow.
 
 \subsubsection{Set-up}
 
-We assume that Alice and Bob previously has securely exchanged public keys and 
+We assume that Alice and Bob already have securely exchanged public keys and 
 signature-verification keys,
 %e.g.\ through~\cite{OTPKX},
 so let \(\PubKey{A}, \PriKey{A}\) denote Alice's public and private key, 
@@ -581,8 +551,8 @@ key-pair \(\SignKey{m}, \VerifKey{m}\).
 Next, Alice computes \(c_m = \AuthEnc_{\Key{m}}( m )\), where \(\AuthEnc\) is 
 an authenticated encryption scheme, and creates a new object with the name 
 \(o_m\) which contains \(c_m\).
-The object \(o_m\) can be on any storage node in the system, Alice simply 
-generates a random object name that does not already exist.
+The object \(o_m\) can be on any storage node in the system.
+Alice simply generates a random object name that does not already exist.
 
 After that, she computes \(c_j = \Enc_{\Key{i_j}}( k_m, v_m, o_m )\) for 
 \(1\leq j\leq l\).
@@ -852,24 +822,17 @@ update the entries in all other users' inboxes.
 %asymmetric ones.
 %This is an important factor for \acp{DOSN} during e.g.~news-feed aggregation 
 %when a user comes online.
+%In these situations we have to handle large amounts of data, which can lead to 
+%performance problems.
 
 
 \section{Performance Evaluation}\label{sec:PerformanceEvaluation}
-% XXX Write the performance evaluation
+% XXX Review the performance evaluation
 % - Estimate theoretically
 % - Actually do some measurements
 
-To evaluate our work, we first apply the \ac{ANOBE} scheme without 
-modifications in our \ac{AC} setting.
-We evaluate its performance and compare that to the constructions mentioned as 
-related work (Sect.~\ref{sec:RelatedWork}).
-We then adapt the \ac{ANOBE} scheme to improve performance in the \ac{DOSN} 
-context.
-We prove the security properties of our constructions and evaluate their 
-complexity.
-
-The complexity is interesting to evaluate from two perspectives: the 
-publisher's (profile owner's) and the subscriber's (friend's).
+The performance is interesting to evaluate from two perspectives: the 
+publisher's (Alice in all examples) and the subscriber's (Bob in all examples).
 From the publisher's perspective it is interesting to investigate the 
 complexity of key-storage size, communication complexity for publication and 
 time complexity for encryption of new material.
@@ -877,15 +840,44 @@ From the subscriber's perspective the complexity of key-storage size and the
 time-complexity of aggregating the newest published messages are the most 
 interesting aspects.
 
+Due to their differences, our two approaches described above has some different 
+complexity properties.
+But they also have some similarities, and we will start with those.
+The space complexity for the key management is the same for both the pull and 
+push model.
+If we have \(n\) friends, then we need to exchange and store \(O(n)\) keys:
+we need one public key per friend.
+
+The space complexity for the ciphertexts are \(O(n)\) for both models.
+The time complexity for encryption is also \(O(n)\) for both models.
+However, in the push model we need to do more operations, but this only adds up 
+to maximally \(O(3n)\).
+The reason is that we have to compute the signatures for the ciphertexts 
+separately, and we also have to compute the \acp{MAC} for all ciphertexts.
+The time complexity for decryption on the other hand is constant time, 
+\(O(1)\), for the push model.
+For the pull model, we need \(O(n)\) trial-and-error decryption operations.
+If we add the \ac{ANOBE} tag-hint system, then we can achieve constant-time 
+decryption even here.
+However, this increases the needed space for the ciphertexts in the pull model.
+
+Finally, the communication complexity for the different models differ slightly.
+Asymptotically they are the same, \(O(n)\).
+But we get a slight overhead in the push model.
+We need to make \(n\) connections instead of one: depending on the underlying 
+system, e.g.\ running Tor on a mobile device, this can be expensive.
+Further, we have to transfer the verification key and signature to every inbox 
+instead of just putting a copy in our index.
+
 
 \section{Conclusions}\label{sec:Conclusions}
 % XXX Write the conclusions
 % - Ensure that the solution covers the needed properties.
 \dots
 
-\subsection{Future Work}
-% XXX Write the future work section
-\dots
+%\subsection{Future Work}
+%% XXX Write the future work section
+%% - Accountability: Alice can see if someone has read her data.
 
 
 \mode<presentation>{%
