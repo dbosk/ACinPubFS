@@ -62,10 +62,13 @@
 
 \acresetall{}
 \section{Introduction}
-% XXX Ensure good structure:
 % 1) what is the concrete setting that we consider (entities and their props),
 % 2) what overall functionality and security properties do we want,
 % 3) how are these properties realized (protocols, composition)?
+%
+% - Good synonyms for "looking at":
+%   - investigating, exploring, evaluating, researching, additionally;
+%   - if in relation to something else: contrasting, comparing.
 
 \mode<presentation>{%
 \subsection{Problem Setting}
@@ -202,25 +205,26 @@ privacy-preserving properties given above:
 \item hidden decisions.
 \end{inparablank}
 
-% XXX Write an overview of our contributions and outline the paper
+% XXX Review the overview of our contributions and outline of the paper
 % - We have simplicity, more performance?
 % - What are the benefits of our scheme?
-In this extended abstract we outline our solution using \ac{ANOBE} and the 
-methodology for evaluating the different designs.
-In Sect.~\ref{sec:SystemModel} we describe our model, i.e.~the assumptions 
-about the underlying systems.
-In light of this model we present the problem in more detail in 
-Sect.~\ref{sec:ProblemStatement} and in Sect.~\ref{sec:RelatedWork} we present 
-related work.
-Section~\ref{sec:ANOBE} gives an overview of the desirable properties of the 
-\ac{ANOBE} scheme~\cite{ANOBE}, motivating our adoption for the \ac{DOSN} 
-setting.
-Section~\ref{sec:Contribution} outlines our approach to solutions and 
-Sect.~\ref{sec:Evaluation} treats how we plan to evaluate these.
+In Sect.~\ref{sec:Design} we present two approaches which both achieve the 
+properties above:
+one approach is within the pull model and the other in the push model.
+Under the pull model subjects fetch data from an index, whereas, under the push 
+model subjects receive data through an inbox.
+We also analyse under which conditions we can achieve the different properties.
+In Sect.~\ref{sec:SystemModel} we outline the underlying assumptions and the 
+context for our work.
+
+We also estimate the performance of the two approaches in 
+Sect.~\ref{sec:PerformanceEvaluation}.
+% XXX Finish performance in the contributions part
 
 
 \section{Related Work}\label{sec:RelatedWork}
 % XXX Add a summarizing intro paragraph to Related Work
+
 The work of \citet{TowardsPPACwHPHCHD} focused on a general solution for 
 privacy-preserving \ac{AC}.
 They built their solution on fully homomorphic encryption, and, as such, the 
@@ -237,7 +241,7 @@ thus anyone can read the \ac{AC} policies and see who may access what data.
 
 \citet{PEAC} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
 % XXX What properties did the PE scheme achieve?
-The scheme achieved properties X.
+%The scheme achieved the properties X.
 % XXX What are the problems with the PE scheme?
 % - More flexibility but less scalability?
 The storage complexity for keys is exponential for the \ac{PE} scheme, it 
@@ -294,6 +298,9 @@ blame another user \(s^\prime\in S\) for leaking.
 But if \(s\in S\) might be the only person to learn the broadcast message, he 
 might be discouraged to tell \(u\) as he might be the only one to blame.
 
+% XXX Review details on ANOBE in related work
+% - Move details to later in the paper, or
+% - add more details about how it works?
 For \ac{ANOBE} to accomplish this, we require an encryption scheme which is 
 key-private~\cite{KeyPrivacy}.
 This property ensures that, given a ciphertext, an eavesdropper cannot tell 
@@ -315,7 +322,7 @@ that later.
 
 
 \section{System Model}\label{sec:SystemModel}
-% XXX Improve the summarizing intro paragraph in System Model
+
 The system model we work in will be relevant to our design.
 Thus we need to make some assumptions about the entities and their 
 properties.
@@ -325,7 +332,7 @@ Finally, there are different ways to implement the \ac{DOSN} architecture, and
 we cover two dichotomous models.
 
 \subsection{The Entities and Their Properties}\label{sec:EntitiesProperties}
-% XXX Clarify the entities and their properties
+
 \mode<presentation>{%
 \begin{frame}<presentation>
   \begin{itemize}
@@ -403,7 +410,7 @@ More specifically, we want the origin of two requests to be
 indistinguishable to the storage node, so the storage node cannot differentiate 
 between the same user making two requests or two users making one request each.
 
-\subsection{The \acs{DOSN} Architecture}
+\subsection{The \acs{DOSN} Architecture}\label{sec:DOSN}
 
 There are several ways to implement the message passing for the social 
 communication in the \ac{DOSN}.
@@ -431,7 +438,7 @@ she appends a copy to his inbox object.
 Sect.~\ref{sec:EntitiesProperties}.)
 
 
-\section{Adversary Model}
+\section{Adversary Model}\label{sec:Adversary}
 
 The adversary Eve wants to learn any information about the users.
 Thus Eve will control one or more of the storage nodes in the network.
@@ -452,35 +459,146 @@ She will try to make friends with other users, to gain access to plaintexts of
 their messages and to be able to post messages to them.
 
 
-\section{The Access Control Mechanism}\label{sec:Contribution}
-% XXX Describe our approach
-% - "If we simplify like this, then we get these problems"
-% - Recap what functional and security properties we want.
-% - How can we achieve these properties?
-% - Be careful with the trivial.
+\section{Design of the Access Control Mechanism}\label{sec:Design}
+% XXX Review the Design section
+% - Check that we recap what functional and security properties we want.
 
-\subsection{Access Control in the Pull Model}
+There are several ways to implement this protocol, each way has its benefits.
+We will start by describing the simplest version, which is plain \ac{ANOBE} as 
+in~\cite{ANOBE}.
+We will start with applying \ac{ANOBE} for \ac{AC} in the pull model, then the 
+push model.
+%Later, we will describe some extensions.
 
-\dots
+\subsection{Access Control in the Pull Model}\label{sec:PullModelAC}
 
-\subsection{Access Control in the Push Model}
+We have Alice who wants to use the pull model for sharing data with her 
+friends.
+In this model, Alice will encrypt the message \(m\) she wants to share under 
+a key \(k_m\), using an authenticated encryption scheme.
+She will publish the ciphertext in an object, then publish a link to the object 
+in her index object.
+The protocol is illustrated in Fig.~\ref{fig:PullModel}, the details follow.
 
-\dots
+\begin{figure}
+  \centering
+  \begin{sequencediagram}
 
-\subsection{Whatever \dots}
+    \newinst{A}{Alice}
+    \newinst[1]{E}{Eve}
+    \newinst[1]{B}{Bob}
 
-We can use cryptographic mechanisms to ensure integrity of the data, i.e.\ that 
-we can detect if the data is modified by someone else than the owner.
-We can use the signature scheme to detect changes to an object made by someone 
-other than the owner.
+    \begin{sdblock}{Set-up}{}
+      \mess{A}{}{B}
+      \node[anchor=east] at (mess from) {%
+        $\PubKey{A}, \VerifKey{A}$
+      };
 
-Every user in the \ac{DOSN} has a profile and each user knows the name of the 
-objects which hold the profiles of their friends.
-From this profile a friend can find the names of other related objects, 
-e.g.~posts and comments.
-Further, the profile owner can group these users (possibly overlapping) to show 
-each group a different version of the profile, e.g.~one for private relations 
-and one for professional ones.
+      \mess{B}{}{A}
+      \node[anchor=west] at (mess from) {%
+        $\PubKey{B}, \VerifKey{B}$
+      };
+
+      \mess{A}{}{B}
+      \node[anchor=east] at (mess from) {%
+        \shortstack{$c = \Enc_{\PubKey{B}}( i_A )$,\\
+          $\sigma = \Sign_{\SignKey{A}}( c )$}
+      };
+    \end{sdblock}
+
+    \begin{sdblock}{Publication}{}
+      \mess{A}{write}{E}
+      \node[anchor=east] at (mess from) {%
+        $c_m = \AuthEnc_{\Key{m}}( m )$
+      };
+      \node[anchor=west] at (mess to) {%
+        $o_m$
+      };
+
+      \mess{A}{append}{E}
+      \node[anchor=east] at (mess from) {%
+        \shortstack{$( \VerifKey{m}, \{c_{\pi(j)}\}_j, 
+          \sigma_{\{c_{\pi(j)}\}_j} )$}
+      };
+      \node[anchor=west] at (mess to) {%
+        $i_A$
+      };
+
+      \mess{B}{read}{E}
+      \node[anchor=west] at (mess from) {%
+        $i_A$
+      };
+
+      \mess{E}{}{B}
+      \node[anchor=east] at (mess from) {%
+        \shortstack{$( \VerifKey{m}^\prime, \{c_{\pi(j)}^\prime\}_j, 
+          \sigma_{\{c_{\pi(j)}\}_j}^\prime )$}
+      };
+
+      \mess{B}{read}{E}
+      \node[anchor=west] at (mess from) {%
+        $o_m^\prime$
+      };
+
+      \mess{E}{}{B}
+      \node[anchor=east] at (mess from) {%
+        $c_m^\prime$
+      };
+
+    \end{sdblock}
+
+  \end{sequencediagram}
+  \caption{%
+    Illustration of the protocol adapted for the pull model.
+    Eve operates all the storage nodes, thus she will return possibly modified 
+    data, indicated by the primes (\(\prime\)).
+  }\label{fig:PullModel}
+\end{figure}
+
+\subsubsection{Set-up}
+
+We assume that Alice and Bob previously has securely exchanged public keys and 
+signature-verification keys,
+%e.g.\ through~\cite{OTPKX},
+so let \(\PubKey{A}, \PriKey{A}\) denote Alice's public and private key, 
+respectively, and let \(\PubKey{B}, \PriKey{B}\) be Bob's.
+Let \(\SignKey{A}, \VerifKey{A}\) denote Alice's signing key and verification 
+key, respectively, and let \(\SignKey{B}, \VerifKey{B}\) be Bob's.
+When Alice wants to add Bob as a friend, she sends the name of her index object 
+\(i_A\) to Bob:
+she computes the ciphertext \(c = \Enc_{\PubKey{B}}( i_A )\) and the signature 
+\(\sigma = \Sign_{\SignKey{A}}( c )\), then she sends \((c, \sigma)\) to Bob.
+
+\subsubsection{Publication}
+
+When Alice wants to publish a message \(m\) to a subset \(S = \{i_1, \ldots, 
+  i_l\}\subset U\) of her friends she does the following.
+%uses a \ac{KEM}, in the case of \ac{ANOBE}~\cite{ANOBE} this is the 
+%Kurosawa-Desmedt \ac{KEM}~\cite{KD-KEM}.
+Alice creates a secret key \(\Key{m}\) and a one-time signature-verification 
+key-pair \(\SignKey{m}, \VerifKey{m}\).
+
+Next, Alice computes \(c_m = \AuthEnc_{\Key{m}}( m )\), where \(\AuthEnc\) is 
+an authenticated encryption scheme, and creates a new object with the name 
+\(o_m\) which contains \(c_m\).
+The object \(o_m\) can be on any storage node in the system, Alice simply 
+generates a random object name that does not already exist.
+
+After that, she computes \(c_j = \Enc_{\Key{i_j}}( k_m, v_m, o_m )\) for 
+\(1\leq j\leq l\).
+She then lets the ciphertext \(c_{\Key{m}} = (\VerifKey{m}, c_{\pi(1)}, \ldots, 
+  c_{\pi(l)}, \sigma_{\Key{m}})\), where \(\sigma_{\Key{m}} 
+  = \Sign_{\SignKey{m}}( c_{\pi(1)}, \ldots, c_{\pi(l)} )\) and \(\pi\colon 
+  \{1,\ldots,l\}\to \{1,\ldots,l\}\) is a random permutation.
+
+Finally, Alice generates a signature \(\sigma_{c_{\Key{m}}} 
+  = \Sign_{\SignKey{A}}( c_{\Key{m}} )\) using her signing key \(\SignKey{A}\) 
+which must be shared with at least all her friends in \(S\).
+Then she appends \((c_{\Key{m}}, \sigma_{c_{\Key{m}}})\) to her index object 
+\(o_{i_A}\).
+
+\subsection{Security in the Pull Model}\label{sec:PullModelSec}
+% XXX Review the security analysis for the pull model scheme
 
 %\begin{frame}<presentation>
 %  \begin{itemize}
@@ -495,12 +613,11 @@ and one for professional ones.
 %  \end{itemize}
 %\end{frame}
 
-% - Where does the secret key come from?
-The hidden-credentials property is trivially achieved in our cryptographic 
-setting: the user's secret key serves as a credential to allow access.
-As all users can read an object and every user is anonymous, then there is no 
-need for a user to show any type of credential to the storage provider and the 
-storage provider cannot identify any of the users.
+The hidden-credentials property is achieved in the pull model: a user's key 
+serves as a credential to allow access.
+As all users can read an object and every user is indistinguishable, then there 
+is no need for a user to show any type of credential to the storage node and 
+the storage node cannot identify any of the users.
 Thus the access credentials are hidden.
 
 %\begin{frame}<presentation>
@@ -516,12 +633,14 @@ Thus the access credentials are hidden.
 %  \end{itemize}
 %\end{frame}
 
-% - If the user only downloads ciphertexts he can decrypt, then this doesn't 
-%   hold.
-The hidden-decisions property is also trivially achieved in our cryptographic 
-setting: a user requests a ciphertext, the storage provider does not learn 
-whether the user can decrypt it or not.
+The hidden-decisions property is also achieved in the pull model: a user 
+requests a ciphertext, the storage node does not learn whether the user can 
+decrypt it or not.
 Thus the access decisions are hidden.
+However, if all users only download ciphertexts they can decrypt, then this 
+will not hold:
+if the storage-node operator always guesses that the decision was 
+\enquote{allowed}, then he will be correct in the majority of the cases.
 
 \begin{frame}<presentation>
   \begin{itemize}
@@ -538,110 +657,207 @@ Thus the access decisions are hidden.
 
 The last property, hidden policies, states that no user shall learn anything 
 about who else is authorized or unauthorized to access a certain object.
-As we will see in Sect.~\ref{sec:RelatedWork}, this is difficult to achieve 
-efficiently.
-%This can be solved by encrypting for every authorized user and sending them the 
-%resultant ciphertext.
-%This way no user can see whether another is granted access or not.
-%The problem is that this scheme has a storage complexity linear in the number 
-%of users (when using a public-key encryption scheme): first one key per user 
-%and then one ciphertext per user.
-%The computational complexity is also linear in the number of users as we have 
-%to do one encryption per recipient.
-Our work focuses on finding a more efficient solution to this problem.
+Due to the anonymity property of the \ac{ANOBE} scheme, the ciphertexts do not 
+reveal the intended recipient and, consequently, not the access policy.
 
-\subsection{The Scheme}
+There is some meta-information that can be inferred in the pull model.
+First, in the pull model, we reveal the cardinality of the recipient set to 
+everyone.
+Since everyone can read the index, they can also read the number of 
+sub-ciphertexts contained in the ciphertext \(c_{\Key{m}}\).
 
-\mode<presentation>{%
-\begin{frame}<presentation>
-  \begin{itemize}
+Second, assume that we are friends with Alice, so we can read and decrypt 
+entries in her index \(i_A\).
+If Alice decides to remove us as a friend, then we will notice that we can no 
+longer decrypt the entries showing up in her index.
+Hence we can infer that Alice has removed us from her list of friends.
+We can then argue that Alice might be posting to several groups in the same 
+index, and that she just stopped posting to our group, but this allows us to 
+monitor Alice's communication activities.
 
-    \item We adapt \ac{ANOBE} to hide the policy.
+\subsection{Access Control in the Push Model}\label{sec:PushModelAC}
 
-    \item \ac{ANOBE} as it is, is inefficient.
+Now Alice wants to use the push model for sharing data with her friends.
+The push model is conceptually different from the pull model in that Alice will 
+publish the link to the object in all her friends' inboxes, instead of in her 
+own index.
+This also allows us to use a \ac{MAC} instead of a digital signature for 
+authentication.
+The benefit is that we remove the non-repudiation property, but this comes at 
+the cost of slightly more computations.
+The protocol is illustrated in Fig.~\ref{fig:PushModel}, the details follow.
 
-  \end{itemize}
-\end{frame}
-}
+\begin{figure}
+  % XXX Review the Push-Model Protocol figure
+  \centering
+  \begin{sequencediagram}
 
-There are several ways to distribute messages in \acp{DOSN}.
-We can broadly categorize them as either a pull or a push model.
-In the pull model, all friends actively pull updates from a user's profile, 
-e.g.~when they go online to look for updates.
-In the push model, the profile owner pushes change notifications to all 
-friends' whenever something is updated in the profile.
-This can be implemented by each user having a designated inbox for such 
-notifications.
+    \newinst{A}{Alice}
+    \newinst[1]{E}{Eve}
+    \newinst[1]{B}{Bob}
 
-We explore how we can use the push model as a replacement for the (storage 
-expensive) anonymous tag-hint system suggested in~\cite{ANOBE} to make 
-decryption more efficient.
+    \begin{sdblock}{Set-up}{}
+      \mess{A}{}{B}
+      \node[anchor=east] at (mess from) {%
+        $\PubKey{A}, \VerifKey{A}$
+      };
 
-\begin{frame}<presentation>
-  \begin{itemize}
+      \mess{B}{}{A}
+      \node[anchor=west] at (mess from) {%
+        $\PubKey{B}, \VerifKey{B}$
+      };
 
-    \item We investigate how we can use different strategies for delivering 
-      messages to make \ac{ANOBE} more efficient:
-      \begin{itemize}
-        \item push-model,
-        \item pull-model.
-      \end{itemize}
+      \mess{A}{}{B}
+      \node[anchor=east] at (mess from) {%
+        \shortstack{$c = \Enc_{\PubKey{B}}( i_A )$,\\
+          $\sigma = \Sign_{\SignKey{A}}( c )$}
+      };
+    \end{sdblock}
 
-    \item \ac{ANOBE} relies on IND-CCA2 public-key encryption.
+    \begin{sdblock}{Publication}{}
+      \mess{A}{write}{E}
+      \node[anchor=east] at (mess from) {%
+        $c_m = \AuthEnc_{\Key{m}}( m )$
+      };
+      \node[anchor=west] at (mess to) {%
+        $o_m$
+      };
 
-    \item We also investigate in which situations we can replace it with 
-      a semantically secure symmetric scheme.
+      \mess{A}{append}{E}
+      \node[anchor=east] at (mess from) {%
+        $( \VerifKey{m}, c_{B}, \mu_{c_B} )$
+      };
+      \node[anchor=west] at (mess to) {%
+        $i_B$
+      };
 
-    \item This would be one chance for making it more efficient.
+      \mess{B}{read}{E}
+      \node[anchor=west] at (mess from) {%
+        $i_B$
+      };
 
-  \end{itemize}
-\end{frame}
+      \mess{E}{}{B}
+      \node[anchor=east] at (mess from) {%
+        $( \VerifKey{m}^\prime, c_{B}^\prime, \mu_{c_{B}^\prime} )$
+      };
 
-% - What properties do we need from the PKE?
-% - We might be able to use the EC algorithms in the NaCl library, if so, then 
-%   we don't need to replace PKE with symmetric ciphers.
-For performance reasons, we also look into a trade-off between using an 
-IND-CCA2 \ac{PKE} scheme and a semantically secure symmetric encryption scheme 
-in the \ac{ANOBE} construction.
-The reason for this is that symmetric decryption is faster than asymmetric 
-decryption.
-This is an important factor for \acp{DOSN} during e.g.~news-feed aggregation 
-when a user comes online.
+      \mess{B}{read}{E}
+      \node[anchor=west] at (mess from) {%
+        $o_m^\prime$
+      };
 
-\begin{frame}<presentation>
-  \begin{itemize}
-    \item \ac{BE} was designed for broadcasting a message to a dynamically 
-      changing group.
+      \mess{E}{}{B}
+      \node[anchor=east] at (mess from) {%
+        $c_m^\prime$
+      };
 
-    \item In these schemes any recipient can see who else can also decrypt the 
-      message.
+    \end{sdblock}
 
-    \item The \ac{ANOBE} scheme removes this part, adding anonymity.
+  \end{sequencediagram}
+  \caption{%
+    Illustration of the protocol adapted for the push model.
+    Eve operates all the storage nodes, thus she will return possibly modified 
+    data, indicated by the primes (\(\prime\)).
+    The difference from Fig.~\ref{fig:PullModel} is that Alice appends to 
+    \(i_B\) instead of \(i_A\), she only includes \(c_B\) instead of 
+    \(\{c_i\}_{i\in S}\), and she uses \(\mu_{c_B}\) instead of 
+    \(\sigma_{\{c_i\}_{i\in S}}\).
+  }\label{fig:PushModel}
+\end{figure}
 
-  \end{itemize}
-\end{frame}
+\subsubsection{Set-up}
 
-Furthermore, \ac{BE} is designed to broadcast a message to a dynamically 
-changing group.
-However, when a new user \(u\) is added to the group, we might want to give 
-\(u\) access to old messages.
-Similarly, when we remove a user \(u^\prime\) from a group, we might want to 
-remove the access rights of \(u^\prime\).
-We want to solve this as efficiently as possible, we do not want to re-encrypt 
-unnecessarily much when we add or remove a friend to or from our network.
+The set-up phase for the push model is similar to that of the pull model.
+When Alice wants to add Bob as a friend, she generates and sends a \ac{MAC} key 
+\(\MACKey{B}\) to Bob:
+she computes the ciphertext \(c_{\MACKey{B}} = \Enc_{\PubKey{B}}( \MACKey{B} 
+  )\) and the signature \(\sigma_{\MACKey{B}} = \Sign_{\SignKey{A}}( 
+  c_{\MACKey{B}} )\), then she sends \((c_{\MACKey{B}}, \sigma_{\MACKey{B}})\) 
+to Bob.
+Bob then replies with the name of his inbox object, \(i_B\):
+he computes \(c_{i_B} = \Enc_{\PubKey{A}}( i_B )\) and \(\sigma_{i_B} 
+  = \Sign_{\SignKey{B}}( c_{i_B} )\) and sends them to Alice.
+
+\subsubsection{Publication}
+
+Again, Alice wants to publish a message \(m\) to a subset \(S = \{i_1, \ldots, 
+  i_l\}\subset U\) of her friends.
+She does the same as she did in the pull model, except for the final step.
+Instead of signing with her signing key \(\SignKey{A}\), she generates 
+a \ac{MAC} \(\mu_{c_{\Key{m}}, i_j}\) for each inbox \(i_j\in S\) using the 
+respective \ac{MAC} key \(\MACKey{i_j}\): \(\mu_{c_{\Key{i_j}}} 
+  = \MAC_{\MACKey{i_j}}( c_{\Key{i_j}} )\).
+Finally, for each \(i_j\in S\)  Alice appends \((c_{\Key{i_j}}, 
+  \mu_{c_{\Key{i_j}}})\) to the inbox \(i_j\).
+
+\subsection{Security in the Push Model}\label{sec:PushModelSec}
+% XXX Review the security analysis for the push model scheme
+
+We make the same arguments as in the pull model that the push model also 
+achieves hidden-credentials and hidden-decisions.
+The argument for the hidden-policy property is also similar, but here the users 
+cannot even see more than their own inboxes.
+However, if Bob uses the same inbox for both Alice and Eve, then Eve can infer, 
+with negligible probability of error, from the verification key 
+\(\VerifKey{m}\) that the same message resides in both their inboxes.
+Hence, Eve can learn part of the access policy.
+If Eve can make an exhaustive search of all objects in the system, then she can 
+learn the policy even if every user use unique inboxes for each friend.
+
+The push model in general is more privacy-preserving than the pull model.
+There are several advantages.
+First, if a user has a different inbox for every friend, then no friend can 
+infer activity by monitoring a users inbox.
+This also means that if we stop receiving messages from a friend, then we 
+cannot distinguish between that friend stopping posing entirely or just 
+stopping posting to us.
+
+Second, in the push model, we no longer reveal the cardinality of the recipient 
+set.
+As stated above, we do not know the names of the other inboxes, nothing reveals 
+even if there is more than our inbox who received the message.
+Even if Eve would control the majority of the storage nodes, she cannot 
+distinguish the origin of two requests and, thus, she cannot relate all 
+requests to a single event.
+
+\subsection{Group Management}\label{sec:GroupManagement}
+% XXX Review the section on group management
+
+Our scheme is, as is general \ac{BE}, designed to broadcast a message to 
+a dynamically changing group.
+This means that we can easily change the recipient group.
+However, when a new user, say Bob, is added to the group, we might want to give 
+Bob access to old messages.
+In our scheme we have to encrypt the message key \(k_m\) for every message 
+\(m\) that we want Bob to access.
+
+Similarly as for adding a user, when we remove a user, say Eve, from a group, 
+we might want to remove Eve's clearances for the objects.
+First, we can argue whether we should remove these or not.
+Since Eve has had access to an object, she might already keep a copy anyway.
+If we remove her clearance, then she learns that we have removed her from the 
+group.
+However, if we want to remove Eve's clearance, then we will have to re-encrypt 
+all objects she had access to.
+This is easier in the pull model, because in the push model we also need to 
+update the entries in all other users' inboxes.
 
 
-\section{Security}
-\label{sec:Security}
+%\section{Extensions}\label{sec:Extensions}
+%% XXX Write about possible extensions to improve the scheme
+%For performance reasons, we also look into a trade-off between using a robust, 
+%key-private IND-CCA2 \ac{PKE} scheme and a semantically secure symmetric 
+%encryption scheme in the \ac{ANOBE} construction.
+%The reason for this is that the symmetric operations are faster than the 
+%asymmetric ones.
+%This is an important factor for \acp{DOSN} during e.g.~news-feed aggregation 
+%when a user comes online.
 
-\dots
 
-
-\section{Performance Evaluation}\label{sec:Evaluation}
-% - No need to over-promise.
-% - Good synonyms for "looking at":
-%   - investigating, exploring, evaluating, researching, additionally;
-%   - if in relation to something else: contrasting, comparing.
+\section{Performance Evaluation}\label{sec:PerformanceEvaluation}
+% XXX Write the performance evaluation
+% - Estimate theoretically
+% - Actually do some measurements
 
 To evaluate our work, we first apply the \ac{ANOBE} scheme without 
 modifications in our \ac{AC} setting.
@@ -662,9 +878,13 @@ time-complexity of aggregating the newest published messages are the most
 interesting aspects.
 
 
-\section{Conclusion}
+\section{Conclusions}\label{sec:Conclusions}
 % XXX Write the conclusions
 % - Ensure that the solution covers the needed properties.
+\dots
+
+\subsection{Future Work}
+% XXX Write the future work section
 \dots
 
 
@@ -679,7 +899,7 @@ interesting aspects.
 
 
 \mode<article>{%
-\subsubsection{\ackname}
+\subsubsection{Acknowledgement}
 
 This work is based on the initial ideas of Oleksandr Bodriagov and Gunnar 
 Kreitz.
