@@ -560,6 +560,7 @@ She then lets the ciphertext \(c_{\Key{m}} = (\VerifKey{m}, c_{\pi(1)}, \ldots,
   c_{\pi(l)}, \sigma_{\Key{m}})\), where \(\sigma_{\Key{m}} 
   = \Sign_{\SignKey{m}}( c_{\pi(1)}, \ldots, c_{\pi(l)} )\) and \(\pi\colon 
   \{1,\ldots,l\}\to \{1,\ldots,l\}\) is a random permutation.
+% XXX Add the tag-hint system to the pull-model scheme
 
 Finally, Alice generates a signature \(\sigma_{c_{\Key{m}}} 
   = \Sign_{\SignKey{A}}( c_{\Key{m}} )\) using her signing key \(\SignKey{A}\) 
@@ -871,13 +872,60 @@ instead of just putting a copy in our index.
 
 
 \section{Conclusions}\label{sec:Conclusions}
-% XXX Write the conclusions
+% XXX Review the conclusions
 % - Ensure that the solution covers the needed properties.
-\dots
 
-%\subsection{Future Work}
-%% XXX Write the future work section
-%% - Accountability: Alice can see if someone has read her data.
+We found that the \ac{AC} mechanisms for the two models yield different privacy 
+properties.
+In the pull model we achieve the three desired properties hidden-credentials, 
+hidden-decisions and hidden-policies, but we reveal meta-information such as 
+our activity in the system.
+In the push model, we achieve the first two properties.
+For the hidden-policy property we must be careful in the design of the system.
+If Alice re-uses an inbox for several friends, then those friends learn that 
+part of her access policy.
+But if we ensure that we use one inbox per friend and it is computationally 
+infeasible to search through all objects, then we can have policy-hiding in the 
+push model too.
+And in the latter case, the push model provides better privacy properties than 
+the pull model.
+
+Both models are asymptotically equally complex, but in practice, the push model 
+is probably slightly more costly for the publisher.
+But this should be investigated in details, currently they are only theoretical 
+estimates.
+Finally, due to the better privacy properties in the push model, we conclude 
+that this model is worthy of further exploration.
+
+\subsection{Future Work}
+% XXX Review the future work section
+% - Accountability: Alice can see if someone has read her data.
+% - Stronger deniability properties.
+
+We can see several interesting tracks to explore from this work.
+First, it would be interesting to have stronger deniability properties in the 
+scheme.
+In the pull model, any deniability relies on the indistinguishability of the 
+users, that a third party cannot distinguish between users.
+However, Bob can prove to the third party what Alice has said, since she has 
+signed her messages to provide authentication.
+In the push model, we reduce the problem by removing the non-repudiation 
+property.
+Since we use a \ac{MAC}, Bob cannot prove anything to the third party, since he 
+himself holds a copy of the \ac{MAC} key.
+But Bob can show that he has a message which is signed using the same signature 
+key as Carol or Eve, so he can prove to them that Alice let him decrypt the 
+message.
+We would like to explore further the possibilities for Alice to deny her 
+activities in the system.
+
+The second track would be the opposite direction of deniability: namely, 
+accountability.
+It would also be interesting to explore what is needed from the system for 
+Alice to know for sure that Bob has read the data she shared with him.
+This can be interesting for several reasons, but one example is that Alice 
+accidentally shared data she did not want to share.
+Then she would like to know if anyone saw it before she removed it again.
 
 
 \mode<presentation>{%
