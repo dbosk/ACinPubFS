@@ -487,8 +487,8 @@ The protocol is illustrated in Fig.~\ref{fig:PullModel}, the details follow.
 
       \mess{A}{append}{E}
       \node[anchor=east] at (mess from) {%
-        \shortstack{$( \VerifKey{m}, \{c_{\pi(j)}\}_j, 
-          \sigma_{\{c_{\pi(j)}\}_j} )$}
+        $( \VerifKey{m}, \{c_{u_{\pi(j)}}\}_j, 
+        \sigma_{\{c_{u_{\pi(j)}}\}_{u_j\in S}} )$
       };
       \node[anchor=west] at (mess to) {%
         $i_A$
@@ -501,8 +501,8 @@ The protocol is illustrated in Fig.~\ref{fig:PullModel}, the details follow.
 
       \mess{E}{}{B}
       \node[anchor=east] at (mess from) {%
-        \shortstack{$( \VerifKey{m}^\prime, \{c_{\pi(j)}^\prime\}_j, 
-          \sigma_{\{c_{\pi(j)}\}_j}^\prime )$}
+        $( \VerifKey{m}^\prime, \{c_{u_{\pi(j)}}^\prime\}_{u_j\in S}, 
+        \sigma_{\{c_{u_{\pi(j)}}\}_j}^\prime )$
       };
 
       \mess{B}{read}{E}
@@ -541,25 +541,26 @@ she computes the ciphertext \(c = \Enc_{\PubKey{B}}( i_A )\) and the signature
 
 \subsubsection{Publication}
 
-When Alice wants to publish a message \(m\) to a subset \(S = \{i_1, \ldots, 
-  i_l\}\subset U\) of her friends she does the following.
+When Alice wants to publish a message \(m\) to a subset \(S = \{u_1, \ldots, 
+  u_l\}\subset U\) of her friends she does the following.
 %uses a \ac{KEM}, in the case of \ac{ANOBE}~\cite{ANOBE} this is the 
 %Kurosawa-Desmedt \ac{KEM}~\cite{KD-KEM}.
 Alice creates a secret key \(\Key{m}\) and a one-time signature-verification 
 key-pair \(\SignKey{m}, \VerifKey{m}\).
 
 Next, Alice computes \(c_m = \AuthEnc_{\Key{m}}( m )\), where \(\AuthEnc\) is 
-an authenticated encryption scheme, and creates a new object with the name 
+an authenticated encryption scheme, and she creates a new object with the name 
 \(o_m\) which contains \(c_m\).
 The object \(o_m\) can be on any storage node in the system.
 Alice simply generates a random object name that does not already exist.
 
-After that, she computes \(c_j = \Enc_{\Key{i_j}}( k_m, v_m, o_m )\) for 
+After that, she computes \(c_{u_j} = \Enc_{\Key{u_j}}( k_m, v_m, o_m )\) for 
 \(1\leq j\leq l\).
-She then lets \(c_{\Key{m}} = (\VerifKey{m}, c_{\pi(1)}, \ldots, c_{\pi(l)}, 
-  \sigma_{\Key{m}})\) be the ciphertext, \(\sigma_{\Key{m}} 
-  = \Sign_{\SignKey{m}}( c_{\pi(1)}, \ldots, c_{\pi(l)} )\) is a signature and 
-\(\pi\colon \{1,\ldots,l\}\to \{1,\ldots,l\}\) is a random permutation.
+She then computes the ciphertext \(c_{\Key{m}} = (\VerifKey{m}, c_{u_{\pi(1)}}, 
+  \ldots, c_{u_{\pi(l)}}, \sigma_{\Key{m}})\), where \(\sigma_{\Key{m}} 
+  = \Sign_{\SignKey{m}}( c_{u_{\pi(1)}}, \ldots, c_{u_{\pi(l)}} )\) is 
+a signature and \(\pi\colon \{1,\ldots,l\}\to \{1,\ldots,l\}\) is a random 
+permutation.
 % XXX Add the tag-hint system to the pull-model scheme
 
 Finally, Alice generates a signature \(\sigma_{c_{\Key{m}}} 
@@ -659,7 +660,6 @@ the cost of slightly more computations.
 The protocol is illustrated in Fig.~\ref{fig:PushModel}, the details follow.
 
 \begin{figure}
-  % XXX Review the Push-Model Protocol figure
   \centering
   \begin{sequencediagram}
 
@@ -680,8 +680,16 @@ The protocol is illustrated in Fig.~\ref{fig:PushModel}, the details follow.
 
       \mess{A}{}{B}
       \node[anchor=east] at (mess from) {%
-        \shortstack{$c = \Enc_{\PubKey{B}}( i_A )$,\\
-          $\sigma = \Sign_{\SignKey{A}}( c )$}
+        \shortstack{%
+          $c_{\MACKey{B}} = \Enc_{\PubKey{B}}( \MACKey{B} )$, \\
+          $\sigma_{\MACKey{B}} = \Sign_{\SignKey{A}}( c_{\MACKey{B}} )$
+        }
+      };
+
+      \mess{B}{}{A}
+      \node[anchor=west] at (mess from) {%
+        \shortstack{$c_{i_B} = \Enc_{\PubKey{A}}( i_B )$,\\
+          $\sigma_{i_B} = \Sign_{\SignKey{B}}( c_{i_B} )$}
       };
     \end{sdblock}
 
@@ -751,15 +759,15 @@ he computes \(c_{i_B} = \Enc_{\PubKey{A}}( i_B )\) and \(\sigma_{i_B}
 
 \subsubsection{Publication}
 
-Again, Alice wants to publish a message \(m\) to a subset \(S = \{i_1, \ldots, 
-  i_l\}\subset U\) of her friends.
+Again, Alice wants to publish a message \(m\) to a subset \(S = \{u_1, \ldots, 
+  u_l\}\subset U\) of her friends.
 She does the same as she did in the pull model, except for the final step.
 Instead of signing with her signing key \(\SignKey{A}\), she generates 
-a \ac{MAC} \(\mu_{c_{\Key{m}}, i_j}\) for each inbox \(i_j\in S\) using the 
-respective \ac{MAC} key \(\MACKey{i_j}\): \(\mu_{c_{\Key{i_j}}} 
-  = \MAC_{\MACKey{i_j}}( c_{\Key{i_j}} )\).
-Finally, for each \(i_j\in S\)  Alice appends \((c_{\Key{i_j}}, 
-  \mu_{c_{\Key{i_j}}})\) to the inbox \(i_j\).
+a \ac{MAC} \(\mu_{c_{\Key{m}}, u_j}\) for each inbox \(u_j\in S\) using the 
+respective \ac{MAC} key \(\MACKey{u_j}\): \(\mu_{c_{\Key{u_j}}} 
+  = \MAC_{\MACKey{u_j}}( c_{\Key{u_j}} )\).
+Finally, for each \(u_j\in S\) Alice appends \((c_{\Key{u_j}}, 
+  \mu_{c_{\Key{u_j}}})\) to the inbox of \(u_j\).
 
 \subsection{Security in the Push Model}\label{sec:PushModelSec}
 % XXX Review the security analysis for the push model scheme
