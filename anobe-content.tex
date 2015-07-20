@@ -72,6 +72,16 @@
 %   - investigating, exploring, evaluating, researching, additionally;
 %   - if in relation to something else: contrasting, comparing.
 
+\acp{OSN} collect and store large amounts of private data.
+Data mining is used to monetize this data through user profiling for directed 
+advertisements or for selling to third parties.
+We know that this data, or even its meta-data, is sensitive and can tell a lot 
+about us~\cite[e.g.][]{pregnancy}.
+We have later learned that government agencies, like the \ac{NSA} and 
+\ac{GCHQ}, are interested in the data found in such centralized storages 
+\cite{prism}.
+Keeping this data out of our own control is thus a risk for privacy violations.
+
 \mode<presentation>{%
 \subsection{Problem Setting}
 \begin{frame}
@@ -89,16 +99,6 @@
   \end{itemize}
 \end{frame}
 }
-
-Online social networks collect and store large amounts of private data.
-Data mining is used to monetize this data through user profiling for directed 
-advertisements or for selling to third parties.
-We know that this data, or even its meta-data, is sensitive and can tell a lot 
-about us~\cite[e.g.][]{pregnancy}.
-We have later learned that government agencies, like the \ac{NSA} and 
-\ac{GCHQ}, are interested in the data found in such centralized storages 
-\cite{prism}.
-Keeping this data out of our own control is thus a risk for privacy violations.
 
 \begin{frame}<presentation>
   \begin{itemize}
@@ -429,7 +429,7 @@ She will try to make friends with other users, to gain access to plaintexts of
 their messages and to be able to post messages to them.
 
 
-\section{Design of the Access Control Mechanism}\label{sec:Design}
+\section{Design of the \acl{AC} Mechanism}\label{sec:Design}
 % XXX Review the Design section
 % - Check that we recap what functional and security properties we want.
 
@@ -440,7 +440,7 @@ We will start with applying \ac{ANOBE} for \ac{AC} in the pull model, then the
 push model.
 %Later, we will describe some extensions.
 
-\subsection{Access Control in the Pull Model}\label{sec:PullModelAC}
+\subsection{\acl{AC} in the Pull Model}\label{sec:PullModelAC}
 
 We have Alice who wants to use the pull model for sharing data with her 
 friends.
@@ -645,7 +645,7 @@ We can then argue that Alice might be posting to several groups in the same
 index, and that she just stopped posting to our group, but this allows us to 
 monitor Alice's communication activities.
 
-\subsection{Access Control in the Push Model}\label{sec:PushModelAC}
+\subsection{\acl{AC} in the Push Model}\label{sec:PushModelAC}
 
 Now Alice wants to use the push model for sharing data with her friends.
 The push model is conceptually different from the pull model in that Alice will 
