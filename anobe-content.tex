@@ -118,35 +118,36 @@ Keeping this data out of our own control is thus a risk for privacy violations.
 
 These risks were considered already in 2009 and \acp{DOSN} were suggested to 
 provide against them~\cite[e.g.][]{Peerson}.
-\ac{DOSN} come with the benefits that users can keep control of their data, 
+% XXX 'it' refers to the data or the central provider?  
+\acp{DOSN} come with the benefits that users can keep control of their data, 
 there is no central provider through which third parties (by force) can access 
-it, and it is more difficult to censor.
-However, such systems require more research to ensure security and privacy, as 
+the data, and it is more difficult to censor.
+However, more research is required to ensure security and privacy in \acp{DOSN}, as 
 the decentralized structure opens up for other risks---even when the data is 
-encrypted~\cite{DevilInMetadata}, we will see an example in 
-Sect.~\ref{sec:PullModelAC}.
+encrypted~\cite{DevilInMetadata} (we will see an example in 
+Sect.~\ref{sec:PullModelAC}).
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
 The main aim of \ac{AC} is to ensure confidentiality and integrity for the user 
 data.
-There are several approaches to implementations, the classical approach is to 
+There are several approaches to implement \ac{AC}, the classical approach is to 
 rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}.
 Centralized \acp{OSN} such as Facebook or Google+ are examples of using 
-a \ac{TTP}, and the Snowden revelations~\cite{prism} have proved that a risk.
+a \ac{TTP}, and the Snowden revelations~\cite{prism} have proved centralized \acp{OSN} a risk.
+% XXX Is "reference monitor" the same as "access control"? If not, you might need to introduce the new term.
 Another way to implement the reference monitor is through cryptography, and 
 with cryptography we can remove the need for trust.
 This way anyone may read the encrypted data and we can be sure that only those 
-to whom we have given the proper keys can read it, also they can verify who is 
-the author.
+to whom we have given the proper keys can understand it, also they can verify who
+the author is.
 This is the approach we explore in this paper.
 Previous research has already identified many pitfalls in this approach, 
 e.g.~\cite{DevilInMetadata}, thus the purpose is not to find pitfalls, but to 
 find efficient mechanisms to avoid them.
 
-\citet{TowardsPPACwHPHCHD} identified three desirable properties for 
-privacy-preserving \ac{AC} mechanisms, they also conjectured that those 
-properties are sufficient.
+\citet{TowardsPPACwHPHCHD} identified three desirable and (conjectured) 
+sufficient properties for a privacy-preserving \ac{AC} mechanism.
 The properties are:
 \begin{description}
   \item[Hidden-Credentials] The reference monitor cannot learn a subject's 
@@ -188,54 +189,52 @@ context for our work.
 
 We also estimate the performance of the two approaches in 
 Sect.~\ref{sec:PerformanceEvaluation}.
-Asymptotically they have the same time and space complexities.
+Asymptotically the two approaches have the same time and space complexities.
 However, in practice, the constants will probably make a difference.
 
 
 \section{Related Work}\label{sec:RelatedWork}
 % XXX Add a summarizing intro paragraph to Related Work
+% XXX Clarify why some of the related work is presented here and some in the subsections. For example if these ones are central and other ones not.
 
-The work of \citet{TowardsPPACwHPHCHD} focused on a general solution for 
+The work of \citet{TowardsPPACwHPHCHD} is focused on a general solution for 
 privacy-preserving \ac{AC}.
-They built their solution on fully homomorphic encryption, and, as such, the 
+They build their solution on fully homomorphic encryption, and as such, the 
 scheme is not yet practically feasible.
-However, there is also a body of work which is practically feasible and applied 
-in our setting.
-There are several proposals for \acp{DOSN} available, e.g.~DECENT
+However, there is also a body of work which is practically feasible and is applied in our setting.
+There are several proposals available for \acp{DOSN}, e.g.~DECENT
 \cite{DECENT}, Cachet~\cite{Cachet} and Persona~\cite{Persona}.
-Their \ac{AC} mechanisms focus on providing confidentiality for the 
-data.
-For this they use \ac{ABE}~\cite{abe} to implement the \ac{AC} mechanism.
-Unfortunately, this yields lacking privacy as \ac{ABE} is not policy-hiding, 
-thus anyone can read the \ac{AC} policies and see who may access what data.
+The \ac{AC} mechanisms in these proposals focus on providing confidentiality for the data. They use \ac{ABE}~\cite{abe} to implement the \ac{AC} mechanism and
+unfortunately, this yields lacking privacy: as \ac{ABE} is not policy-hiding, 
+anyone can read the \ac{AC} policies and see who may access what data.
 
 \citet{PEAC} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
 % XXX What properties did the PE scheme achieve?
 %The scheme achieved the properties X.
 % XXX What are the problems with the PE scheme?
 % - More flexibility but less scalability?
-The storage complexity for keys is exponential for the \ac{PE} scheme, it 
+For the \ac{PE} scheme, the storage complexity for keys is exponential and it 
 requires \(O(2^g)\) keys, where \(g\) is the number of groups a user is 
 a member of.
-The key size is also bound to the expressibility of the policy, e.g.\ I can 
+The key size is also bound to the expressibility of the policy, e.g.\ we can 
 estimate from the size of my key how many other individuals and groups are 
 accounted for in the policy.
 As this scheme reveals such meta-information, it is not satisfactory.
 
 \subsection{Broadcast Encryption}\label{sec:BE}
 
-The purpose of \ac{BE}~\cite{broadcastenc} was to develop methods to 
-efficiently transmit data to a dynamically changing target audience 
+The purpose of \ac{BE}~\cite{broadcastenc} is to develop methods to 
+efficiently transmit data to dynamically changing target audiences 
 \(S\subseteq U\) who are allowed to read the data, whereas the remaining users 
 \(U\setminus S\) are not.
-This fits our use-case well.
-However, most research in \ac{BE} has focused on efficiency and not privacy.
+This scenario fits our use-case well.
+However, most research in \ac{BE} has been focused on efficiency and not privacy.
 Thus schemes usually require that the set \(S\) is revealed as it is required 
 for the members \(s\in S\) to know \(S\) for decryption.
 \citet{PseudonymousBE} adapted a \ac{BE} scheme using pseudonyms, but 
 pseudonyms yield a limited anonymity property~\cite{PseudonymousBE}.
 Due to this limitation of \ac{BE} schemes, \citet{ANOBE} developed \ac{ANOBE}, 
-where the goal is to allow decryption without knowing \(S\).
+where the goal was to allow decryption without knowing \(S\).
 % XXX Why is ANOBE expensive?
 The complexity of the \ac{ANOBE} scheme is linear in the size of the recipient 
 set, i.e.~\(O(|S|)\), whereas constant-size ciphertexts\footnote{%
@@ -325,17 +324,18 @@ The main entities are users (or \emph{subjects}) who want to access
 \emph{objects} stored on different \emph{storage nodes}.
 In essence, the storage nodes can be thought of as \ac{WWW} servers which serve 
 only static objects, ciphertexts in our case.
-More specifically, we want the following properties.
-All users can create objects with unique names, i.e.\ analogous publishing 
-static content on the \ac{WWW}.
-The object name is actually a \ac{URI}~\cite{rfc3986}:
+More specifically, we want the following properties:
+\begin{itemize}
+    \item All users can create objects with unique names, i.e.\ analogous publishing static content on the \ac{WWW}.
+    \item The object name is actually a \ac{URI}~\cite{rfc3986}:
 one part of the name indicates the address of the object, i.e.\ which storage 
 node that holds the object;
 the remaining part of the name makes the object uniquely identifiable in the 
 storage node.
-All objects are world readable and only the owner of an object can modify it.
+    \item All objects are world readable and only the owner of an object can modify it.
 However, we optionally have an append operation which is available to all 
 users, provided that the owner has enabled it for the object in question.
+\end{itemize}
 % XXX Put a good reference to NebuloStore here
 
 \mode<presentation>{%
@@ -433,11 +433,11 @@ their messages and to be able to post messages to them.
 % XXX Review the Design section
 % - Check that we recap what functional and security properties we want.
 
-There are several ways to implement this protocol, each way has its benefits.
+There are several ways to implement this protocol, each having its own benefits.
 We will start by describing the simplest version, which is plain \ac{ANOBE} as 
 in~\cite{ANOBE}.
-We will start with applying \ac{ANOBE} for \ac{AC} in the pull model, then the 
-push model.
+We will start with applying \ac{ANOBE} for \ac{AC} in the pull model, and then 
+in the push model.
 %Later, we will describe some extensions.
 
 \subsection{\acl{AC} in the Pull Model}\label{sec:PullModelAC}
@@ -545,8 +545,8 @@ When Alice wants to publish a message \(m\) to a subset \(S = \{u_1, \ldots,
   u_l\}\subset U\) of her friends she does the following.
 %uses a \ac{KEM}, in the case of \ac{ANOBE}~\cite{ANOBE} this is the 
 %Kurosawa-Desmedt \ac{KEM}~\cite{KD-KEM}.
-Alice creates a secret key \(\Key{m}\) and a one-time signature-verification 
-key-pair \(\SignKey{m}, \VerifKey{m}\).
+First Alice creates a secret key \(\Key{m}\) and a one-time 
+signature-verification key-pair \(\SignKey{m}, \VerifKey{m}\).
 
 Next, Alice computes \(c_m = \AuthEnc_{\Key{m}}( m )\), where \(\AuthEnc\) is 
 an authenticated encryption scheme, and she creates a new object with the name 
@@ -781,14 +781,14 @@ with negligible probability of error, from the verification key
 \(\VerifKey{m}\) that the same message resides in both their inboxes.
 Hence, Eve can learn part of the access policy.
 If Eve can make an exhaustive search of all objects in the system, then she can 
-learn the policy even if every user use unique inboxes for each friend.
+learn the policy even if every user uses unique inboxes for each friend.
 
 The push model in general is more privacy-preserving than the pull model.
-There are several advantages.
+There are several advantages regarding the push model.
 First, if a user has a different inbox for every friend, then no friend can 
 infer activity by monitoring a users inbox.
 This also means that if we stop receiving messages from a friend, then we 
-cannot distinguish between that friend stopping posing entirely or just 
+cannot distinguish between that friend stopping posting entirely or just 
 stopping posting to us.
 
 Second, in the push model, we no longer reveal the cardinality of the recipient 
@@ -840,16 +840,16 @@ update the entries in all other users' inboxes.
 % - Estimate theoretically
 % - Actually do some measurements
 
-The performance is interesting to evaluate from two perspectives: the 
+The performance is interesting to be evaluated from two perspectives: the 
 publisher's (Alice in all examples) and the subscriber's (Bob in all examples).
-From the publisher's perspective it is interesting to investigate the 
+From the publisher's perspective, it is interesting to investigate the 
 complexity of key-storage size, communication complexity for publication and 
 time complexity for encryption of new material.
-From the subscriber's perspective the complexity of key-storage size and the 
+From the subscriber's perspective, the complexity of key-storage size and the 
 time-complexity of aggregating the newest published messages are the most 
 interesting aspects.
 
-Due to their differences, our two approaches described above has some different 
+Due to their differences, our two approaches described above have some different 
 complexity properties.
 But they also have some similarities, and we will start with those.
 The space complexity for the key management is the same for both the pull and 
