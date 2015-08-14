@@ -172,3 +172,4 @@ biblatex-lncs-src
 
 # we don't use PDF figures
 *.pdf
+*.pdf_tex
