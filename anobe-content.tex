@@ -10,9 +10,9 @@
 \institute{%
   School of Computer Science and Communication\\
   KTH Royal Institute of Technology, Stockholm, Sweden\\
-  Email: \email{\{dbosk,buc\}@kth.se}%
+  \email{\{dbosk,buc\}@kth.se}%
 }
-\date{IFIP Summer School, 20th August 2015}
+\date{IFIP Summer School\\Edinburgh, 20th August 2015}
 
 \mode<presentation>{%
   \begin{frame}<presentation>
@@ -211,6 +211,30 @@ find efficient mechanisms to avoid them.
 %  \end{itemize}
 %\end{frame}
 
+\mode<presentation>{%
+\begin{frame}{Our Goals}
+  \begin{figure}
+    \centering
+    \def\svgwidth{0.5\columnwidth}
+    \input{decentralized.pdf_tex}
+    \mode<none>{%
+    \caption{%
+      An example of a centralized network with a \ac{TTP} and a decentralized 
+      network.
+      Image: OpenClipart
+    }\label{fig:De-Centralized}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Hidden-Policies
+      \pause{}
+    \item Hidden-Credentials
+      \pause{}
+    \item Hidden-Decisions
+  \end{itemize}
+\end{frame}
+}
+
 \citet{TowardsPPACwHPHCHD} identified three desirable and (conjectured) 
 sufficient properties for a privacy-preserving \ac{AC} mechanism.
 The properties are:
@@ -219,11 +243,14 @@ The properties are:
     credentials, despite using them in the access decision.
     As such, the reference monitor cannot track which subjects are requesting 
     access.
+
   \item[Hidden-Policies] The access policy remains hidden from the subjects, 
     i.e.\ the subjects cannot learn which other subjects can access the same 
     object.
+
   \item[Hidden-Decisions] The reference monitor cannot learn the outcome of an 
     access decision, but the policy is still enforced.
+
 \end{description}
 
 \subsection{Our Contributions}
@@ -258,24 +285,6 @@ We also analyse under which conditions we can achieve the different properties
 and state some requirements for the system.
 In Sect.~\ref{sec:SystemModel} we outline the underlying assumptions and the 
 context for our work.
-
-\begin{frame}<presentation>{Our Contributions}
-  \begin{itemize}
-    \item We focus on the access control mechanisms in a decentralized storage 
-      system for \acp{DOSN}.
-
-    \item We use only cryptographic mechanisms, we don't rely on any \acp{TTP} 
-      as reference monitors.
-
-      \pause{}
-
-    \item We achieve Hidden-Credentials, Hidden-Policies, and 
-      Hidden-Decisions~\cite{TowardsPPACwHPHCHD} for our scheme.
-
-    \item For this we use \ac*{ANOBE}~\cite{ANOBE}.
-  \end{itemize}
-\end{frame}
-\mode<presentation>{\acused{ANOBE}}
 
 We also estimate the complexity of the two approaches in 
 Sect.~\ref{sec:PerformanceEvaluation}.
@@ -373,7 +382,8 @@ set, i.e.~\(O(|S|)\), whereas constant-size ciphertexts\footnote{%
 
       \pause{}
 
-    \item \ac{ANOBE} does the same without the description of \(S\).
+    \item \acf{ANOBE}~\cite{ANOBE} does the same without the description of 
+      \(S\).
 
     \item By revealing \(S\) we reveal the policy.
   \end{itemize}
@@ -425,7 +435,7 @@ correct or incorrect decryption.
 We will get back to the details about this shortly.
 
 \begin{frame}
-  \mode<presentation>{{ANOBE Encryption}}
+  \mode<presentation>{\frametitle{ANOBE Encryption}}
   \begin{figure}
     \begin{algorithmic}[1]
       \Function{$\Enc^{\mathrm{ANOBE}}_S$}{$k$}
@@ -570,16 +580,16 @@ If there are no more \(c_i\) to try, then return \(\bot\).
   \end{figure}
 \end{frame}
 
-\begin{frame}<presentation>{ANOBE Decryption}
-  \begin{itemize}
-    \item Instead of trial-and-error decryption, we can use the tag-hint system 
-      from~\cite{ANOBE}.
-
-    \item Apply a function on the \ac{ANOBE} ciphertext and our private key, 
-      the result reveals the sub-ciphertext we can decrypt.
-
-  \end{itemize}
-\end{frame}
+%\begin{frame}<presentation>{ANOBE Decryption}
+%  \begin{itemize}
+%    \item Instead of trial-and-error decryption, we can use the tag-hint system 
+%      from~\cite{ANOBE}.
+%
+%    \item Apply a function on the \ac{ANOBE} ciphertext and our private key, 
+%      the result reveals the sub-ciphertext we can decrypt.
+%
+%  \end{itemize}
+%\end{frame}
 
 To decrypt an \ac{ANOBE} ciphertext, we need a trial-and-error decryption 
 procedure to decide if the ciphertext was indeed intended for us.
@@ -691,7 +701,7 @@ between the same user making two requests or two users making one request each.
 \mode<presentation>{%
 \begin{frame}<presentation>{DOSN Architecture}
   \begin{itemize}
-    \item The \ac{DOSN} architecture can be achieve in several ways.
+    \item The \acf{DOSN} architecture can be achieve in several ways.
 
     \item We have two models:
       \begin{itemize}
@@ -703,7 +713,7 @@ between the same user making two requests or two users making one request each.
 
     \item The Pull Model is like the \ac{WWW}.
 
-    \item The Push Model is more like magazine subscriptions.
+    \item The Push Model is more like newsletter subscriptions.
   \end{itemize}
 \end{frame}
 }
@@ -1250,6 +1260,10 @@ unique per-recipient instead of per-message.
 % XXX Review the performance evaluation
 % - Actually do some measurements
 % - Better integrate group management as performance evaluation
+% XXX Summarize the complexities in a table
+
+
+\subsection{Key Management, Encryption and Decryption}
 
 The performance is interesting to be evaluated from two perspectives: the 
 publisher's (Alice in all examples) and the subscriber's (Bob in all examples).
@@ -1259,23 +1273,75 @@ time complexity for encryption of new material.
 From the subscriber's perspective, the complexity of key-storage size and the 
 time-complexity of aggregating the newest published messages are the most 
 interesting aspects.
+An overview of the results is presented in Tab.~\ref{tab:PublisherComplexities} 
+and~\ref{tab:SubscriberComplexities}.
 
-\subsection{Key Management, Encryption and Decryption}
+\begin{frame}
+  \mode<presentation>{\frametitle{Publisher's View}}
+\begin{table}
+  \centering
+  \mode<article>{%
+  \caption{%
+    The storage, communication and time complexities in the two models.
+    \(F\) is the set of friends of a user, \(S\) is the set of recipients of 
+    a message.
+  }\label{tab:PublisherComplexities}
+  }
+  \subfloat{%
+  \begin{tabular}{lrr}
+    Publisher
+    & \head{Pull Model}
+    & \head{Push Model} \\
+    
+    \toprule
 
-\mode<presentation>{%
-  \begin{frame}<presentation>{Algorithmic Complexity}
-  \begin{itemize}
-    \item The space complexity for key management is similar for both models: 
-      \emph{linear} in the number of friends.
+    Key-storage size
+    & \(2|F|\) & \(|F|\) \\
 
-      \pause{}
+    \pause{}%
+    Ciphertext size
+    & \(2|S|\) & \(|S|\) \\
 
-    \item The Pull Model has slightly higher (constant factor) due to the 
-      tag-hint system.
+    Encryption
+    & \(2|S|\) & \(2|S|\) \\
 
-  \end{itemize}
-\end{frame}
+    \pause{}%
+    Communication
+    & \(1\) & \(|S|\) \\
+
+    \bottomrule
+
+  \end{tabular}
 }
+\mode<article>{\hspace{1em}}
+\subfloat{%
+  \begin{tabular}{lrr}
+    Subscriber
+    \mode<article>{& \head{Pull Model} & \head{Push Model}} \\
+    %& \head{Pull Model} & \head{Push Model} \\
+    
+    \toprule
+
+    Key-storage size
+    & \(2\) & \(1\) \\
+
+    \pause{}%
+    Ciphertext size
+    & \(2|S|\) & \(1\) \\
+
+    Decryption
+    & \(2\) & \(1\) \\
+
+    \pause{}%
+    Communication
+    & \(1\) & \(1\) \\
+
+    \bottomrule
+
+  \end{tabular}
+}
+\end{table}
+\end{frame}
 
 Due to their differences, our two approaches described above have some 
 different complexity properties.
@@ -1285,31 +1351,31 @@ Push Model.
 If we have \(n\) friends, then we need to exchange and store \(O(n)\) keys:
 we need one public key per friend.
 
-\begin{frame}<presentation>{Algorithmic Complexity}
-  \begin{itemize}
-    \item Space complexity for ciphertexts is \emph{linear} in the cardinality 
-      of the recipient set.
-
-      \pause{}
-
-    \item The same for the time complexity for encryption: \emph{linear} in the 
-      recipient set.
-
-    \item There is a higher constant factor for the Push Model, since we need 
-      to compute the signatures per-recipient.
-
-      \pause{}
-
-    \item The decryption is constant-time.
-
-    \item It's slightly higher in the Pull Model, since we need to compute the 
-      hint.
-
-    \item Decryption would be linear in the Pull Model without the tag-hint 
-      system.
-
-  \end{itemize}
-\end{frame}
+%\begin{frame}<presentation>{Algorithmic Complexity}
+%  \begin{itemize}
+%    \item Space complexity for ciphertexts is \emph{linear} in the cardinality 
+%      of the recipient set.
+%
+%      \pause{}
+%
+%    \item The same for the time complexity for encryption: \emph{linear} in the 
+%      recipient set.
+%
+%    \item There is a higher constant factor for the Push Model, since we need 
+%      to compute the signatures per-recipient.
+%
+%      \pause{}
+%
+%    \item The decryption is constant-time.
+%
+%    \item It's slightly higher in the Pull Model, since we need to compute the 
+%      hint.
+%
+%    \item Decryption would be linear in the Pull Model without the tag-hint 
+%      system.
+%
+%  \end{itemize}
+%\end{frame}
 
 The space complexity for the ciphertexts are \(O(n)\) for both models.
 The time complexity for encryption is also \(O(n)\) for both models.
@@ -1324,18 +1390,18 @@ If we add the \ac{ANOBE} tag-hint system, then we can achieve constant-time
 decryption even here.
 However, this increases the needed space for the ciphertexts in the Pull Model.
 
-\begin{frame}<presentation>{Algorithmic Complexity}
-  \begin{itemize}
-    \item The communication complexity is \emph{linear} in both models.
-
-      \pause{}
-
-    \item In the Pull Model the publisher needs only one connection.
-
-    \item In the Push Model the publisher needs \(|S|\) connections.
-
-  \end{itemize}
-\end{frame}
+%\begin{frame}<presentation>{Algorithmic Complexity}
+%  \begin{itemize}
+%    \item The communication complexity is \emph{linear} in both models.
+%
+%      \pause{}
+%
+%    \item In the Pull Model the publisher needs only one connection.
+%
+%    \item In the Push Model the publisher needs \(|S|\) connections.
+%
+%  \end{itemize}
+%\end{frame}
 
 Finally, the communication complexity for the different models differ slightly.
 Asymptotically they are the same, \(O(n)\).
@@ -1401,6 +1467,8 @@ update the entries in all other users' inboxes.
 % - Ensure that the solution covers the needed properties.
 % XXX Add slides for the conclusions
 
+\mode<presentation>{%
+\subsection{Conclusions}
 \begin{frame}<presentation>{Conclusions}
   \begin{itemize}
     \item We focus on the access control mechanisms in a decentralized storage 
@@ -1415,6 +1483,7 @@ update the entries in all other users' inboxes.
     \item For this we use \ac{ANOBE}~\cite{ANOBE}.
   \end{itemize}
 \end{frame}
+}
 
 We found that the \ac{AC} mechanisms for the two models yield different privacy 
 properties.
@@ -1443,7 +1512,7 @@ But it is important that the symmetric cipher has properties corresponding to
 robustness and key-privacy, as these properties are crucial to the security of 
 the \ac{ANOBE} scheme.
 
-\subsection<article>{Future Work}
+\subsection{Future Work}
 % XXX Review the future work section
 
 \mode<presentation>{%
