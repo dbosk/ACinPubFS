@@ -1257,10 +1257,10 @@ unique per-recipient instead of per-message.
 
 
 \section[Complexity]{Algorithmic Complexity}\label{sec:PerformanceEvaluation}
-% XXX Review the performance evaluation
+% XXX Review the algorithmic complexities
 % - Actually do some measurements
 % - Better integrate group management as performance evaluation
-% XXX Summarize the complexities in a table
+% XXX Write an introduction to the section on complexities
 
 
 \subsection{Key Management, Encryption and Decryption}
@@ -1273,8 +1273,7 @@ time complexity for encryption of new material.
 From the subscriber's perspective, the complexity of key-storage size and the 
 time-complexity of aggregating the newest published messages are the most 
 interesting aspects.
-An overview of the results is presented in Tab.~\ref{tab:PublisherComplexities} 
-and~\ref{tab:SubscriberComplexities}.
+An overview of the results is presented in Tab.~\ref{tab:Complexities}.
 
 \begin{frame}
   \mode<presentation>{\frametitle{Publisher's View}}
@@ -1283,11 +1282,10 @@ and~\ref{tab:SubscriberComplexities}.
   \mode<article>{%
   \caption{%
     The storage, communication and time complexities in the two models.
-    \(F\) is the set of friends of a user, \(S\) is the set of recipients of 
-    a message.
-  }\label{tab:PublisherComplexities}
+    \(U\) is the set of friends of a user (the universal set), \(S\) is the set 
+    of recipients of a message.
+  }\label{tab:Complexities}
   }
-  \subfloat{%
   \begin{tabular}{lrr}
     Publisher
     & \head{Pull Model}
@@ -1296,7 +1294,7 @@ and~\ref{tab:SubscriberComplexities}.
     \toprule
 
     Key-storage size
-    & \(2|F|\) & \(|F|\) \\
+    & \(2|U|\) & \(|U|\) \\
 
     \pause{}%
     Ciphertext size
@@ -1312,9 +1310,6 @@ and~\ref{tab:SubscriberComplexities}.
     \bottomrule
 
   \end{tabular}
-}
-\mode<article>{\hspace{1em}}
-\subfloat{%
   \begin{tabular}{lrr}
     Subscriber
     \mode<article>{& \head{Pull Model} & \head{Push Model}} \\
@@ -1339,7 +1334,6 @@ and~\ref{tab:SubscriberComplexities}.
     \bottomrule
 
   \end{tabular}
-}
 \end{table}
 \end{frame}
 
