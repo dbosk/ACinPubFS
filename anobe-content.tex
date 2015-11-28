@@ -1,7 +1,7 @@
 \title{%
-  Privacy-Preserving Access Control in
-  Decentralized Online Social Networks using
-  Anonymous Broadcast Encryption
+  Privacy-Preserving Access Control
+  in Decentralized Storage
+  for Online Social Networks
 }
 \author{%
   Daniel Bosk \and
@@ -80,7 +80,7 @@ We know that this data, or even its meta-data, is sensitive and can tell a lot
 about us~\cite[e.g.][]{pregnancy}.
 We have later learned that government agencies, like the \ac{NSA} and 
 \ac{GCHQ}, are interested in the data found in such centralized storages 
-\cite{Prism}.
+\cite[cf.][]{Prism}.
 Keeping this data out of our own control is thus a risk for privacy violations.
 
 \mode<presentation>{%
@@ -99,7 +99,7 @@ Keeping this data out of our own control is thus a risk for privacy violations.
       \pause{}
 
     \item Besides marketing departments, governments are also interested in 
-      this data~\cite{Prism}.
+      this data~\cite[cf.][]{Prism}.
 
     \item Keeping this data out of our own control is thus a risk for privacy 
       violations.
@@ -141,9 +141,9 @@ provide against them~\cite[e.g.][]{Peerson}.
 there is no central provider through which third parties (by force) can access 
 the data or censor it for other users.
 However, more research is required to ensure security and privacy in 
-\acp{DOSN}, as the decentralized structure opens up for other risks---even when 
-the data is encrypted~\cite{DevilInMetadata} (we will see an example in 
-Sect.~\ref{sec:PullModelAC}).
+\acp{DOSN}, as the decentralized structure opens up for other risks --- even 
+when the data is encrypted~\cite{DevilInMetadata} (we will see an example in 
+\cref{PullModelAC}).
 
 \mode<presentation>{%
 \begin{frame}{Problem Setting}
@@ -180,23 +180,23 @@ Sect.~\ref{sec:PullModelAC}).
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
-The main aim of \ac{AC} is to ensure confidentiality and integrity for the user 
-data.
+The main aim of \ac{AC} is to ensure confidentiality and integrity for the 
+user's data.
 There are several approaches to implement \ac{AC}, the classical approach is to 
-rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}.
+rely on a \ac{TTP} as a reference monitor~\cite{AccessControl}; i.e.\ the 
+subject sends a request for accessing an object to the reference monitor and, 
+depending on the policy, the reference monitor grants or rejects the request.
 Centralized \acp{OSN} such as Facebook or Google+ are examples of using 
 a \ac{TTP}, and the Snowden revelations~\cite{Prism} have proved centralized 
 \acp{OSN} a risk.
-% XXX Is "reference monitor" the same as "access control"? If not, you might need to introduce the new term.
-Another way to implement a (logical) reference monitor is through cryptography, 
-and with cryptography we can remove the need for trust.
+Another way to implement a (logical) reference monitor is through cryptography; 
+i.e.\ we encrypt the data, distribute keys according to our policy, then access 
+is granted when decryption is successful and rejected when unsuccessful.
+With the cryptographic approach we can remove the need for trust in the third 
+party.
 This way anyone may read the encrypted data and we can be sure that only those 
-to whom we have given the proper keys can understand it, also they can verify 
-who the author is.
+to whom we have given the proper keys can understand it.
 This is the approach we explore in this paper.
-Previous research has already identified many pitfalls in this approach, 
-e.g.~\cite{DevilInMetadata}, thus the purpose is not to find pitfalls, but to 
-find efficient mechanisms to avoid them.
 
 %\begin{frame}<presentation>{Problem Setting}
 %  \begin{itemize}
@@ -236,8 +236,7 @@ find efficient mechanisms to avoid them.
 }
 
 \citet{TowardsPPACwHPHCHD} identified three desirable and (conjectured) 
-sufficient properties for a privacy-preserving \ac{AC} mechanism.
-The properties are:
+sufficient properties for a privacy-preserving \ac{AC} mechanism:
 \begin{description}
   \item[Hidden-Credentials] The reference monitor cannot learn a subject's 
     credentials, despite using them in the access decision.
@@ -252,58 +251,22 @@ The properties are:
     access decision, but the policy is still enforced.
 
 \end{description}
+The work in \cite{TowardsPPACwHPHCHD} focused on \ac{FHE} and is thus not 
+feasible for our purposes.
+We want to achieve these properties in \iac{AC} scheme for a decentralized 
+storage system to be used in \acp{DOSN} and similar systems.
 
-\subsection{Our Contributions}
-% XXX Improve the problem statement
-% - Clearly describe the problem before any solution
-% - What functional and security properties do we want?
-% - What properties do we need?
-%   - Do we need anonymity?
-%   - Can we make a trade-off which is good enough?
-
-% XXX Review the overview of our contributions and outline of the paper
-% - We have simplicity, more performance?
-% - What are the benefits of our scheme?
-% - What is the problem that this paper solves and how?
-% - The initial concern was performance, right?  But given the right library 
-%   this goes away, iirc.
-% - Needs more thinking.
-
-We have created an \ac{AC} mechanism for a decentralized storage system, 
-relying on minimal trust in other entities.
-In Sect.~\ref{sec:Design} we present two approaches which both achieve the 
-properties above:
-\begin{inparablank}
-\item Hidden-Credentials,
-\item Hidden-Policies,
-\item Hidden-Decisions.
-\end{inparablank}
-One approach is within the Pull Model and the other in the Push Model.
-Under the Pull Model subjects fetch data from \iac{TOC}, whereas, under the 
-Push Model subjects receive data through an inbox.
-We also analyse under which conditions we can achieve the different properties 
-and state some requirements for the system.
-In Sect.~\ref{sec:SystemModel} we outline the underlying assumptions and the 
-context for our work.
-
-We also estimate the complexity of the two approaches in 
-Sect.~\ref{sec:PerformanceEvaluation}.
-Asymptotically the two approaches have the same time and space complexities.
-However, they differ by constant factors.
-
-
-\section<article>{Related Work}\label{sec:RelatedWork}
+\section<article>{Related Work}\label{RelatedWork}
 
 There is some related work already done in this area.
 First, there is work done focusing on privacy-preserving access control, but 
 these use different approaches than we do in this paper.
-We summarize these below, in Sect.~\ref{sec:PPAC}.
+We summarize these below, in \cref{PPAC}.
 Second, there is a lot of work done in broadcast encryption.
 This body of work is relevant for the way we approach this problem.
-We briefly summarize broadcast encryption in Sect.~\ref{sec:BE} 
-and~\ref{sec:ANOBE}.
+We briefly summarize broadcast encryption in \cref{BE,ANOBE}.
 
-\subsection<article>{Privacy-Preserving Access Control}\label{sec:PPAC}
+\subsection<article>{Privacy-Preserving Access Control}\label{PPAC}
 
 The work of \citet{TowardsPPACwHPHCHD} is focused on a general solution for 
 privacy-preserving \ac{AC}.
@@ -321,7 +284,7 @@ anyone can read the \ac{AC} policies and see who may access what data.
 
 \citet{PEAC} adapted \ac{PE} for the \ac{AC} mechanism in \acp{DOSN}.
 % XXX What properties did the PE scheme achieve?
-%The scheme achieved the properties X.
+% - The scheme achieved the properties X.
 % XXX What are the problems with the PE scheme?
 % - More flexibility but less scalability?
 For the \ac{PE} scheme, the storage complexity for keys is exponential and it 
@@ -332,13 +295,12 @@ estimate from the size of my key how many other individuals and groups are
 accounted for in the policy.
 As this scheme reveals such meta-information, it is not satisfactory.
 
-\subsection<article>{Broadcast Encryption}\label{sec:BE}
+\subsection<article>{Broadcast Encryption}\label{BE}
 % XXX Rewrite BE and ANOBE sections with Alice and Bob instead of u
 
-The purpose of \ac{BE}~\cite{broadcastenc} is to develop methods to 
-efficiently transmit data to dynamically changing target audiences 
-\(S\subseteq U\) who are allowed to read the data, whereas the remaining users 
-\(U\setminus S\) are not.
+The purpose of \ac{BE} is to develop methods to efficiently transmit data to 
+dynamically changing target audiences \(S\subseteq U\) who are allowed to read 
+the data, whereas the remaining users \(U\setminus S\) are not.
 This scenario fits our use-case well.
 However, most research in \ac{BE} has been focused on efficiency and not 
 privacy.
@@ -357,7 +319,7 @@ set, i.e.~\(O(|S|)\), whereas constant-size ciphertexts\footnote{%
   type of coding scheme to reduce it further).
 }, \(O(1)\), has been achieved for non-anonymous \ac{BE}.
 
-\subsection{Anonymous Broadcast Encryption}\label{sec:ANOBE}
+\subsection{Anonymous Broadcast Encryption}\label{ANOBE}
 
 \mode<presentation>{%
 \begin{frame}<presentation>{Anonymous Broadcast Encryption}
@@ -604,7 +566,7 @@ If this value is not found among the sub-ciphertexts, then the recipient was
 not among the designated recipients.
 
 
-\section{System Model}\label{sec:SystemModel}
+\section{System Model}\label{SystemModel}
 
 The system model we work in will be relevant to our design.
 Thus we need to make some assumptions about the entities and their 
@@ -789,7 +751,7 @@ She will try to make friends with other users, to gain access to plaintexts of
 their messages and to be able to post messages to them.
 
 
-\section[Scheme Design]{Design of the \acl{AC} Mechanism}\label{sec:Design}
+\section[Scheme Design]{Design of the \acl{AC} Mechanism}\label{Design}
 % XXX Review the Design section
 % - Check that we recap what functional and security properties we want.
 
@@ -800,7 +762,7 @@ We will start with applying \ac{ANOBE} for \ac{AC} in the Pull Model, and then
 in the Push Model.
 %Later, we will describe some extensions.
 
-\subsection{\Acl{AC} in the Pull Model}\label{sec:PullModelAC}
+\subsection{\Acl{AC} in the Pull Model}\label{PullModelAC}
 
 We have Alice who wants to use the Pull Model for sharing data with her 
 friends.
@@ -1256,7 +1218,7 @@ unique per-recipient instead of per-message.
 %performance problems.
 
 
-\section[Complexity]{Algorithmic Complexity}\label{sec:PerformanceEvaluation}
+\section[Complexity]{Algorithmic Complexity}\label{PerformanceEvaluation}
 % XXX Review the algorithmic complexities
 % - Actually do some measurements
 % - Better integrate group management as performance evaluation
@@ -1564,6 +1526,44 @@ Alice to know for sure that Bob has read the data she shared with him.
 This can be interesting for several reasons, but one example is that Alice 
 accidentally shared data she did not want to share.
 Then she would like to know if anyone saw it before she removed it again.
+
+\subsection{Our Contributions}
+% XXX Improve the problem statement
+% - Clearly describe the problem before any solution
+% - What functional and security properties do we want?
+% - What properties do we need?
+%   - Do we need anonymity?
+%   - Can we make a trade-off which is good enough?
+
+% XXX Review the overview of our contributions and outline of the paper
+% - We have simplicity, more performance?
+% - What are the benefits of our scheme?
+% - What is the problem that this paper solves and how?
+% - The initial concern was performance, right?  But given the right library 
+%   this goes away, iirc.
+% - Needs more thinking.
+
+We have created an \ac{AC} mechanism for a decentralized storage system, 
+relying on minimal trust in other entities.
+In \cref{Design} we present two approaches which both achieve the properties 
+above:
+\begin{inparablank}
+\item Hidden-Credentials,
+\item Hidden-Policies,
+\item Hidden-Decisions.
+\end{inparablank}
+One approach is within the Pull Model and the other in the Push Model.
+Under the Pull Model subjects fetch data from \iac{TOC}, whereas, under the 
+Push Model subjects receive data through an inbox.
+We also analyse under which conditions we can achieve the different properties 
+and state some requirements for the system.
+In \cref{SystemModel} we outline the underlying assumptions and the context for 
+our work.
+
+We also estimate the complexity of the two approaches in 
+\cref{PerformanceEvaluation}.
+Asymptotically the two approaches have the same time and space complexities.
+However, they differ by constant factors.
 
 
 \mode<presentation>{%
