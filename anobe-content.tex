@@ -34,8 +34,8 @@
   The current research on access control in \acp{DOSN} has been focused on 
   efficiently achieving confidentiality for data.
   In this paper, we focus on achieving privacy-preserving access control 
-  mechanisms for the \ac{DOSN} setting, i.e.~Hidden-Policies, 
-  Hidden-Credentials and Hidden-Decisions.
+  mechanisms for the \ac{DOSN} setting, i.e.~hidden policies, 
+  hidden credentials and hidden decisions.
   We design an access-control scheme for two models of communication, the Pull 
   Model and the Push Model.
   These models yield different privacy properties and requirements on the 
@@ -181,6 +181,8 @@ when the data is encrypted~\cite{DevilInMetadata} (we will see an example in
 
 % XXX Emphasize the main purpose of the work
 In this work, we focus on \ac{AC} in such decentralized systems.
+We use \acp{DOSN} as an example use-case, but the results should be applicable 
+to any decentralized storage system for communication.
 We focus on encryption-based \ac{AC}: i.e.\ using cryptography as a logical 
 reference monitor as opposed to the traditional way of having \iac{TTP}.
 We encrypt the data, distribute keys according to our policy, then access is 
@@ -730,7 +732,8 @@ outsider anonymity.
 Yet other interesting primitives are various \ac{ABE} schemes.
 The requirements for this category of schemes is that they need to be 
 decentralized and policy hiding.
-There is some work done in this area, but they are out of scope for this paper.
+There is some work done in this area, but to our knowledge, current \ac{ABE} 
+schemes are not policy hiding.
 % XXX Does key-privacy imply hidden policies?
 
 
@@ -756,7 +759,7 @@ storage node in our descriptions below.
 
 \subsection{\Acl*{AC} in the Pull Model}\label{PullModelAC}
 
-In this model, Alice distribute the link and key to the object by posting them 
+In this model, Alice distributes the link and key to the object by posting them 
 to her \ac{TOC} (index).
 The protocol is illustrated in \cref{PullModelSetup,PullModelPublication}, the 
 details follow.
@@ -1368,7 +1371,7 @@ connections to all the friends' \acp{TOC}.
 \end{frame}
 }
 
-Our scheme is, as is general \ac{BE} schemes, designed to broadcast a message 
+Our scheme is, as are general \ac{BE} schemes, designed to broadcast a message 
 to a dynamically changing group.
 This means that we can easily change the recipient group.
 However, when a new user, say Bob, is added to the group, we might want to give 
@@ -1422,9 +1425,8 @@ update the entries in all other users' inboxes.
 \section<article>{Related Work}\label{RelatedWork}
 % XXX Adapt related work to be in the end
 
-There is some related work already done in this area, work done focusing on 
-privacy-preserving access control, but these use different approaches than we 
-do in this paper.
+There is some related work already done in this area, ranging from general 
+solutions to specific solutions in \ac{P2P} file-sharing systems or \acp{DOSN}.
 We summarize these below.
 
 The work of \citet{TowardsPPACwHPHCHD} is focused on a general solution for 
@@ -1482,8 +1484,12 @@ Finally, however, when it comes to removing the reading rights of a subscriber,
 all schemes are equally inefficient: they need to re-encrypt all previously 
 posted material.
 
-\subsection{Our Contributions}
-% XXX Integrate our contributions to the related work
+
+\section{Conclusions}\label{sec:Conclusions}
+% XXX Review the conclusions
+% - Ensure that the solution covers the needed properties.
+% XXX Add slides for the conclusions
+
 % XXX Improve the problem statement
 % - Clearly describe the problem before any solution
 % - What functional and security properties do we want?
@@ -1505,22 +1511,16 @@ From these requirements we gave a high-level description of what the storage
 system must be like.
 We then suggested two models for publication and subscription of content in 
 that system --- the Pull and Push Model --- and analysed what privacy 
-properties can be achieved in the different models and the requirements for the 
-cryptographic primitives used to implement it.
+properties can be achieved and how in the different models and the requirements 
+for the cryptographic primitives used to implement it.
 
-We created an \ac{AC} mechanism for a decentralized storage system, relying on 
-minimal trust in other entities.
+From these findings we created an \ac{AC} mechanism for a decentralized storage 
+system, relying on minimal trust in other entities.
 We presented an example implementation using the \ac{ANOBE} primitive.
-We also estimated the complexity of the two approaches in 
-\cref{AlgComplexity}.
-Asymptotically the two approaches have the same time and space complexities.
-However, they differ by constant factors.
-
-
-\section{Conclusions}\label{sec:Conclusions}
-% XXX Review the conclusions
-% - Ensure that the solution covers the needed properties.
-% XXX Add slides for the conclusions
+Using this example we showed how to achieve different privacy properties and 
+estimated the algorithmic complexity of the two models.
+Asymptotically the two approaches have the same time and space complexities, 
+but they differ by constant factors.
 
 \mode<presentation>{%
 \subsection{Conclusions}
@@ -1540,26 +1540,25 @@ However, they differ by constant factors.
 \end{frame}
 }
 
-We found that the \ac{AC} mechanisms for the two models yield different privacy 
-properties.
 In the Pull Model we achieve the three desired properties hidden credentials, 
 hidden decisions and hidden policies, but we reveal meta-information such as 
-our activity in the system.
-However, we are required to use a padding scheme to hide the cardinality of the 
-recipient set.
-Without this we reveal this piece of information about the policy.
+our activity in the system and we are required to use a padding scheme to hide 
+the cardinality of the recipient set.
+Without the padding scheme we reveal this piece of information about the 
+policy.
 
-In the Push Model, we achieve the first two properties.
+In the Push Model, we achieve the first two properties similarly as for the 
+Pull Model..
 For the hidden policy property we must be careful in the design of the system.
 If Alice re-uses an inbox for several friends, then those friends learn that 
 part of her access policy.
-But if we ensure that we use one inbox per friend and it is computationally 
-infeasible to search through all objects or that we use unique randomness and 
-signature-verification keys, then we can have policy hiding in the Push Model 
-too.
+But if we ensure that we use one inbox per friend and that it is 
+computationally infeasible to search through all objects or that we use unique 
+randomness and signature-verification keys, then we can have policy hiding in 
+the Push Model too.
 
-Both models are asymptotically equally complex, but in practice, the Push Model 
-is probably slightly more costly for the publisher while cheaper for the 
+Although both models are asymptotically equally complex, in practice, the Push 
+Model is probably slightly more costly for the publisher while cheaper for the 
 subscriber.
 But this should be investigated in details, currently they are only theoretical 
 estimates.
@@ -1600,23 +1599,20 @@ the \ac{ANOBE} scheme.
 }
 
 We can see several interesting tracks to explore from this work.
-First, it would be interesting to have stronger deniability properties in the 
-scheme.
+First, we would like to have stronger deniability properties in the scheme.
 In the Pull Model, any deniability relies on the indistinguishability of the 
 users, that a third party cannot distinguish between users.
 However, Bob can prove to the third party what Alice has said, since she has 
 signed her messages to provide authentication.
-This could be fixed by using a \ac{MAC} scheme for authentication of messages, 
-then we no longer have the non-repudiation property.
-In the Push Model, we can easily remove the non-repudiation property in this 
-way.
+This could have a negative effect on free speech.
+We should be able to fix this by using a \ac{MAC} scheme for authentication of 
+messages, then we no longer have the non-repudiation property.
 Since we use a \ac{MAC}, Bob cannot prove anything to the third party, since he 
 himself holds a copy of the \ac{MAC} key.
-This can be extended to a larger group by sharing the \ac{MAC} key within the 
-group.
-But Bob can still show that he has a message which is signed using the same 
-signature key as Carol or Eve, so he can (somewhat) prove to them that Alice 
-let him decrypt the message.
+In the Push Model, we can easily remove the non-repudiation property in this 
+way.
+But it must be extended to a larger group by sharing the \ac{MAC} key within 
+the group in the Pull Model.
 We would like to explore further the possibilities for Alice to deny her 
 activities in the system.
 
