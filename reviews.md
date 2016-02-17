@@ -62,3 +62,96 @@ Suggested papers
 
 "Outsider-Anonymous Broadcast Encryption with Sublinear Ciphertexts"
 Nelly Fazio, Irippuge Milinda Perera
+
+
+REVIEW 3:
+===============================================================================
+
+The paper describes a privacy-preserving data sharing system where users
+can store (encrypted) data in a distributed manner yet enforce strong
+access control. The later is done in an anonymous way such that the node
+hosting the (encrypted) data should not learn who is allowed to fully
+access the content.
+
+Roughly, the idea is to use anonymous broadcast encryption (ANOBE) which
+allows to encrypt data for a set of users such that the ciphertext
+does not leak any information about the intended receivers. In the
+envisaged scheme, a user that wants to publish some data encrypts it
+under a fresh key k and then encrypts k for all eligible readers using
+the ANOBE scheme. How the encrypted data and wrapped key is transmitted
+to the intended users depends on whether the pull or push mode is used.
+
+The desired (informal) security properties are briefly discussed, but
+unfortunately, neither a formal security notion nor proof is given. The
+informal security properties also rely on system properties that are
+hardly described, such as where the encrypted data is stored and how the
+user retrieve that data. While the beginning of the paper introduces the
+entity of decentralised storage nodes those don't appear in the actual
+description where it is simply said that the ciphertexts are stored
+"somewhere in the storage system". So I'm not sure how important the
+aspect of decentralization is for the solution.
+
+From an editorial point, the readability of the paper could be greatly
+improved by providing a clear separation of the considered setting, goal,
+building blocks and solution. For instance, Section 2 (Hidden Policies,
+Credentials) and  Section 3 (System Model) are both a similar mix of
+informal security properties, introduction of entities and sketched
+solutions for some of the properties. For the ANOBE building block some
+encryption and decryption algorithms are introduced where it is not clear
+though, whether this is a generic ANOBE procedure or a concrete and new
+construction proposed by the authors. If its the latter, then one would
+also have to prove that the proposed construction is indeed a secure
+ANOBE scheme, as those abstract properties are used in the high-level
+security discussion.
+
+Thus, while the topic of the paper is certainly interesting, I lean
+towards rejection given the confusing presentation and the lack of a
+proper security analysis.
+
+
+REVIEW 4:
+===============================================================================
+
+The paper describes a storage system based on anonymous broadcast
+encryption.  This could be an interesting paper but unfortunately, the
+write up is a mess (sorry to be so blunt), unfortunately.  To accept
+this in the proceeding a serious rewrite needs to be done. See comments.
+
+Section 2.  This is a way to informal discussion of the security
+requirements. While the requirements seem to be named, it is does not
+become clear which are the requirements. Neither does it become clear
+what the different operations of the system are. The section starts
+off well be listening the involved parties, but then the algorithms or
+protocol of the system should be stated, in the best case with input and
+output specification.  Then a *list* of the requirements should be given
+(e.g., the following x requirements must be met), followed by a definition
+(even informal)  what the requirements are, and then the requirements
+can be discussed.
+
+Section 3. How does this relate to section 2? It seems to be the
+infrastructure requirements and some kind of architecture that uses the
+scheme of section 5.
+
+Section 4. The title seems to indicate that you introduces the necessary
+cryptographic primitive that you built your scheme form. However, you
+only discuss anonymous broadcast encryption. So the section should be
+renamed and section 3.2 integrated in the intro of the section. Then,
+when you introduce broadcast encryption it is not clear whether this
+is your own scheme, or one from the literature.  Further, the security
+requirements of AONBE are not discussed. Aslo what kind of decryption
+algorithm do you require? Linear of with tags?  The algorithm you give
+does not cater for tags. How is this defined.
+
+Section 5. After having read section 4, one would expect that you actually
+use the algorithms introduced in section 4, but now, you use an other
+encryption scheme, then authenticated encryption (both of which you
+do not introduce in section 3), so why did you bother to write section
+4?? What kind of encryption scheme do you need one that is secure against
+chosen ciphertext security? What kind of signature scheme?  The security
+discussion would benefit from a better section 2 so you could address
+each requirement one by one in a structured fashion.
+
+In section 5.3. Suddenly you want to remove non-repudiation with MAC? Is
+this a new requirement?  Is it crucial? You just mention this here
+in passing.
+
