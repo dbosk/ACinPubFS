@@ -17,6 +17,87 @@
   \makebox[#2][l]{\rotatebox{#1}{#3}}
 }
 
+\usepackage{amssymb}
+\usepackage{amsmath}
+\DeclareMathOperator{\FS}{\mathcal{FS}}
+\DeclareMathOperator{\fscreateop}{\FS.\mathsf{create}}
+\NewDocumentCommand{\fscreate}{m m}{%
+  \ensuremath{\fscreateop\left( #1, #2 \right)}%
+}
+\DeclareMathOperator{\fsreadop}{\FS.\mathsf{read}}
+\NewDocumentCommand{\fsread}{m}{%
+  \ensuremath{\fsreadop\left( #1 \right)}%
+}
+\DeclareMathOperator{\fsappendop}{\FS.\mathsf{append}}
+\NewDocumentCommand{\fsappend}{m m}{%
+  \ensuremath{\fsappendop\left( #1, #2 \right)}%
+}
+
+\DeclareMathOperator{\C}{\mathcal{C}}
+\NewDocumentCommand{\csetup}{m o}{%
+  \IfNoValueTF{#2}{%
+    \ensuremath{\C\left[#1\right].\mathsf{setup}()}%
+  }{%
+    \ensuremath{\C\left[#1\right].\mathsf{setup}\left( #2 \right)}%
+  }
+}
+\NewDocumentCommand{\cpub}{m m m}{%
+  \ensuremath{\C\left[ #1 \right].\mathsf{publish}\left( #2, #3 \right)}%
+}
+\NewDocumentCommand{\cget}{m}{%
+  \ensuremath{\C\left[ #1 \right].\mathsf{fetch}()}%
+}
+
+% Push Model
+\DeclareMathOperator{\PushOp}{\mathcal{P}_n}
+\NewDocumentCommand{\Push}{m o}{\ensuremath{%
+    \PushOp\left[ #1 \right]%
+    \IfValueT{#2}{%
+      \!.\mathsf{#2}%
+    }
+  }}
+\NewDocumentCommand{\pnsetup}{m o}{\ensuremath{%
+    \Push{#1}[setup]%
+    \IfValueT{#2}{%
+      \left( #2 \right)%
+    }
+  }}
+\NewDocumentCommand{\pnpub}{m o o}{\ensuremath{%
+    \Push{#1}[publish]%
+    \IfValueT{#2}{%
+      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+    }
+  }}
+\NewDocumentCommand{\pnget}{m o}{\ensuremath{%
+    \Push{#1}[fetch]%
+    \IfValueT{#2}{\left( #2 \right)}
+  }}
+% Pull Model
+\DeclareMathOperator{\PullOp}{\mathcal{P}_1}
+\NewDocumentCommand{\Pull}{m o}{\ensuremath{%
+    \PullOp\left[ #1 \right]%
+    \IfValueT{#2}{%
+      \!.\mathsf{#2}%
+    }
+  }}
+\NewDocumentCommand{\psetup}{m o}{\ensuremath{%
+    \Pull{#1}[setup]%
+    \IfValueT{#2}{%
+      \left( #2 \right)%
+    }
+  }}
+\NewDocumentCommand{\ppub}{m o o}{\ensuremath{%
+    \Pull{#1}[publish]%
+    \IfValueT{#2}{%
+      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+    }
+  }}
+\NewDocumentCommand{\pget}{m o}{\ensuremath{%
+    \Pull{#1}[fetch]%
+    \IfValueT{#2}{\left( #2 \right)}
+  }}
+
+
 \usepackage[strict]{csquotes}
 %\MakeBlockQuote{|}{§}{|}
 %\EnableQuotes{}
@@ -32,10 +113,6 @@
 \addbibresource{ac.bib}
 \addbibresource{be.bib}
 \addbibresource{rfc.bib}
-
-\usepackage{amssymb}
-\usepackage{amsmath}
-%\usepackage{amsthm}
 
 \usepackage[binary,amssymb]{SIunits}
 \usepackage{cleveref}

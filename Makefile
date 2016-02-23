@@ -1,5 +1,5 @@
 .PHONY: all
-all: DecentAC-paper.pdf DecentAC-slides.pdf
+all: DecentAC-paper.pdf
 
 ANOBE_DEPENDS= 		DecentAC-content.tex
 ANOBE_DEPENDS+= 	libbib.sty

@@ -67,115 +67,361 @@
 \section{Introduction}\label{Introduction}
 % XXX Rewrite the introduction
 
-\Acp{OSN} collect and store large amounts of private data.
-Data mining is used to monetize this data through user profiling for directed 
-advertisements or for selling to third parties.
-We know that this data, or even its meta-data, is sensitive and can tell a lot 
-about us~\cite[e.g.][]{pregnancy}.
-We have later learned that government agencies, like the \ac{NSA} and 
-\ac{GCHQ}, are interested in the data found in such centralized storages 
-\cite[cf.][]{Prism}.
-Keeping this data out of our own control is thus a risk for privacy violations.
+Alice and her friends want to communicate asynchronously.
+To do this they want to use a publicly available file system and write their 
+messages to different files, which the other party later can read.
+We are interested in enforcing access-control policies in such a public file 
+system which does not have any built-in access control mechanisms.
+Beyond the expected confidentiality, Alice wants some stronger privacy 
+properties as well:
+\begin{itemize}
+  \item \dots
+\end{itemize}
 
-\mode<presentation>{%
-\subsection{Problem Setting}
-\begin{frame}{Problem Setting}
+We will assume a simple file system with no built-in access control.
+This system is discussed and defined in \cref{FileSystem}.
+We will continue to define two communication models such a system in 
+\cref{PushAndPull}.
+Then we will discuss the high-level properties in \cref{PushAndPullAnalysis}.
+
+
+% XXX Formalize the setting, the system model:
+%  - A file system: read, write, append.
+%  - Adversary is storage node, operates file system.
+%  - Adversary participates as user.
+
+\section{A General File System}\label{FileSystem}
+
+We will model our system as an abstract file system with the operations create, 
+read and append.
+The operations are defined as we intuitively expect: we can create an object, 
+then read it and also append to it.
+The file system itself provides no access control.
+
+\begin{definition}[Public File System]\label{FS}
+  A \emph{file} \(f = (i, m)\) consists of the \emph{identifier} \(i\) and the 
+  \emph{content} \(m\).
+  We define the set of files \(F = \{(i, m_i)\}\) together with the following 
+  operations to be the \emph{public file system} \(\FS\):
   \begin{itemize}
+    \item \(\fscreate{i}{m_i}\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
+      \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\).
+      Otherwise this operation has no effect.
 
-    \item \acp{OSN} collect and store large amounts of private data.
+    \item \(\fsread{i} = m_i\) if \((i, m_i)\in F\), otherwise 
+      \(\fsread{i^\prime} = \bot\).
 
-      \pause{}
-
-    \item This data can reveal sensitive information.
-
-    \item Even its meta-data can reveal a lot of information.
-
-      \pause{}
-
-    \item Besides marketing departments, governments are also interested in 
-      this data~\cite[cf.][]{Prism}.
-
-    \item Keeping this data out of our own control is thus a risk for privacy 
-      violations.
-
+    \item \(\fsappend{i}{m^\prime}\) will set \((i, m)\gets (i, m\concat 
+        m^\prime)\) for \((i, m)\in F\).
+      If \(\{(i^\prime, m^\prime)\in F\mid i^\prime = i\} = \emptyset\) this 
+      operation has no effect.
   \end{itemize}
-\end{frame}
-}
+\end{definition}
 
-\mode<presentation>{%
-\begin{frame}<presentation>{Problem Setting}
+We can see in the definition that anyone can read any object in the file 
+system.
+Anyone can also create new files and append to existing files.
+
+% XXX Formalize assumptions:
+%  - Storage node cannot tell the origin of two requests apart.
+%  - Eve controls the entire storage system?
+%    - Here she can do an exhaustive search.
+%  - Eve only controls part of the network?
+%    - Can Eve do an exhaustive search in the storage?
+%
+%Assuming that Eve controls the entire storage system should be more 
+%interesting as it's a stronger adversary.  There shouldn't be any need 
+%for the weaker adversary who controls only a part of the storage system.  
+%We'll have to remove some randomness re-use from ANOBE for the 
+%implementation, but that should suffice.
+
+We will let the adversary Eve operate the file system \(\FS\) defined in 
+\cref{FS}.
+By this we mean that Eve has access to the internal state of \(\FS\) directly, 
+i.e.\ the set of files \(F\).
+She can thus read all files (same as everyone else), but she can also do 
+arbitrary searches since she does not have to use \(\fsread{\cdot}\).
+She can also modify the files (including deleting them).
+
+To be consistent with \cref{FS}, Eve cannot distinguish between Alice's and 
+Bob's requests to the operations of \(\FS\) --- in the definition there is 
+nothing to identify who used any of the operations.
+But she can record the times at which they occurred with her own clock, since 
+she executes them.
+
+
+% XXX Formalize what we want to do:
+%  - Publisher makes a message m asynchronously available to n recipients 
+%    while hiding the recipient set:
+%    - Pull model: publish m as object o.
+%    - Push model: publish m as objects o_1, ..., o_n.
+%  - Each recipient reads m:
+%    - Pull model: read object o.
+%    - Push model: read object o_i.
+%  - The publisher should be unidentifiable for a non-recipient.
+
+\section{Two Communication Protocols}\label{PushAndPull}
+
+There are several ways Alice can implement the message passing with her 
+friends.
+We will start with a general outline of the model of communication Alice will 
+use, then we will proceed to the details of two alternative protocols that 
+implements the model.
+
+\begin{definition}[Communication model]\label{CommunicationModel}
+  Let \(\C\) be a \emph{\((p, S)\)-communication model} with a \emph{publisher} 
+  \(p\) and a \emph{set of subscribers} \(S\).
+  Then we have the following operations defined on \(\C\):
   \begin{itemize}
-
-    \item One way is to decentralize the \ac{OSN}:
-      \begin{itemize}
-        \item to get away from a central provider,
-        \item to keep the users in control of their data.
-      \end{itemize}
-
-    %\item The system gets increased censorship resistance.
-
+    \item Before start the publisher runs \(\csetup{p}\) and each subscriber 
+      \(s\in S\) runs \(\csetup{s}\).
+    \item The publisher \(p\) uses \(\cpub{p}{R}{m}\) to publish the message 
+      \(m\) to the designated \emph{recipient set} \(R\) by making it available 
+      to all subscribers \(s\in R\subseteq S\).
+    \item Each subscriber \(s\in S\) uses \(\cget{s}\) to get the set \(M\) of 
+      published messages \(m\in M\) for which \(s\) was in the recipient set.
   \end{itemize}
-  \begin{figure}
-    \centering
-    \def\svgwidth{\columnwidth}
-    \input{de-centralized.pdf_tex}
-    \mode<none>{%
-    \caption{%
-      An example of a centralized and a decentralized network.
-      Image: OpenClipart
-    }\label{fig:De-Centralized}
-    }
-  \end{figure}
-\end{frame}
-}
+\end{definition}
 
-These risks were considered already in 2009 and \acp{DOSN} were suggested to 
-provide against them~\cite[e.g.][]{Peerson}.
-\Acp{DOSN} come with the benefits that users can keep control of their data, 
-there is no central provider through which third parties (by force) can access 
-the data or censor it for other users.
-However, more research is required to ensure security and privacy in 
-\acp{DOSN}, as the decentralized structure opens up for other risks --- even 
-when the data is encrypted~\cite{DevilInMetadata} (we will see an example in 
-\cref{PullModelAC}).
+In our desired scenario, Alice acts as a publisher and her friends as the 
+subscribers.
+We note that no subscriber \(s\in S\) can use \(\cpub{s}{R}{m}\) to publish 
+a message \(m\).
+The communication model is strictly unidirectional from publisher to 
+subscribers and they cannot use the publisher's interface.
+In the same sense, no subscriber \(s^\prime\in S\) can use \(\cget{s}\) for 
+\(s^\prime\neq s\).
+It follows too that no subscriber \(s_i\) can learn which \(s_1, \ldots, s_n\in 
+  R\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given 
+message \(m\).
 
-\mode<presentation>{%
-\begin{frame}{Problem Setting}
-  \begin{figure}
-    \centering
-    \def\svgwidth{\columnwidth}
-    \input{de-centralized.pdf_tex}
-    \mode<none>{%
-    \caption{%
-      An example of a centralized network with a \ac{TTP} and a decentralized 
-      network.
-      Image: OpenClipart
-    }\label{fig:De-Centralized}
-    }
-  \end{figure}
+There are several ways to implement the message-passing protocol for this 
+communication model.
+We will focus on two alternative protocols which uses \(\FS\) from \cref{FS} 
+above, these are the Push Model and the Pull Model.
+The Push Model is analogous to the subscription of magazines:
+a subscriber contacts the publisher and signs a subscription, whenever the 
+publisher issues a new magazine it sends a copy to the subscribers mailbox.
+The Pull Model the converse of the Push Model.
+It is analogous to the selling of magazines in kiosks:
+the publisher issues magazines and the \enquote{subscribers} come to the kiosk 
+and buy them whenever they want.
+
+\subsection{Analysis of the Push Model}
+
+We base our analysis on the following definition.
+
+\begin{definition}[Push Model]\label{PushModel}
+  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an encryption scheme, 
+  \(\mathcal{S} = (\KeygenOp^\prime, \SignOp, \VerifyOp)\) be  
+  a digital-signature scheme and \(\FS\) be a public file system.
+  We denote by \(\PushOp\) the \emph{push model protocol} implementing a \((p, 
+    S)\)-communication model through the operations
   \begin{itemize}
-    \item In this paper we focus on the access control mechanisms in such 
-      systems.
-
-      \pause{}
-
-    \item The classical approach to access control is a \ac{TTP} as reference 
-      monitor.
-
-    \item We use cryptography as a (logical) reference monitor.
-
-      \pause{}
-
-    \item Related work has focused on efficiency rather than privacy.
-
+    \item \(\pnsetup{p}[\cdot]\) and \(\pnsetup{s}[\cdot]\),
+    \item \(\pnpub{p}[\cdot][\cdot]\), and
+    \item \(\pnget{s}[\cdot]\)
   \end{itemize}
-\end{frame}
-}
+  as in \cref{PushFunctions}.
+\end{definition}
+
+\begin{figure}[p]
+  \framebox{%
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup{p}$}{$1^n$}
+        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen[\prime]{1^n}$}
+        \State{$\forall s\in S$: give $\VerifKey{p}$ to $\Push{s}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnpub{p}$}{$R, m$}
+        \For{$s\in R$}
+          \State{$\sigma_s = \Enc[\PubKey{s}]{m}$}
+          \State{$\tau_s = \Sign[\SignKey{p}]{\sigma_s}$}
+          \State{$\fsappend{i_s}{\sigma_s, \tau_s}$}
+        \EndFor{}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup{s}$}{$1^n$}
+        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^n}$}
+        \State{$i_s\rgets \{0, 1\}^n$}
+        \State{Give $(\PubKey{s}, i_s)$ to $\Push{p}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnget{s}$}{}
+        \State{$C = \fsread{i_s}$}
+        \State{$M\gets \emptyset$}
+        \For{$(\sigma, \tau)\in C$}
+          \If{$\Verify[\VerifKey{p}]{\sigma, \tau}$}
+            \State{$m_\sigma = \Dec[\PriKey{s}]{\sigma}$}
+            \State{$M\gets M\cup \{m\}$}
+          \EndIf{}
+        \EndFor{}
+        \State{\Return{$M$}}
+
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  }
+  \caption{%
+    Functions implementing the communication model for the Push Model protocol.
+  }\label{PushFunctions}
+\end{figure}
+
+When Alice executes \(\pnsetup{p}\) she generates a signature-verification 
+key-pair \((\SignKey{p}, \VerifKey{p})\) and gives the verification key to all 
+her friends.
+Each of her friends \(s\in S\), when they execute \(\pnsetup{s}\) they generate
+a public-private key-pair and a random string as an identifier.
+They give the public key and the identifier to Alice.
+
+When Alice wants to send a message \(m\) to a subset \(R\subseteq S\) of her 
+friends, she uses \(\pnpub{p}\) to encrypt the message for each of her friends 
+\(s\in R\) under their respective public key, \(\sigma_s\gets 
+  \Enc[\PubKey{s}]{m}\).
+Then she uses \(\FS\) to append the ciphertext \(\sigma_s\) to the file with 
+identifier \(i_s\).
+Each friend can then use \(\pnget{s}\) to retrieve their ciphertexts from the 
+file system and decrypt them.
+
+\subsection{Analysis of the Pull Model}
+
+In our analysis we will use the following definition for the Pull Model.
+
+\begin{definition}[Pull Model]\label{PullModel}
+  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an encryption scheme, 
+  \(\mathcal{S} = (\KeygenOp^\prime, \SignOp, \VerifyOp)\) be  
+  a digital-signature scheme and \(\FS\) be a public file system.
+  We denote by \(\PullOp\) the \emph{push model protocol} implementing a \((p, 
+    S)\)-communication model through the operations
+  \begin{itemize}
+    \item \(\psetup{p}[\cdot]\) and \(\psetup{s}[\cdot]\),
+    \item \(\ppub{p}[\cdot][\cdot]\), and
+    \item \(\pget{s}[\cdot]\)
+  \end{itemize}
+  as in \cref{PullFunctions}.
+\end{definition}
+
+\begin{figure}[p]
+  \framebox{%
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup{p}$}{$1^n$}
+        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen[\prime]{1^n}$}
+        \State{$i_p\rgets \{0, 1\}^n$}
+        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull{s}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnpub{p}$}{$R, m$}
+        \State{$\sigma_R = \Enc[\PubKey{R}]{m}$}
+        \State{$\fsappend{i_p}{\sigma_s}$}
+        \EndFor{}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup{s}$}{$1^n$}
+        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^n}$}
+        \State{$i_s\rgets \{0, 1\}^n$}
+        \State{Give $(\PubKey{s}, i_s)$ to $\Push{p}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnget{s}$}{}
+        \State{$C = \fsread{i_s}$}
+        \State{$M\gets \emptyset$}
+        \For{$\sigma\in C$}
+          \State{$m_\sigma = \Dec[\PriKey{s}]{\sigma}$}
+          \State{$M\gets M\cup \{m\}$}
+        \EndFor{}
+        \State{\Return{$M$}}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  }
+  \caption{%
+    Functions implementing the communication model for the Pull Model protocol.
+  }\label{PullFunctions}
+\end{figure}
+
+In this model, each publisher has an index.
+
+More specifically, each publisher has a \emph{\acl{TOC}} (\acs{TOC}, an index), 
+e.g.\ a user profile, stored in an object.
+In the set-up phase, when Alice the publisher becomes friends with Bob the 
+subscriber, she gives him an object name containing her \ac{TOC} and they agree 
+on a key.
+This key can be either Bob's public key or they generate and agree on 
+a symmetric key.
+(We will elaborate on the needed properties of the encryption scheme below.)
+When Alice wants to publish new material, she updates her \ac{TOC}.
+Later, whenever Bob is interested in seeing new posts by Alice, he can read her 
+\ac{TOC}, i.e.\ pull new content from Alice's object.
+
+
+\section{Requirements}
+
+\dots
+
+% XXX Top-down approach:
+%  - First, analyse high-level properties in pull and push models.
+%    - Motivation for hidden policies, credentials, decisions.
+%    - Alice removes Bob from recipient set: Bob shouldn't distinguish this or 
+%      if Alice stopped posting to all.
+%    - Bob shouldn't be able to monitor Alice's activities unrelated to Bob.
+%    - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, she 
+%      shouldn't be able to tell if it's also in Bob's.
+%  - Second, suggest an example of possible implementation using ANOBE.
+%  - Third, complexity for solution.
+%
+%I think this disposition will make the paper less confusing.  This also 
+%requires a lot of formalization:
+%
+% XXX Formalize hidden policies, credentials and decisions --- but how?
+%  - Hidden policies: policy-hiding ciphertext, how to formalize?
+%    - Given two equally-sized ciphertexts the adversary cannot tell them 
+%      apart?
+%    - What about the size of the recipient set?  Padding and dummy entries 
+%      should work?
+%    - Probably the definition in [ANOBE] can help?
+%    - Timing-attacks on the push model?  Alice writes n same-sized 
+%      objects to n places within a short timespan.  How to formalize?
+%  - Hidden credentials: the keys are by definition hidden, how to 
+%    formalize?  In identity-based access control, is the identity itself 
+%    the credential or whatever authenticates the identity?  Or both?
+%  - Hidden decisions: the adversary should not be able to guess the 
+%    outcome, an IND-style property.  This shouldn't be any problem to 
+%    turn into a security game.
+%
+%I'll have to refresh my mind by looking at a few papers, to see how they 
+%have defined the properties.  These shouldn't be too difficult to find 
+%definitions for.  The following are a bit less straight-forward for me 
+%right now:
+%
+% XXX Formalize other required (more high-level) properties:
+%  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
+%    Alice stopped posting to all.
+%  - Bob shouldn't be able to monitor Alice's activities.
+%  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
+%    she shouldn't be able to tell if it's also in Bob's.
+%
+%I think this should be possible to capture in one definition.  But right 
+%now it's a bit out of reach for me.
+%
 
 % XXX Emphasize the main purpose of the work
-In this work, we focus on \ac{AC} in such decentralized systems.
-We use \acp{DOSN} as an example use-case, but the results should be applicable 
-to any decentralized storage system for communication.
+In this work, we focus on \ac{AC} in decentralized systems.
 We focus on encryption-based \ac{AC}: i.e.\ using cryptography as a logical 
 reference monitor as opposed to the traditional way of having \iac{TTP}.
 We encrypt the data, distribute keys according to our policy, then access is 
@@ -198,30 +444,6 @@ to whom we have given the proper keys can read it.
 %  \end{itemize}
 %\end{frame}
 
-\mode<presentation>{%
-\begin{frame}{Our Goals}
-  \begin{figure}
-    \centering
-    \def\svgwidth{0.5\columnwidth}
-    \input{decentralized.pdf_tex}
-    \mode<none>{%
-    \caption{%
-      An example of a centralized network with a \ac{TTP} and a decentralized 
-      network.
-      Image: OpenClipart
-    }\label{fig:De-Centralized}
-    }
-  \end{figure}
-  \begin{itemize}
-    \item Hidden Policies
-      \pause{}
-    \item Hidden Credentials
-      \pause{}
-    \item Hidden Decisions
-  \end{itemize}
-\end{frame}
-}
-
 \citet{TowardsPPACwHPHCHD} identified three desirable and (conjectured 
 sufficient) properties for a privacy-preserving \ac{AC} mechanism:
 \begin{inparablank}
@@ -229,7 +451,7 @@ sufficient) properties for a privacy-preserving \ac{AC} mechanism:
 \item hidden credentials, and
 \item hidden decisions.
 \end{inparablank}
-The work in \cite{TowardsPPACwHPHCHD} focused on \ac{FHE} and is thus not 
+The work in~\cite{TowardsPPACwHPHCHD} focused on \ac{FHE} and is thus not 
 feasible for our purposes.
 But we want to achieve these properties in \iac{AC} scheme for a decentralized 
 storage system to be used in \acp{DOSN} and similar systems.
@@ -306,154 +528,6 @@ For this reason, in addition to anonymization, subjects must also request
 ciphertexts they cannot decrypt.
 This can be done either by dummy requests (i.e.\ requesting objects at random) 
 or by \ac{PIR} techniques, such as \ac{OT}.
-
-
-\section{System Model}\label{SystemModel}
-
-% XXX Improve SystemModel intro paragraph
-We will now outline a system model based on our discussion in \cref{HiddenPCD}.
-We will describe what properties the system will have and what the publishers 
-and subscribers can do in the system.
-We assume that our adversary Eve is honest-but-curious and participates in the 
-system in all roles --- storage node, publisher and subscriber.
-
-\subsection{The Underlying Communication}\label{UnderlyingCommunication}
-
-We can start out with the underlying communication system.
-The hidden credentials and hidden decisions properties required that users are 
-anonymized to not break the hidden policies property.
-There is a large body of work in anonymity systems, e.g.\ Tor~\cite{Tor}, so 
-for our purposes we assume that all users in the system, including the storage 
-nodes, are anonymous.
-% XXX We should be able to formalize this
-More specifically, a storage node receiving two requests, cannot decide whether 
-it is
-\begin{enumerate}
-\item two requests from the same user, or
-\item two requests from two different users.
-\end{enumerate}
-This can be achieved either with Tor or any type of mix-net.
-
-\mode<presentation>{%
-\begin{frame}<presentation>{Entities and Properties}
-  \begin{figure}
-    \centering
-    \def\svgwidth{0.4\columnwidth}
-    \input{decentralized.pdf_tex}
-    %\caption{A decentralized storage system.}
-  \end{figure}
-  \begin{itemize}
-    \item We assume there exists a distributed storage system:
-      \begin{itemize}
-        \item All users can create new objects.
-        \item Any user can read any object.
-
-          \pause{}
-
-        \item Only the owner can modify an object.
-        \item An owner can optionally allow others to append.
-      \end{itemize}
-
-  \end{itemize}
-\end{frame}
-}
-
-\subsection{The Storage System}\label{UnderlyingStorage}
-
-On top of this communication system we run our decentralized storage system.
-For this system we need some basic functionality:
-publishers need to create objects and subscribers need to read objects.
-In some circumstances the publisher also wants the subscribers to be able to 
-append to (but not modify) some objects, e.g.\ for commenting on one of the 
-publisher's publications.
-% XXX Add reference to NebuloStore
-
-To preserve the confidentiality of the object, we need the object name to be 
-randomized.
-And to preserve the privacy of the owner, the object location should also be 
-randomized.
-If not, then where the object is stored implies the possible owners of the 
-object.
-\citet{DataAvailability} explored the problem of replica placement of data.
-They used game theory and found that storage nodes giving similar availability 
-guarantees benefited by replicating each others' data, but that storage nodes 
-of higher availability would not replicate data of nodes of lower availability.
-This means that a publisher's objects cannot be allocated randomly within the 
-entire system, but can be allocated randomly within the group of publishers of 
-similar availability.
-Thus, how much a publisher is online determines the size of the anonymity set.
-
-\mode<presentation>{%
-  % XXX Rewrite properties slide
-  \begin{frame}<presentation>{Entities and Properties}
-  \begin{itemize}
-
-    \item The users should not have to trust the storage nodes.
-
-    \item We trust the storage nodes to keep \enquote{something} online.
-
-      \pause{}
-
-    \item We also assume that we can anonymize the users and storage nodes.
-
-    \item This can be accomplished using e.g.~Tor~\cite{Tor}.
-
-  \end{itemize}
-\end{frame}
-}
-
-\subsection{The \acs*{DOSN} Architecture}\label{DOSNArchitecture}
-
-\mode<presentation>{%
-\begin{frame}<presentation>{DOSN Architecture}
-  \begin{itemize}
-    \item The \acf{DOSN} architecture can be achieve in several ways.
-
-    \item We have two models:
-      \begin{itemize}
-        \item Pull Model
-        \item Push Model
-      \end{itemize}
-
-      \pause{}
-
-    \item The Pull Model is like the \ac{WWW}.
-
-    \item The Push Model is more like newsletter subscriptions.
-  \end{itemize}
-\end{frame}
-}
-
-There are several ways to implement the message passing for the social 
-communication over the above storage system.
-We will focus on two models: the Push Model and the Pull Model.
-
-The Pull Model is analogous to the magazine selling in kiosks:
-the publisher issues magazines and the \enquote{subscribers} come to the kiosk 
-and buy them whenever they want.
-More specifically, each publisher has a \emph{\acl{TOC}} (\acs{TOC}, an index), 
-e.g.\ a user profile, stored in an object.
-In the set-up phase, when Alice the publisher becomes friends with Bob the 
-subscriber, she gives him an object name containing her \ac{TOC} and they agree 
-on a key.
-This key can be either Bob's public key or they generate and agree on 
-a symmetric key.
-(We will elaborate on the needed properties of the encryption scheme below.)
-When Alice wants to publish new material, she updates her \ac{TOC}.
-Later, whenever Bob is interested in seeing new posts by Alice, he can read her 
-\ac{TOC}, i.e.\ pull new content from Alice's object.
-
-The Push Model is the converse of the Pull Model.
-It is analogous to the subscription of magazines:
-a subscriber contacts the publisher and signs a subscription, whenever the 
-publisher issues a new magazine it sends a copy to the subscribers mailbox.
-The set-up phase is similar to that of the Pull Model, the difference is that 
-Bob will give Alice the object name of an \emph{inbox} and ask her to put 
-a copy all her new posts there.
-When Alice wants to publish new content, she knows that Bob is interested, so 
-she appends a copy to his inbox object.
-(This is another reason why we want the append functionality mentioned in 
-\cref{UnderlyingStorage}.)
 
 
 \section<article>{Cryptographic Primitives}\label{BE}\label{Prerequisites}
@@ -1437,7 +1511,7 @@ unfortunately, this yields lacking privacy: as this is not policy-hiding,
 anyone can read the \ac{AC} policies and see who may access what data.
 
 There is also a body of work done in storage for \ac{P2P} file-sharing systems, 
-e.g.\ \cite{TunableACinP2P}.
+e.g.~\cite{TunableACinP2P}.
 \citet{TunableACinP2P} aimed at the trade-off between privacy and search in 
 \ac{P2P} file-sharing systems.
 So it is not directly applicable in our use-case and neither does it fulfil the 
