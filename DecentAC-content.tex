@@ -171,7 +171,8 @@ she executes them.
 %    - Bob shouldn't be able to monitor Alice's activities unrelated to Bob.
 %    - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, she 
 %      shouldn't be able to tell if it's also in Bob's.
-%  - Second, suggest an example of possible implementation using ANOBE.
+%  - Second, suggest an example of possible implementation using (modified) 
+%    ANOBE.
 %  - Third, complexity for solution.
 %
 \section{Two Communication Protocols}\label{PushAndPull}
@@ -264,12 +265,127 @@ the publisher issues magazines and the \enquote{subscribers} come to the kiosk
 and buy them whenever they want.
 We note that essentially all \ac{BE} schemes, including \ac{ANOBE}, are 
 designed for the Pull Model.
+It is therefore natural to start our analysis with the Pull Model.
+
+\subsection{Analysis of the Pull Model}
+\label{PullAnalysis}
+
+In this model, each publisher has an index file in the file system.
+This is simply a file object with a randomly chosen identifier.
+The publisher adds new publications to the index while subscribers pull new 
+content from the index.
+In our analysis we will use the following definition for the Pull Model.
+
+\begin{definition}[Pull Model]\label{PullModel}
+  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
+  broadcast-encryption scheme and \(\FS\) be a public file system.
+  We denote by \(\PullOp\) the \emph{push model protocol} implementing a \((p, 
+    S)\)-communication model through the operations
+  \begin{itemize}
+    \item \(\psetup{p}[\cdot]\) and \(\psetup{s}[\cdot]\),
+    \item \(\ppub{p}[\cdot][\cdot]\), and
+    \item \(\pget{s}[\cdot]\)
+  \end{itemize}
+  as in \cref{PullFunctions}.
+\end{definition}
+
+\begin{figure}%[p]
+  \framebox{%
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\psetup{p}$}{$1^\lambda$}
+        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
+        \State{$i_p\rgets \{0, 1\}^{\lambda}$}
+        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull{s}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\ppub{p}$}{$R, m$}
+        \State{$\sigma \gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
+        \State{$\fsappend[i_p][\sigma]$}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\psetup{s}$}{$1^\lambda$}
+        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
+        \State{Give $\PubKey{s}$ to $\Push{p}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pget{s}$}{}
+        \State{$C = \fsread[i_p]$}
+        \State{$M\gets \emptyset$}
+        \For{$\sigma\in C$}
+          \State{$m_\sigma = \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
+          \State{$M\gets M\cup \{m\}$}
+        \EndFor{}
+        \State{\Return{$M$}}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  }
+  \caption{%
+    Functions implementing the communication model for the Pull Model protocol.
+    The publisher's interface is to the left and the subscribers' to the right.
+  }\label{PullFunctions}
+\end{figure}
+
+When Alice executes \(\pnsetup{p}\) the \(\KeygenOp\) algorithm generates 
+a signature-verification key-pair \((\SignKey{p}, \VerifKey{p})\).\footnote{%
+  Since the scheme \(\mathcal{E}\) is an authenticated \ac{BE} scheme, the key 
+  generation yields a proper broadcast keys for encryption and decryption in 
+  addition to a signature-verification key-pair --- in Alice's case (conversely 
+  for her friends) we are only interested in the authentication part, so we 
+  simply discard her encryption keys in the definition.
+}
+She also randomly chooses an identifier.
+Then the verification key and identifier are both given to all her friends.
+Each of her friends \(s\in S\), when they execute \(\pnsetup{s}\) the 
+\(\KeygenOp\) algorithm generates a public-private key-pair.\footnote{%
+  Actually this is ju the notation we use.
+  It might just as well be Alice's execution that generates the broadcast keys 
+  and distributes them to her friends, while her friends' \(\psetup{s}\) does 
+  nothing.
+}
+They give their respective public key to Alice.
+
+When Alice wants to publish a message \(m\) to the recipient set \(R\subseteq 
+  S\), she runs \(\ppub{p}[R][m]\).
+This operation simply creates an authenticated broadcast ciphertext 
+\(\sigma\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}\) by combining the 
+broadcast key \(\{\PubKey{s}\}_{s\in R}\) and the signature key 
+\(\SignKey{p}\).
+She appends the ciphertext to her index file.
+Each friend can then use \(\pnget{s}\) to retrieve the ciphertexts from the 
+file system and decrypt them.
+
+As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed 
+for the Pull Model.
+We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
+ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
+However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
+jealous Bob (\cref{JealousBob}).
+Bob can read Alice's index, conclude that there are entries which he cannot 
+decrypt and thus he can become jealous.
+(In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
+the output of \(\pget{\cdot}\).)
+To prevent this Alice needs a unique index per friend, so Bob has his own 
+index.
+This actually reduces the problem to the Push Model.
+%, except with broadcast ciphertexts instead.
+%This introduces other problems, Eve can correlate all inboxes with by observing 
+%equal ciphertexts.
 
 \subsection{Analysis of the Push Model}
 \label{PushAnalysis}
 
 The idea of the Push Model is for each subscriber to have an inbox in the file 
-system.
+system --- as opposed to the Pull Model, where the publisher has an 
+\enquote{outbox}, namely the index.
 This is simply a file object with a randomly chosen identifier.
 The publisher then puts all published material in the inbox of each subscriber.
 We base our analysis on the following definition.
@@ -355,8 +471,9 @@ The encryption scheme simply combines the recipients public key \(\PubKey{s}\)
 and Alice's signature key \(\SignKey{p}\).
 Then she uses \(\FS\) to append the ciphertext \(\sigma_s\) to the file with 
 identifier \(i_s\).
-Each friend can then use \(\pnget{s}\) to retrieve their ciphertexts from the 
-file system and decrypt them.
+
+The operation \(\pget{s}\) works exactly the same as for the Pull Model, it 
+just uses a different file.
 
 Note that the authenticated encryption scheme \(\mathcal{E}\) can be 
 a symmetric-key scheme although we use the notation of public-key cryptography 
@@ -368,104 +485,6 @@ We have thus not yet limited ourselves to any properties of \(\mathcal{E}\)
 
 % XXX Write high-level analysis of push model
 Some high-level analysis \dots
-
-\subsection{Analysis of the Pull Model}
-\label{PullAnalysis}
-
-In this model, each publisher has an index instead of each subscriber having an 
-inbox.
-The publisher adds new publications to the index while subscribers pull new 
-content from the index.
-In our analysis we will use the following definition for the Pull Model.
-
-\begin{definition}[Pull Model]\label{PullModel}
-  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
-  broadcast-encryption scheme and \(\FS\) be a public file system.
-  We denote by \(\PullOp\) the \emph{push model protocol} implementing a \((p, 
-    S)\)-communication model through the operations
-  \begin{itemize}
-    \item \(\psetup{p}[\cdot]\) and \(\psetup{s}[\cdot]\),
-    \item \(\ppub{p}[\cdot][\cdot]\), and
-    \item \(\pget{s}[\cdot]\)
-  \end{itemize}
-  as in \cref{PullFunctions}.
-\end{definition}
-
-\begin{figure}%[p]
-  \framebox{%
-  \begin{minipage}[t]{0.48\textwidth}
-    \begin{algorithmic}
-      \Function{$\psetup{p}$}{$1^\lambda$}
-        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
-        \State{$i_p\rgets \{0, 1\}^{\lambda}$}
-        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull{s}$.}
-      \EndFunction{}
-
-      \Statex{}
-
-      \Function{$\ppub{p}$}{$R, m$}
-        \State{$\sigma \gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
-        \State{$\fsappend{i_p}{\sigma}$}
-      \EndFunction{}
-    \end{algorithmic}
-  \end{minipage}
-  \begin{minipage}[t]{0.48\textwidth}
-    \begin{algorithmic}
-      \Function{$\psetup{s}$}{$1^\lambda$}
-        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
-        \State{Give $\PubKey{s}$ to $\Push{p}$.}
-      \EndFunction{}
-
-      \Statex{}
-
-      \Function{$\pget{s}$}{}
-        \State{$C = \fsread{i_p}$}
-        \State{$M\gets \emptyset$}
-        \For{$\sigma\in C$}
-          \State{$m_\sigma = \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
-          \State{$M\gets M\cup \{m\}$}
-        \EndFor{}
-        \State{\Return{$M$}}
-      \EndFunction{}
-    \end{algorithmic}
-  \end{minipage}
-  }
-  \caption{%
-    Functions implementing the communication model for the Pull Model protocol.
-    The publisher's interface is to the left and the subscribers' to the right.
-  }\label{PullFunctions}
-\end{figure}
-
-The set-up phase is similar as in the Push Model.
-Alice (\(\psetup{p}\)) creates a signature-verification key-pair, but in 
-addition, she randomly chooses an identifier for her index.
-Her friends (\(\psetup{s}\)) now only create a public-private key-pair, they 
-have no need for any identifier.
-
-When Alice wants to publish a message \(m\) to the recipient set \(R\subseteq 
-  S\), she runs \(\ppub{p}[R][m]\).
-This operation simply creates an authenticated broadcast ciphertext 
-\(\sigma\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}\) by combining the 
-broadcast key \(\{\PubKey{s}\}_{s\in R}\) and the signature key 
-\(\SignKey{p}\).
-
-The operation \(\pget{s}\) works exactly the same as for the Push Model.
-
-% XXX Write high-level analysis of pull model
-Some high-level analysis \dots
-
-As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed 
-for the Pull Model.
-We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
-ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
-However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
-jealous Bob (\cref{JealousBob}).
-Bob can read Alice's index, conclude that there are entries which he cannot 
-decrypt and thus he can become jealous.
-To prevent this Alice needs a unique index per friend, so Bob has his own 
-index.
-But we can see that this reduces the problem to the Push Model, except with 
-broadcast ciphertexts instead.
 
 
 \section{Security Proofs and Other Necessary Stuff}
