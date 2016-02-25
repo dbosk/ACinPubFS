@@ -19,39 +19,86 @@
 
 \usepackage{amssymb}
 \usepackage{amsmath}
-\DeclareMathOperator{\FS}{\mathcal{FS}}
-\DeclareMathOperator{\fscreateop}{\FS.\mathsf{create}}
-\NewDocumentCommand{\fscreate}{m m}{%
-  \ensuremath{\fscreateop\left( #1, #2 \right)}%
-}
-\DeclareMathOperator{\fsreadop}{\FS.\mathsf{read}}
-\NewDocumentCommand{\fsread}{m}{%
-  \ensuremath{\fsreadop\left( #1 \right)}%
-}
-\DeclareMathOperator{\fsappendop}{\FS.\mathsf{append}}
-\NewDocumentCommand{\fsappend}{m m}{%
-  \ensuremath{\fsappendop\left( #1, #2 \right)}%
-}
+% Common algorithms
+\DeclareMathOperator{\Aop}{\mathcal{A}}
+\NewDocumentCommand{\A}{o}{\ensuremath{%
+    \Aop%
+    \IfValueT{#1}{%
+      \left( #1 \right)%
+    }
+  }}
+\DeclareMathOperator{\Dop}{\mathcal{D}}
+\NewDocumentCommand{\D}{o}{\ensuremath{%
+    \Dop%
+    \IfValue{#1}{%
+      \left( #1 \right)%
+    }
+  }}
+%\DeclareMathOperator{\Fop}{\mathcal{F}}
+%\NewDocumentCommand{\F}{o}{\ensuremath{%
+%    \Fop%
+%    \IfValueT{#1}{%
+%      \left( #1 \right)%
+%    }
+%  }}
+% File system
+\DeclareMathOperator{\FSop}{\mathcal{FS}}
+\NewDocumentCommand{\FS}{o}{\ensuremath{%
+    \FSop%
+    \IfValueT{#1}{%
+      \!.\mathsf{#1}%
+    }
+  }}
+\NewDocumentCommand{\fscreate}{o o}{\ensuremath{%
+    \FS[create]%
+    \IfValueT{#1}{%
+      \left( #1, \IfValueTF{#2}{#2}{\cdot} \right)%
+    }
+  }}
+\NewDocumentCommand{\fsread}{o}{\ensuremath{%
+    \FS[read]%
+    \IfValueT{#1}{%
+      \left( #1 \right)%
+    }
+  }}
+\NewDocumentCommand{\fsappend}{o o}{\ensuremath{%
+    \FS[append]%
+    \IfValueT{#1}{%
+      \left( #1, \IfValueT{#2}{#2}{\cdot} \right)%
+    }
+  }}
 
-\DeclareMathOperator{\C}{\mathcal{C}}
-\NewDocumentCommand{\csetup}{m o}{%
-  \IfNoValueTF{#2}{%
-    \ensuremath{\C\left[#1\right].\mathsf{setup}()}%
-  }{%
-    \ensuremath{\C\left[#1\right].\mathsf{setup}\left( #2 \right)}%
-  }
-}
-\NewDocumentCommand{\cpub}{m m m}{%
-  \ensuremath{\C\left[ #1 \right].\mathsf{publish}\left( #2, #3 \right)}%
-}
-\NewDocumentCommand{\cget}{m}{%
-  \ensuremath{\C\left[ #1 \right].\mathsf{fetch}()}%
-}
+% Communication model
+\DeclareMathOperator{\Cop}{\mathcal{C}}
+\NewDocumentCommand{\C}{m o}{\ensuremath{%
+    \Cop\!\left[ #1 \right]%
+    \IfValueT{#2}{%
+      \!.\mathsf{#2}%
+    }
+  }}
+\NewDocumentCommand{\csetup}{m o}{\ensuremath{%
+    \C{#1}[setup]%
+    \IfValueT{#2}{%
+      \left( #2 \right)%
+    }
+  }}
+\NewDocumentCommand{\cpub}{m o o}{\ensuremath{%
+    \C{#1}[publish]%
+    \IfValueT{#2}{%
+      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+    }
+  }}
+\NewDocumentCommand{\cget}{m o}{\ensuremath{%
+    \C{#1}[get]%
+    \IfValueT{#2}{%
+      \left( #2 \right)%
+    }
+  }}
 
 % Push Model
 \DeclareMathOperator{\PushOp}{\mathcal{P}_n}
 \NewDocumentCommand{\Push}{m o}{\ensuremath{%
-    \PushOp\left[ #1 \right]%
+    \PushOp\!\left[ #1 \right]%
     \IfValueT{#2}{%
       \!.\mathsf{#2}%
     }
@@ -75,7 +122,7 @@
 % Pull Model
 \DeclareMathOperator{\PullOp}{\mathcal{P}_1}
 \NewDocumentCommand{\Pull}{m o}{\ensuremath{%
-    \PullOp\left[ #1 \right]%
+    \PullOp\!\left[ #1 \right]%
     \IfValueT{#2}{%
       \!.\mathsf{#2}%
     }
