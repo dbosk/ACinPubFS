@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{subfig}
+\usepackage{mleftright}
 
 \usepackage{xparse}
 \NewDocumentCommand{\head}{O{45} O{1em} m}{%
@@ -24,21 +25,21 @@
 \NewDocumentCommand{\A}{o}{\ensuremath{%
     \Aop%
     \IfValueT{#1}{%
-      \left( #1 \right)%
+      \mleft( #1 \mright)%
     }
   }}
 \DeclareMathOperator{\Dop}{\mathcal{D}}
 \NewDocumentCommand{\D}{o}{\ensuremath{%
     \Dop%
     \IfValue{#1}{%
-      \left( #1 \right)%
+      \mleft( #1 \mright)%
     }
   }}
 %\DeclareMathOperator{\Fop}{\mathcal{F}}
 %\NewDocumentCommand{\F}{o}{\ensuremath{%
 %    \Fop%
 %    \IfValueT{#1}{%
-%      \left( #1 \right)%
+%      \mleft( #1 \mright)%
 %    }
 %  }}
 % File system
@@ -52,96 +53,96 @@
 \NewDocumentCommand{\fscreate}{o o}{\ensuremath{%
     \FS[create]%
     \IfValueT{#1}{%
-      \left( #1, \IfValueTF{#2}{#2}{\cdot} \right)%
+      \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
     }
   }}
 \NewDocumentCommand{\fsread}{o}{\ensuremath{%
     \FS[read]%
     \IfValueT{#1}{%
-      \left( #1 \right)%
+      \mleft( #1 \mright)%
     }
   }}
 \NewDocumentCommand{\fsappend}{o o}{\ensuremath{%
     \FS[append]%
     \IfValueT{#1}{%
-      \left( #1, \IfValueT{#2}{#2}{\cdot} \right)%
+      \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
     }
   }}
 
 % Communication model
 \DeclareMathOperator{\Cop}{\mathcal{C}}
 \NewDocumentCommand{\C}{m o}{\ensuremath{%
-    \Cop\!\left[ #1 \right]%
+    \Cop\mleft[ #1 \mright]%
     \IfValueT{#2}{%
-      \!.\mathsf{#2}%
+      .\mathsf{#2}%
     }
   }}
 \NewDocumentCommand{\csetup}{m o}{\ensuremath{%
     \C{#1}[setup]%
     \IfValueT{#2}{%
-      \left( #2 \right)%
+      \mleft( #2 \mright)%
     }
   }}
 \NewDocumentCommand{\cpub}{m o o}{\ensuremath{%
     \C{#1}[publish]%
     \IfValueT{#2}{%
-      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
     }
   }}
 \NewDocumentCommand{\cget}{m o}{\ensuremath{%
     \C{#1}[get]%
     \IfValueT{#2}{%
-      \left( #2 \right)%
+      \mleft( #2 \mright)%
     }
   }}
 
 % Push Model
 \DeclareMathOperator{\PushOp}{\mathcal{P}_n}
 \NewDocumentCommand{\Push}{m o}{\ensuremath{%
-    \PushOp\!\left[ #1 \right]%
+    \PushOp\mleft[ #1 \mright]%
     \IfValueT{#2}{%
-      \!.\mathsf{#2}%
+      .\mathsf{#2}%
     }
   }}
 \NewDocumentCommand{\pnsetup}{m o}{\ensuremath{%
     \Push{#1}[setup]%
     \IfValueT{#2}{%
-      \left( #2 \right)%
+      \mleft( #2 \mright)%
     }
   }}
 \NewDocumentCommand{\pnpub}{m o o}{\ensuremath{%
     \Push{#1}[publish]%
     \IfValueT{#2}{%
-      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
     }
   }}
 \NewDocumentCommand{\pnget}{m o}{\ensuremath{%
     \Push{#1}[fetch]%
-    \IfValueT{#2}{\left( #2 \right)}
+    \IfValueT{#2}{\mleft( #2 \mright)}
   }}
 % Pull Model
 \DeclareMathOperator{\PullOp}{\mathcal{P}_1}
 \NewDocumentCommand{\Pull}{m o}{\ensuremath{%
-    \PullOp\!\left[ #1 \right]%
+    \PullOp\mleft[ #1 \mright]%
     \IfValueT{#2}{%
-      \!.\mathsf{#2}%
+      .\mathsf{#2}%
     }
   }}
 \NewDocumentCommand{\psetup}{m o}{\ensuremath{%
     \Pull{#1}[setup]%
     \IfValueT{#2}{%
-      \left( #2 \right)%
+      \mleft( #2 \mright)%
     }
   }}
 \NewDocumentCommand{\ppub}{m o o}{\ensuremath{%
     \Pull{#1}[publish]%
     \IfValueT{#2}{%
-      \left( #2, \IfValueTF{#3}{#3}{\cdot} \right)%
+      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
     }
   }}
 \NewDocumentCommand{\pget}{m o}{\ensuremath{%
     \Pull{#1}[fetch]%
-    \IfValueT{#2}{\left( #2 \right)}
+    \IfValueT{#2}{\mleft( #2 \mright)}
   }}
 
 

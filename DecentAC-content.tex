@@ -301,7 +301,7 @@ We base our analysis on the following definition.
       \Function{$\pnpub{p}$}{$R, m$}
         \For{$s\in R$}
           \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{m}$}
-          \State{$\fsappend{i_s}{\sigma_s}$}
+          \State{$\fsappend[i_s][\sigma_s]$}
         \EndFor{}
       \EndFunction{}
     \end{algorithmic}
@@ -317,7 +317,7 @@ We base our analysis on the following definition.
       \Statex{}
 
       \Function{$\pnget{s}$}{}
-        \State{$C = \fsread{i_s}$}
+        \State{$C = \fsread[i_s]$}
         \State{$M\gets \emptyset$}
         \For{$\sigma\in C$}
           \State{$m_\sigma\gets \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
