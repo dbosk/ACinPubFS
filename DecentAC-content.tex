@@ -242,6 +242,13 @@ from Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
       \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
 \end{definition}
 
+% XXX Formalize other required (more high-level) properties:
+%  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
+%    Alice stopped posting to all.
+%  - Bob shouldn't be able to monitor Alice's activities.
+%  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
+%    she shouldn't be able to tell if it's also in Bob's.
+
 However, there are some desirable privacy properties that are not captured by 
 ANO-IND-CCA\@.
 Bob might become jealous if he realizes that Alice no longer includes him in 
@@ -378,9 +385,6 @@ the output of \(\pget{\cdot}\).)
 To prevent this Alice needs a unique index per friend, so Bob has his own 
 index.
 This actually reduces the problem to the Push Model.
-%, except with broadcast ciphertexts instead.
-%This introduces other problems, Eve can correlate all inboxes with by observing 
-%equal ciphertexts.
 
 \subsection{Analysis of the Push Model}
 \label{PushAnalysis}
@@ -488,8 +492,14 @@ We have thus not yet limited ourselves to any properties of \(\mathcal{E}\)
 % XXX Write high-level analysis of push model
 Some high-level analysis \dots
 
+Eve can correlate all inboxes with by observing equal ciphertexts.
 
-\section{Security Proofs and Other Necessary Stuff}
+\section{Security Proof for the Push Model}
+
+\dots
+
+
+\section{Related Work}
 
 \dots
 
@@ -508,22 +518,6 @@ Some high-level analysis \dots
 %  - Hidden decisions: the adversary should not be able to guess the 
 %    outcome, an IND-style property.  This shouldn't be any problem to 
 %    turn into a security game.
-%
-%I'll have to refresh my mind by looking at a few papers, to see how they 
-%have defined the properties.  These shouldn't be too difficult to find 
-%definitions for.  The following are a bit less straight-forward for me 
-%right now:
-%
-% XXX Formalize other required (more high-level) properties:
-%  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
-%    Alice stopped posting to all.
-%  - Bob shouldn't be able to monitor Alice's activities.
-%  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
-%    she shouldn't be able to tell if it's also in Bob's.
-%
-%I think this should be possible to capture in one definition.  But right 
-%now it's a bit out of reach for me.
-%
 
 %\citet{TowardsPPACwHPHCHD} identified three desirable and (conjectured 
 %sufficient) properties for a privacy-preserving \ac{AC} mechanism:
@@ -533,38 +527,11 @@ Some high-level analysis \dots
 %\item hidden decisions.
 %\end{inparablank}
 %The work in~\cite{TowardsPPACwHPHCHD} focused on \ac{FHE} and is thus not 
-%feasible for our purposes.
-%But we want to achieve these properties in \iac{AC} scheme for a decentralized 
-%storage system to be used in \acp{DOSN} and similar systems.
+%directly feasible for our purposes.
+%However, the properties are still relevant in our setting.
 %
-%We first analyse the high-level requirements to provide hidden policies, hidden 
-%credentials and hidden decisions in our \ac{AC} setting.
-%From these requirements we give a high-level description of what the storage 
-%system must be like.
-%We then suggest two models for publication and subscription of content in that 
-%system and analyse what privacy properties can be achieved in the different 
-%models and the requirements for the cryptographic mechanisms used to implement 
-%it.
-%
-%
-%\section{Hidden Policies, Credentials and Decisions in 
-%  \acsp{DOSN}}\label{HiddenPCD}
-%% XXX Write a summarizing intro paragraph for HiddenPCD
-%% XXX Write slides for HiddenPCD
-%% XXX Can we turn HiddenPCD into security games?
-%
-%In the \ac{DOSN} setting we have two main roles, we call them the 
-%\emph{publisher} and the \emph{subscriber}.
-%In the standard \ac{AC} terminology, the publisher is the \emph{owner} of the 
-%\emph{object} (i.e.\ published data) and the subscriber is a \emph{subject} 
-%requesting access to the object.
-%(We will use these terms interchangeably depending on the context.)
-%We also have the \emph{storage nodes} which store all data in the system.
-%Some of these storage nodes might also be publishers or, more importantly, 
-%subscribers in the system.
-%
-%Hidden policies means that the access policy remains hidden from anyone but the 
-%owner and the subjects learn at most if they have access or not.
+%Hidden policies means that the access policy remains hidden from anyone but 
+%the owner and the subjects learn at most if they have access or not.
 %So the subjects cannot learn which other subjects can access the same object.
 %We mentioned in \cref{Introduction} that we have a logical reference monitor 
 %based solely on cryptography and that, due to this fact, everyone can read all 
@@ -609,7 +576,7 @@ Some high-level analysis \dots
 %ciphertexts they cannot decrypt.
 %This can be done either by dummy requests (i.e.\ requesting objects at random) 
 %or by \ac{PIR} techniques, such as \ac{OT}.
-%
+
 %\subsection{The Push and Pull Models}
 %
 %We achieve hidden credentials in the Pull Model: a user's private key serves as 
@@ -1563,9 +1530,16 @@ Some high-level analysis \dots
 %Finally, however, when it comes to removing the reading rights of a subscriber, 
 %all schemes are equally inefficient: they need to re-encrypt all previously 
 %posted material.
-%
-%
-%\section{Conclusions}\label{sec:Conclusions}
+
+
+\section{Conclusions}\label{Conclusions}
+
+\dots
+
+We do not have to consider the re-encryption problem when changing group 
+constellations: this would violate the property that jealous Bob cannot infer 
+a change in the access policy.
+
 %% XXX Review the conclusions
 %% - Ensure that the solution covers the needed properties.
 %% XXX Add slides for the conclusions
