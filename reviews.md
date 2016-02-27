@@ -155,3 +155,47 @@ In section 5.3. Suddenly you want to remove non-repudiation with MAC? Is
 this a new requirement?  Is it crucial? You just mention this here
 in passing.
 
+
+FEEDBACK
+===============================================================================
+
+I appreciate that you aim at a formal security notion and consider the UC       
+framework. I'm not sure, though, whether this is feasible in the given time     
+frame. Working out an ideal functionality in the UC framework usually takes     
+weeks (even with quite some experience), and requires a lot of finetuning that 
+becomes only apparent when working out the detailed proof. Also the security    
+proof is very different from a "normal" proof, and requires a lot of work as    
+well.                                                                           
+                                                                                
+Further, aiming at a UC-secure version usually also impacts the construction    
+and comes with a significant "penalty" in terms of efficiency, as one has to    
+make a lot of things extractable and let the protocol contain proves of         
+correctnes of all steps. (Our work on the distributed password protocol was     
+very exceptional in that context, as we could leverage some very strong - yet   
+unavoidable assumptions to avoid the usual overhead and ZKPs).                  
+                                                                                
+So, I'd actually recommmend not to go for UC security, as I think this would    
+basically be a paper on its own and require 1-2 months of work at least. What   
+you could do though is to define things on a semi-formal basis by describing a  
+rough ideal world behaviour (but not fully compliant with the UC framework).    
+Property-based or informal definitions are also ok ... it should simply allow   
+the reader to understand which properties are guaranteed, and what are the      
+considered capabilities of the adversary.                                       
+                                                                                
+Looking at the draft that you sent earlier I would also recommend to make       
+clear what is a security/functional definition and what is the concrete         
+construction. Ideally, the security/functional definition should not make any   
+assumptions or usage of concrete building blocks but rather describe the        
+desired behaviour in abstract terms.                                            
+                                                                                
+In the DecentAC-paper.pdf in Section 3.1 and 3.2 you introduce a "definition    
+of the push/pull model". From that title I would expect a generic definition    
+of the model, but it seems that the definition is rather the concrete           
+construction that you propose. So, having a clear seperation of a) the desired  
+functional and security properties b) the necessary building blocks and c) the  
+concrete construction, would be very helpful for the reader.                    
+                                                                                
+I think the strengths of your paper is that you look at an interesting          
+application and propose modular constructions based on ANOBE and other          
+cryptographic primitives. I'd focus on presenting that contribution in a clear  
+and structured manner.
