@@ -255,11 +255,8 @@ Bob might become jealous if he realizes that Alice no longer includes him in
 the recipient set for her messages.
 As such Bob should only be able to determine that Alice publishes content by 
 being in the recipient set himself.
-We capture this in the following game.
-
-\begin{definition}[Jealous Bob]\label{JealousBob}
-  \dots
-\end{definition}
+We treat this problem in \cref{UC}, until then we will refer to this as 
+\enquote{the problem of Jealous Bob}.
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.
@@ -502,7 +499,9 @@ Some high-level analysis \dots
 
 Eve can correlate all inboxes with by observing equal ciphertexts.
 
-\section{Security Proof for the Push Model}
+
+\section{Universally Composable Security}
+\label{UC}
 
 \dots
 
