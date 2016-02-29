@@ -376,15 +376,18 @@ As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed
 for the Pull Model.
 We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
 ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
+(We will not restate their proof here as the only difference is a matter of 
+notation.)
 However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
-jealous Bob (\cref{JealousBob}).
+Jealous Bob.
 Bob can read Alice's index, conclude that there are entries which he cannot 
 decrypt and thus he can become jealous.
 (In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
 the output of \(\pget{\cdot}\).)
 To prevent this Alice needs a unique index per friend, so Bob has his own 
 index.
-This actually reduces the problem to the Push Model.
+This actually reduces the problem to the Push Model which we will analyse 
+next.
 
 \subsection{Analysis of the Push Model}
 \label{PushAnalysis}
@@ -422,8 +425,10 @@ We base our analysis on the following definition.
 
       \Function{$\pnpub{p}$}{$R, m$}
         \For{$s\in R$}
-          \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{m}$}
+          \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
+          \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
           \State{$\fsappend[i_s][\sigma_s]$}
+          \State{$i_s\gets i_s^\prime$}
         \EndFor{}
       \EndFunction{}
     \end{algorithmic}
@@ -439,11 +444,14 @@ We base our analysis on the following definition.
       \Statex{}
 
       \Function{$\pnget{s}$}{}
-        \State{$C = \fsread[i_s]$}
+        \State{$C\gets \fsread[i_s]$}
         \State{$M\gets \emptyset$}
         \For{$\sigma\in C$}
-          \State{$m_\sigma\gets \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
+          \State{$(i_s^\prime, m_\sigma) \gets \Dec[\PriKey{s}, 
+            \VerifKey{p}]{\sigma}$}
           \State{$M\gets M\cup \{m\}$}
+          \State{$C^\prime \gets \fsread[i_s^\prime]$}
+          \State{$C\gets C\cup C^\prime$}
         \EndFor{}
         \State{\Return{$M$}}
       \EndFunction{}
