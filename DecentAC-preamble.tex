@@ -69,6 +69,39 @@
     }
   }}
 
+\DeclareMathOperator{\Mop}{\mathcal{M}}
+\NewDocumentCommand{\M}{o}{\ensuremath{%
+    \Mop%
+    \IfValueT{#1}{%
+      \mleft( #1 \mright)%
+    }
+  }}
+\DeclareMathOperator{\AFSop}{\mathcal{AFS}}
+\NewDocumentCommand{\AFS}{o}{\ensuremath{%
+    \AFSop%
+    \IfValueT{#1}{%
+      \!.\mathsf{#1}%
+    }
+  }}
+\NewDocumentCommand{\afscreate}{o o}{\ensuremath{%
+    \AFS[create]%
+    \IfValueT{#1}{%
+      \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
+    }
+  }}
+\NewDocumentCommand{\afsread}{o}{\ensuremath{%
+    \AFS[read]%
+    \IfValueT{#1}{%
+      \mleft( #1 \mright)%
+    }
+  }}
+\NewDocumentCommand{\afsappend}{o o}{\ensuremath{%
+    \AFS[append]%
+    \IfValueT{#1}{%
+      \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
+    }
+  }}
+
 % Communication model
 \DeclareMathOperator{\Cop}{\mathcal{C}}
 \NewDocumentCommand{\C}{m o}{\ensuremath{%

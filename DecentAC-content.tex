@@ -95,7 +95,7 @@ instances of either of the two models, then prove prove its security.
 %  - Adversary is storage node, operates file system.
 %  - Adversary participates as user.
 
-\section{A General File System}\label{FileSystem}
+\section{An Anonymous File System}\label{FileSystem}
 
 We will model our system as an abstract file system with the operations create, 
 read and append.
@@ -145,14 +145,57 @@ We will let the adversary Eve operate the file system \(\FS\) defined in
 By this we mean that Eve has access to the internal state of \(\FS\) directly, 
 i.e.\ the set of files \(F\).
 She can thus read all files (same as everyone else), but she can also do 
-arbitrary searches since she does not have to use \(\fsread{\cdot}\).
-She can also modify the files (including deleting them).
+arbitrary searches.
+%She can also modify the files (including deleting them).
 
-To be consistent with \cref{FS}, Eve cannot distinguish between Alice's and 
-Bob's requests to the operations of \(\FS\) --- in the definition there is 
-nothing to identify who used any of the operations.
-But she can record the times at which they occurred with her own clock, since 
-she executes them.
+We will now introduce an anonymizing layer on top of the file system.
+
+\begin{definition}[Anonymizing functionality]\label{AnonymizingFunctionality}
+  We denote by \(\M\) an \emph{anonymizing functionality}.
+  Then \(\M\) provides the interface \(\M[\cdot]\), which takes a function call
+  and its arguments and executes the call anonymously.
+\end{definition}
+
+We note that \(\M\) can be implemented using a mix-net or onion-routing, it may 
+arbitrary delay the execution of the function if necessary for the 
+anonymization.
+We summarize its capabilities in the following security game.
+
+\begin{definition}[MIX-IND]
+  Let \(\M\) be an anonymizing functionality.
+  \begin{description}
+    \item[Setup] \dots
+    \item[Challenge] The adversary prepares two sets of standalone operations, 
+      \(O_1, O_2\), and gives these to the challenger.
+      The challenger then randomly chooses \(b\in \{0, 1\}\) and executes 
+      \(\M[O_b]\) followed by \(\M[O_{1-b}]\).
+    \item[Guess] The adversary observes the executions as they happen and then 
+      outputs \(\hat{b}\).
+  \end{description}
+  We define the adversary's advantage as \(\Adv{\text{MIX-IND}}{\A, 
+      \M}[\lambda] = |\Pr[\hat{b} = b] - \frac{1}{2}|\).
+\end{definition}
+
+Now, combining this anonymizing functionality with the public file system we 
+get an anonymous public file system.
+
+\begin{definition}[Anonymous public file system]\label{AFS}
+  Let \(\FS\) be a public file system and \(\M\) be an anonymizing 
+  functionality.
+  Then we let \(\AFS\) be an anonymized file system with the following 
+  interface:
+  \begin{itemize}
+    \item \(\afscreate[i][m] = \M[\fscreate[i][m]]\),
+    \item \(\afsread[i] = \M[\fsread[i]]\), and
+    \item \(\afsappend[i][m] = \M[\fsappend[i][m]]\).
+  \end{itemize}
+\end{definition}
+
+Now, using \(\AFS\), Eve cannot distinguish between Alice's and Bob's requests 
+to the operations of \(\FS\).
+Eve can record the times at which they occurred with her own clock, since she 
+executes them, but the anonymizing layer \(\M\) might render this useless --- 
+since it can reorder and delay the requests for execution.
 
 
 % XXX Formalize what we want to do:
@@ -261,7 +304,7 @@ the problem of \enquote{Jealous Bob}.
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.
-We will focus on two alternative protocols which uses \(\FS\) from \cref{FS} 
+We will focus on two alternative protocols which uses \(\AFS\) from \cref{AFS} 
 above, these are the Push Model and the Pull Model.
 The Push Model is analogous to the subscription of magazines:
 a subscriber contacts the publisher and signs a subscription, whenever the 
@@ -285,7 +328,7 @@ In our analysis we will use the following definition for the Pull Model.
 
 \begin{definition}[Pull Model]\label{PullModel}
   Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
-  broadcast-encryption scheme and \(\FS\) be a public file system.
+  broadcast-encryption scheme and \(\AFS\) be an anonymized public file system.
   We denote by \(\PullOp\) the \emph{push model protocol} implementing a \((p, 
     S)\)-communication model through the operations
   \begin{itemize}
@@ -310,7 +353,7 @@ In our analysis we will use the following definition for the Pull Model.
 
       \Function{$\ppub{p}$}{$R, m$}
         \State{$\sigma \gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
-        \State{$\fsappend[i_p][\sigma]$}
+        \State{$\afsappend[i_p][\sigma]$}
       \EndFunction{}
     \end{algorithmic}
   \end{minipage}
@@ -324,7 +367,7 @@ In our analysis we will use the following definition for the Pull Model.
       \Statex{}
 
       \Function{$\pget{s}$}{}
-        \State{$C = \fsread[i_p]$}
+        \State{$C = \afsread[i_p]$}
         \State{$M\gets \emptyset$}
         \For{$\sigma\in C$}
           \State{$m_\sigma = \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
@@ -425,7 +468,7 @@ We base our analysis on the following definition.
         \For{$s\in R$}
           \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
           \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
-          \State{$\fsappend[i_s][\sigma_s]$}
+          \State{$\afsappend[i_s][\sigma_s]$}
           \State{$i_s\gets i_s^\prime$}
         \EndFor{}
       \EndFunction{}
@@ -442,7 +485,7 @@ We base our analysis on the following definition.
       \Statex{}
 
       \Function{$\pnget{s}$}{}
-        \State{$C\gets \fsread[i_s]$}
+        \State{$C\gets \afsread[i_s]$}
         \If{$C = \bot$}
           \State{\Return{$\bot$}}
         \EndIf{}
