@@ -82,12 +82,12 @@ properties as well:
 
 We will assume a simple file system with no built-in access control.
 This system is discussed and defined in \cref{FileSystem}.
-We will continue to define an ideal communication functionality and two models 
-implementing that functionality in \cref{PushAndPull}.
-Then we will discuss the high-level properties of the two models in 
-\cref{PushAnalysis,PullAnalysis}.
-Finally we prove in \cref{SecurityProof} that one of the protocols securely 
-realizes the ideal communication model.
+We will continue to define an ideal communication functionality in 
+\cref{PushAndPull}.
+The we give two models implementing that functionality and analyse what 
+properties their primitives must have in \cref{PullAnalysis,PushAnalysis}.
+Finally, in \cref{Composed}, we construct a protocol composed of several 
+instances of either of the two models, then prove prove its security.
 
 
 % XXX Formalize the setting, the system model:
@@ -103,7 +103,7 @@ The operations are defined as we intuitively expect: we can create an object,
 then read it and also append to it.
 The file system itself provides no access control.
 
-\begin{definition}[Public File System]\label{FS}
+\begin{definition}[Public file system]\label{FS}
   A \emph{file} \(f = (i, m)\) consists of the \emph{identifier} \(i\) and the 
   \emph{content} \(m\).
   We define the set of files \(F = \{(i, m_i)\}\) together with the following 
@@ -111,10 +111,10 @@ The file system itself provides no access control.
   \begin{itemize}
     \item \(\fscreate[i][m_i]\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
       \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\).
-      Otherwise this operation has no effect.
+      Otherwise this operation has the effect of \(\fsappend[i][m_i]\).
 
     \item \(\fsread[i] = m_i\) if \((i, m_i)\in F\), otherwise 
-      \(\fsread{i^\prime} = \bot\).
+      \(\fsread[i^\prime] = \bot\).
 
     \item \(\fsappend[i][m^\prime]\) will set \((i, m)\gets (i, m\concat 
         m^\prime)\) for \((i, m)\in F\).
@@ -181,9 +181,10 @@ she executes them.
 
 There are several ways Alice can implement the message passing with her 
 friends.
-We will start with a general outline of the model of communication Alice will 
-use, then we will proceed to the details of two alternative protocols that 
-implements the model.
+We will start by presenting an ideal model of communication 
+(\cref{CommunicationModel}) whose properties Alice wants to achieve.
+Then we will proceed to the details of two alternative protocols 
+(\cref{PullModel,PushModel}) that yields the properties of the ideal model.
 
 % XXX Shall we have an adversary interface for C?
 \begin{definition}[Communication model]\label{CommunicationModel}
@@ -255,8 +256,8 @@ Bob might become jealous if he realizes that Alice no longer includes him in
 the recipient set for her messages.
 As such Bob should only be able to determine that Alice publishes content by 
 being in the recipient set himself.
-We treat this problem in \cref{UC}, until then we will refer to this as 
-\enquote{the problem of Jealous Bob}.
+We treat this problem in \cref{Composed}, until then we will refer to this as 
+the problem of \enquote{Jealous Bob}.
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.
@@ -374,7 +375,7 @@ for the Pull Model.
 We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
 ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
 (We will not restate their proof here as the only difference is a matter of 
-notation.)
+notation, further, the proof in \cref{PushAnalysis} will be similar enough.)
 However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
 Jealous Bob.
 Bob can read Alice's index, conclude that there are entries which he cannot 
@@ -442,13 +443,18 @@ We base our analysis on the following definition.
 
       \Function{$\pnget{s}$}{}
         \State{$C\gets \fsread[i_s]$}
+        \If{$C = \bot$}
+          \State{\Return{$\bot$}}
+        \EndIf{}
         \State{$M\gets \emptyset$}
         \For{$\sigma\in C$}
-          \State{$(i_s^\prime, m_\sigma) \gets \Dec[\PriKey{s}, 
-            \VerifKey{p}]{\sigma}$}
-          \State{$M\gets M\cup \{m\}$}
-          \State{$C^\prime \gets \fsread[i_s^\prime]$}
-          \State{$C\gets C\cup C^\prime$}
+          \State{$d\gets \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
+          \If{$d\neq \bot$}
+            \State{$(i_s^\prime, m_\sigma)\gets d$}
+            \State{$M\gets M\cup \{m_\sigma\}$}
+            \State{$i_s\gets i_s^\prime$}
+            \State{$M\gets M\cup \pnget{s}[]$}
+          \EndIf{}
         \EndFor{}
         \State{\Return{$M$}}
       \EndFunction{}
@@ -483,8 +489,16 @@ and Alice's signature key \(\SignKey{p}\).
 Then she uses \(\FS\) to append the ciphertext \(\sigma_s\) to the file with 
 identifier \(i_s\).
 
-The operation \(\pget{s}\) works exactly the same as for the Pull Model, it 
-just uses a different file.
+The operation \(\pget{s}\) works similarly as in the Pull Model, however, it 
+uses a different file and since the inbox contains a pointer to the next inbox 
+it recursively calls itself upon finishing a message.
+It starts by reading the inbox from the file system.
+Then it iterates through the list of entries, decrypting each entry.
+Each entry, if successfully decrypted, is a new inbox and a message.
+It appends the message to the list of messages and sets the inbox to be the new
+inbox.
+Then it recursively calls itself to check the newly acquired inbox for 
+messages.
 
 Note that the authenticated encryption scheme \(\mathcal{E}\) can be 
 a symmetric-key scheme although we use the notation of public-key cryptography 
@@ -500,8 +514,8 @@ Some high-level analysis \dots
 Eve can correlate all inboxes with by observing equal ciphertexts.
 
 
-\section{Universally Composable Security}
-\label{UC}
+\section{A Composed Protocol}
+\label{Composed}
 
 \dots
 
@@ -1546,6 +1560,10 @@ Eve can correlate all inboxes with by observing equal ciphertexts.
 We do not have to consider the re-encryption problem when changing group 
 constellations: this would violate the property that jealous Bob cannot infer 
 a change in the access policy.
+
+If we relax Eve's control of the public file system, i.e.\ that she only 
+controls parts of it, then we need less strict constructions for the composed 
+protocol.
 
 %% XXX Review the conclusions
 %% - Ensure that the solution covers the needed properties.
