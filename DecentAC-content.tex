@@ -83,7 +83,7 @@ properties as well:
 We will assume a simple file system with no built-in access control.
 This system is discussed and defined in \cref{FileSystem}.
 We will continue to define an ideal communication functionality in 
-\cref{PushAndPull}.
+\cref{IdealCommunication}.
 The we give two models implementing that functionality and analyse what 
 properties their primitives must have in \cref{PullAnalysis,PushAnalysis}.
 Finally, in \cref{Composed}, we construct a protocol composed of several 
@@ -177,7 +177,7 @@ she executes them.
 %    ANOBE.
 %  - Third, complexity for solution.
 %
-\section{Two Communication Protocols}\label{PushAndPull}
+\section{The Ideal Communication Model}\label{IdealCommunication}
 
 There are several ways Alice can implement the message passing with her 
 friends.
@@ -274,7 +274,8 @@ We note that essentially all \ac{BE} schemes, including \ac{ANOBE}, are
 designed for the Pull Model.
 It is therefore natural to start our analysis with the Pull Model.
 
-\subsection{Analysis of the Pull Model}
+
+\section{Analysis of the Pull Model}
 \label{PullAnalysis}
 
 In this model, each publisher has an index file in the file system.
@@ -375,26 +376,93 @@ for the Pull Model.
 We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
 ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
 (We will not restate their proof here as the only difference is a matter of 
-notation, further, the proof in \cref{PushAnalysis} will be similar enough.)
+notation.)
+
 However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
 Jealous Bob.
 Bob can read Alice's index, conclude that there are entries which he cannot 
 decrypt and thus he can become jealous.
 (In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
 the output of \(\pget{\cdot}\).)
-To prevent this Alice needs a unique index per friend, so Bob has his own 
-index.
-This actually reduces the problem to the Push Model which we will analyse 
-next.
+One approach to prevent this is that Alice uses a unique index per friend, so 
+Bob has his own index.
+This actually reduces the problem to the Push Model.
+Unfortunately this is not entirely trivial, which we will see in our analysis 
+in \cref{PushModel}.
+We will instead analyse a simpler solution for the Pull Model.
 
-\subsection{Analysis of the Push Model}
+\subsection{Changing Recipient Set in the Pull Model}
+\label{ChangingPullRecipientSet}
+
+We will now propose and analyse a solution to the problem of Jealous Bob.
+This solution, however, is based on the intricacies of the \ac{ANOBE} 
+construction, and thus require us to use \ac{ANOBE} in the Pull Model above.
+(For convenience the \ac{ANOBE} scheme is described in \cref{ANOBE}.)
+
+When Alice wants to change her policy and remove Jealous Bob from the 
+subscriber set \(S\), she will update the identifier of her index file.
+Essentially she will divide \(S\) into two new sets \(S_0, S_1\subset S\) such 
+that \(S = S_0\cup S_1\), where Jealous Bob will be alone in one of them.
+Then she will generate two new index identifiers \(i_0, i_1\) --- one for the 
+recipients in \(S_0\) and one those in \(S_1\).
+She will then create a broadcast ciphertext which decrypts to \(i_0\) for 
+recipients in \(S_0\) and to \(i_1\) for recipients in \(S_1\).
+From them on Alice will publish to the two index files \(i_0\) and \(i_1\) 
+separately.
+If she no longer wants to post to Bob, she will simply fade out her 
+publications in his new index.
+
+We summarize this algorithm in the following definition.
+
+\begin{definition}[Split group]\label{SplitGroup}
+  \dots
+\end{definition}
+
+The property we want from this algorithm is that Bob cannot determine how the 
+subscribers are divided.
+Thus he cannot know whether he is removed or not.
+We capture this in the following game.
+
+\begin{definition}[X-IND-CCA]
+  \dots
+\end{definition}
+
+Now we prove the following theorem about the security of the split-group 
+algorithm.
+
+\begin{theorem}
+  The algorithm in \cref{SplitGroup} is X-IND-CCA provided the encryption 
+  algorithm is IND-CCA secure and the signature scheme is strongly one-time 
+  unforgeable.
+\end{theorem}
+
+\begin{proof}
+  \dots
+\end{proof}
+
+We will add the split-group algorithm (\cref{SplitGroup}) as an available 
+interface in the Pull Model (\cref{PullModel}) and we summarize this as the 
+Extended Pull Model in the following definition.
+
+\begin{definition}[Extended Pull Model]
+  \dots
+\end{definition}
+
+\section{Analysis of the Push Model}
 \label{PushAnalysis}
 
 The idea of the Push Model is for each subscriber to have an inbox in the file 
 system --- as opposed to the Pull Model, where the publisher has an 
-\enquote{outbox}, namely the index.
+\enquote{outbox} (the index).
 This is simply a file object with a randomly chosen identifier.
 The publisher then puts all published material in the inbox of each subscriber.
+
+We can see that if we simply put the broadcast ciphertext from the Pull Model 
+in all inboxes, then Eve can relate them since they contain identical 
+ciphertexts.
+More formally, we break random permutaion
+We thus have to make some more modifications.
+
 We base our analysis on the following definition.
 
 \begin{definition}[Push Model]\label{PushModel}
@@ -510,8 +578,19 @@ We have thus not yet limited ourselves to any properties of \(\mathcal{E}\)
 
 % XXX Write high-level analysis of push model
 Some high-level analysis \dots
+Point out what properties we need from \(\mathcal{E}\).
+These will probably be very similar as for \ac{ANOBE}.
+(Eve can correlate all inboxes by observing equal ciphertexts.)
 
-Eve can correlate all inboxes with by observing equal ciphertexts.
+Prove that with these properties the Push Model is ANO-IND-CCA\@.
+\begin{theorem}
+  Something like:
+  \[\Adv{\text{ANO-IND-CCA}}{\A, \PushOp}[\lambda]\leq 
+    \Adv{\text{IND-CCA}}{\A}[\lambda] + \Adv{\text{AI-CCA}}{\A}[\lambda].\]
+\end{theorem}
+\begin{proof}
+  \dots
+\end{proof}
 
 
 \section{A Composed Protocol}
@@ -712,239 +791,6 @@ Eve can correlate all inboxes with by observing equal ciphertexts.
 %  So we should add another \(|S|\) bits per ciphertext (if we do not use any 
 %  type of coding scheme to reduce it further).
 %}, \(O(1)\), has been achieved for non-anonymous \ac{BE}.
-%
-%\subsection{Anonymous Broadcast Encryption}\label{ANOBE}
-%
-%\mode<presentation>{%
-%\begin{frame}<presentation>{Anonymous Broadcast Encryption}
-%  \begin{figure}
-%   \begin{tikzpicture}[scale=0.75]
-%      \draw (0,0) circle [radius=1];
-%      \draw (0,0) node []{$S$};
-%      \draw (-3,-2) rectangle (3,2);
-%      \draw (-2,0) node []{$U$};
-%    \end{tikzpicture}
-%    \mode<article>{%
-%    \caption{%
-%      The subset of users \(S\subseteq U\).
-%    }\label{fig:SubsetS}
-%    }
-%  \end{figure}
-%  \begin{itemize}
-%    \item A \ac{BE} scheme wants to distribute a key \(k\) to a subset of users 
-%      \(S\subseteq U\).
-%
-%    \item This results in a ciphertext \(c_k\) and a description of \(S\).
-%
-%      \pause{}
-%
-%    \item \acf{ANOBE}~\cite{ANOBE} does the same without the description of 
-%      \(S\).
-%
-%    \item By revealing \(S\) we reveal the policy.
-%  \end{itemize}
-%\end{frame}
-%}
-%
-%The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
-%such that they can decrypt the broadcast message encrypted with \(k\) but no 
-%one else can.
-%The users who receive \(k\) should not be able to figure out who else received 
-%\(k\) and who did not.
-%This is a suitable mechanism for our system model as publishing a message to 
-%all friends is basically a broadcast to all or a subset of friends in the 
-%network.
-%The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
-%This is an important property to achieve hidden policies as outlined in 
-%\cref{HiddenPCD}.
-%
-%% XXX Review details on ANOBE
-%% - Is ANOBE perfect as it is or does it need changes for the context?
-%We will now describe how \ac{ANOBE} works.
-%An overview of the encryption function is given in Fig.~\ref{fig:EncANOBE} and 
-%an overview of the decryption function in Fig.~\ref{fig:DecANOBE}.
-%
-%\subsubsection<article>{Encryption}
-%
-%We must first generate a signature-verification key-pair \((\SignKey{k}, 
-%  \VerifKey{k})\), then we choose a random permutation \(\pi\colon S\to S\).
-%Next we must encrypt the key and the verification key \((k, \VerifKey{k})\) for 
-%every user \(u_i\in S\) in the recipient set \(S\subseteq U\) under their 
-%respective public key, \(c_{u_i} = \Enc[\PubKey{u_i}]{k, \VerifKey{k}}\).
-%We let the \ac{ANOBE} ciphertext be the tuple \((\VerifKey{k}, C, \sigma_k)\), 
-%where
-%\(C = ( c_{\pi(u_1)}, \ldots, c_{\pi(u_{|S|})})\) and
-%\(\sigma_k = \Sign[\SignKey{k}]{ C }\).
-%Note that the signatures does not authenticate the sender, it is used to verify 
-%correct or incorrect decryption.
-%We will get back to the details about this shortly.
-%
-%\begin{frame}
-%  \mode<presentation>{\frametitle{ANOBE Encryption}}
-%  \begin{figure}
-%    \begin{algorithmic}[1]
-%      \Function{$\EncOp^{\mathrm{ANOBE}}_S$}{$k$}
-%      \Comment{%
-%        Recipient set $S$,
-%        $k$ to be encrypted.
-%      }
-%        \State{%
-%          $(\SignKey{k}, \VerifKey{k})\gets{\Gen{\lambda}}$
-%        }
-%        \Comment{%
-%          Signature-verification key-pair\mode<article>{, security parameter 
-%            $\lambda$}
-%        }
-%        \State{%
-%          Choose a random permutation \(\pi\colon S\to S\).
-%        }
-%
-%        \pause{}
-%
-%        \For{$u_i \in S$}
-%          \State{%
-%            $c_{u_i}\gets{ \Enc[\PubKey{u_i}]{k, \VerifKey{k}} }$
-%          }
-%        \EndFor{}
-%
-%        \pause{}
-%
-%        \State{%
-%          $C\gets{( c_{\pi(u_1)}, \ldots, c_{\pi(u_{|S|})} )}$
-%        }
-%        \Comment{%
-%          $\forall i\in\{ 1, \ldots, |S|\}\colon u_i\in S$
-%        }
-%        \State{%
-%          $\sigma\gets{ \Sign[\SignKey{k}]{C} }$
-%        }
-%        \State{%
-%          \Return{$(\VerifKey{k}, C, \sigma_k)$}
-%        }
-%      \EndFunction{}
-%    \end{algorithmic}
-%    \mode<article>{%
-%    \caption{%
-%      An algorithmic overview of the encryption algorithm in the \ac{ANOBE} 
-%      scheme.
-%    }\label{fig:EncANOBE}
-%    }
-%  \end{figure}
-%\end{frame}
-%
-%\begin{frame}<presentation>{ANOBE Requirements}
-%  \begin{itemize}
-%    \item The encryption scheme \(\EncOp\) must be 
-%      key-private~\cite{KeyPrivacy}.
-%
-%    \item Key-privacy ensures that a ciphertext does not reveal for which 
-%      public key is was created.
-%
-%      \pause{}
-%
-%    \item The encryption scheme \(\EncOp\) further requires 
-%      robustness~\cite{RobustEncryption}.
-%
-%    \item Robustness ensures that we cannot create one ciphertext valid for two 
-%      different public keys.
-%  \end{itemize}
-%\end{frame}
-%
-%For \ac{ANOBE} to be anonymous, we require an encryption scheme which is 
-%key-private~\cite{KeyPrivacy}.
-%This property ensures that, given a ciphertext, an eavesdropper cannot tell 
-%which public key, out of a set of public keys, was used to generate the 
-%ciphertext.
-%This also means that a user \(u\in U\) must try to decrypt the ciphertexts to 
-%decide whether \(u\in S\) or \(u\notin S\).
-%For this reason we also need the encryption scheme to be 
-%robust~\cite{RobustEncryption}.
-%Robust encryption ensures that we cannot create a ciphertext which is valid for 
-%two different recipients:
-%if we have a set of possible recipients \(R\), we encrypt a message for one of 
-%them, \(r\in R\), then all \(r^\prime\neq r\) must decrypt the ciphertext to an 
-%invalid message under their keys.
-%
-%\subsubsection<article>{Decryption}
-%
-%We now have data which we parse as the tuple \((\VerifKey{k}, C, \sigma_k)\).
-%If \(\Verify[\VerifKey{k}]{ C, \sigma_k } = 0\), then we return \(\bot\) as the 
-%verification failed.
-%For each \(c_i\) (from \(C\)):
-%Compute \(M = \Dec[\PriKey{u}]{ c_i }\).
-%If \(M \neq \bot\) and \(M = (k, \VerifKey{k})\), then return \(k\).
-%Otherwise, try the next \(c_i\).
-%If there are no more \(c_i\) to try, then return \(\bot\).
-%
-%\begin{frame}
-%  \mode<presentation>{\frametitle{ANOBE Decryption}}
-%  \begin{figure}
-%    \begin{algorithmic}[1]
-%      \Function{$\DecOp^{\mathrm{ANOBE}}_{\PriKey{u}}$}{$\VerifKey{k}, C, 
-%        \sigma_k$}
-%      \Comment{%
-%        Private key \(\PriKey{u}\),
-%        ciphertext $(\VerifKey{k}, C, \sigma_k)$.
-%      }
-%        \pause{}
-%
-%        \If{$\Verify[\VerifKey{k}]{ C, \sigma_k } = 0$}
-%          \State{%
-%            \Return{$\bot$}
-%          }
-%        \EndIf{}
-%
-%        \pause{}
-%
-%        \For{$c_i\in C$}
-%          \Comment{%
-%            For each sub-ciphertext, or use tag-hints.
-%          }
-%          \State{%
-%            $M\gets{\Dec[\PriKey{u}]{c_i}}$
-%          }
-%          \Comment{%
-%            Try to decrypt
-%          }
-%          \If{$M = \bot$}
-%            \State{\Return{$\bot$}}
-%          \ElsIf{$M = (k, \VerifKey{k})$}
-%            \State{\Return{k}}
-%          \EndIf{}
-%        \EndFor{}
-%        \State{\Return{$\bot$}}
-%      \EndFunction{}
-%    \end{algorithmic}
-%    \mode<article>{%
-%    \caption{%
-%      An algorithmic overview of the decryption algorithm in the \ac{ANOBE} 
-%      scheme.
-%    }\label{fig:DecANOBE}
-%    }
-%  \end{figure}
-%\end{frame}
-%
-%%\begin{frame}<presentation>{ANOBE Decryption}
-%%  \begin{itemize}
-%%    \item Instead of trial-and-error decryption, we can use the tag-hint system 
-%%      from~\cite{ANOBE}.
-%%
-%%    \item Apply a function on the \ac{ANOBE} ciphertext and our private key, 
-%%      the result reveals the sub-ciphertext we can decrypt.
-%%
-%%  \end{itemize}
-%%\end{frame}
-%
-%To decrypt an \ac{ANOBE} ciphertext, we need a trial-and-error decryption 
-%procedure to decide if the ciphertext was indeed intended for us.
-%This is costly as it makes the decryption function complexity \(O(|S|)\).
-%\citet{ANOBE} presented a tag-hint system along with their \ac{ANOBE} scheme.
-%The tag-hint system reduced the complexity back to \(O(1)\).
-%Each recipient needs a tag-hint public-private key-pair.
-%The system works by letting the recipient do a constant-time computation on the 
-%received message and the private tag-hint key which gives a value.
-%If this value is not found among the sub-ciphertexts, then the recipient was 
-%not among the designated recipients.
 %
 %\subsection{Other Primitives}
 %
@@ -1724,3 +1570,239 @@ We would also like to thank the anonymous reviewers for valuable feedback.
 \begin{frame}
 \printbibliography{}
 \end{frame}
+
+
+\appendix
+\section{\Acl{ANOBE}}\label{ANOBE}
+
+\mode<presentation>{%
+\begin{frame}<presentation>{Anonymous Broadcast Encryption}
+  \begin{figure}
+   \begin{tikzpicture}[scale=0.75]
+      \draw (0,0) circle [radius=1];
+      \draw (0,0) node []{$S$};
+      \draw (-3,-2) rectangle (3,2);
+      \draw (-2,0) node []{$U$};
+    \end{tikzpicture}
+    \mode<article>{%
+    \caption{%
+      The subset of users \(S\subseteq U\).
+    }\label{fig:SubsetS}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item A \ac{BE} scheme wants to distribute a key \(k\) to a subset of users 
+      \(S\subseteq U\).
+
+    \item This results in a ciphertext \(c_k\) and a description of \(S\).
+
+      \pause{}
+
+    \item \acf{ANOBE}~\cite{ANOBE} does the same without the description of 
+      \(S\).
+
+    \item By revealing \(S\) we reveal the policy.
+  \end{itemize}
+\end{frame}
+}
+
+The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
+such that they can decrypt the broadcast message encrypted with \(k\) but no 
+one else can.
+The users who receive \(k\) should not be able to figure out who else received 
+\(k\) and who did not.
+This is a suitable mechanism for our system model as publishing a message to 
+all friends is basically a broadcast to all or a subset of friends in the 
+network.
+The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
+This is an important property to achieve hidden policies as outlined in 
+\cref{HiddenPCD}.
+
+% XXX Review details on ANOBE
+% - Is ANOBE perfect as it is or does it need changes for the context?
+We will now describe how \ac{ANOBE} works.
+An overview of the encryption function is given in Fig.~\ref{fig:EncANOBE} and 
+an overview of the decryption function in Fig.~\ref{fig:DecANOBE}.
+
+\subsubsection<article>{Encryption}
+
+We must first generate a signature-verification key-pair \((\SignKey{k}, 
+  \VerifKey{k})\), then we choose a random permutation \(\pi\colon S\to S\).
+Next we must encrypt the key and the verification key \((k, \VerifKey{k})\) for 
+every user \(u_i\in S\) in the recipient set \(S\subseteq U\) under their 
+respective public key, \(c_{u_i} = \Enc[\PubKey{u_i}]{k, \VerifKey{k}}\).
+We let the \ac{ANOBE} ciphertext be the tuple \((\VerifKey{k}, C, \sigma_k)\), 
+where
+\(C = ( c_{\pi(u_1)}, \ldots, c_{\pi(u_{|S|})})\) and
+\(\sigma_k = \Sign[\SignKey{k}]{ C }\).
+Note that the signatures does not authenticate the sender, it is used to verify 
+correct or incorrect decryption.
+We will get back to the details about this shortly.
+
+\begin{frame}
+  \mode<presentation>{\frametitle{ANOBE Encryption}}
+  \begin{figure}
+    \begin{algorithmic}[1]
+      \Function{$\EncOp^{\mathrm{ANOBE}}_S$}{$k$}
+      \Comment{%
+        Recipient set $S$,
+        $k$ to be encrypted.
+      }
+        \State{%
+          $(\SignKey{k}, \VerifKey{k})\gets{\Gen{\lambda}}$
+        }
+        \Comment{%
+          Signature-verification key-pair\mode<article>{, security parameter 
+            $\lambda$}
+        }
+        \State{%
+          Choose a random permutation \(\pi\colon S\to S\).
+        }
+
+        \pause{}
+
+        \For{$u_i \in S$}
+          \State{%
+            $c_{u_i}\gets{ \Enc[\PubKey{u_i}]{k, \VerifKey{k}} }$
+          }
+        \EndFor{}
+
+        \pause{}
+
+        \State{%
+          $C\gets{( c_{\pi(u_1)}, \ldots, c_{\pi(u_{|S|})} )}$
+        }
+        \Comment{%
+          $\forall i\in\{ 1, \ldots, |S|\}\colon u_i\in S$
+        }
+        \State{%
+          $\sigma\gets{ \Sign[\SignKey{k}]{C} }$
+        }
+        \State{%
+          \Return{$(\VerifKey{k}, C, \sigma_k)$}
+        }
+      \EndFunction{}
+    \end{algorithmic}
+    \mode<article>{%
+    \caption{%
+      An algorithmic overview of the encryption algorithm in the \ac{ANOBE} 
+      scheme.
+    }\label{fig:EncANOBE}
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}<presentation>{ANOBE Requirements}
+  \begin{itemize}
+    \item The encryption scheme \(\EncOp\) must be 
+      key-private~\cite{KeyPrivacy}.
+
+    \item Key-privacy ensures that a ciphertext does not reveal for which 
+      public key is was created.
+
+      \pause{}
+
+    \item The encryption scheme \(\EncOp\) further requires 
+      robustness~\cite{RobustEncryption}.
+
+    \item Robustness ensures that we cannot create one ciphertext valid for two 
+      different public keys.
+  \end{itemize}
+\end{frame}
+
+For \ac{ANOBE} to be anonymous, we require an encryption scheme which is 
+key-private~\cite{KeyPrivacy}.
+This property ensures that, given a ciphertext, an eavesdropper cannot tell 
+which public key, out of a set of public keys, was used to generate the 
+ciphertext.
+This also means that a user \(u\in U\) must try to decrypt the ciphertexts to 
+decide whether \(u\in S\) or \(u\notin S\).
+For this reason we also need the encryption scheme to be 
+robust~\cite{RobustEncryption}.
+Robust encryption ensures that we cannot create a ciphertext which is valid for 
+two different recipients:
+if we have a set of possible recipients \(R\), we encrypt a message for one of 
+them, \(r\in R\), then all \(r^\prime\neq r\) must decrypt the ciphertext to an 
+invalid message under their keys.
+
+\subsubsection<article>{Decryption}
+
+We now have data which we parse as the tuple \((\VerifKey{k}, C, \sigma_k)\).
+If \(\Verify[\VerifKey{k}]{ C, \sigma_k } = 0\), then we return \(\bot\) as the 
+verification failed.
+For each \(c_i\) (from \(C\)):
+Compute \(M = \Dec[\PriKey{u}]{ c_i }\).
+If \(M \neq \bot\) and \(M = (k, \VerifKey{k})\), then return \(k\).
+Otherwise, try the next \(c_i\).
+If there are no more \(c_i\) to try, then return \(\bot\).
+
+\begin{frame}
+  \mode<presentation>{\frametitle{ANOBE Decryption}}
+  \begin{figure}
+    \begin{algorithmic}[1]
+      \Function{$\DecOp^{\mathrm{ANOBE}}_{\PriKey{u}}$}{$\VerifKey{k}, C, 
+        \sigma_k$}
+      \Comment{%
+        Private key \(\PriKey{u}\),
+        ciphertext $(\VerifKey{k}, C, \sigma_k)$.
+      }
+        \pause{}
+
+        \If{$\Verify[\VerifKey{k}]{ C, \sigma_k } = 0$}
+          \State{%
+            \Return{$\bot$}
+          }
+        \EndIf{}
+
+        \pause{}
+
+        \For{$c_i\in C$}
+          \Comment{%
+            For each sub-ciphertext, or use tag-hints.
+          }
+          \State{%
+            $M\gets{\Dec[\PriKey{u}]{c_i}}$
+          }
+          \Comment{%
+            Try to decrypt
+          }
+          \If{$M = \bot$}
+            \State{\Return{$\bot$}}
+          \ElsIf{$M = (k, \VerifKey{k})$}
+            \State{\Return{k}}
+          \EndIf{}
+        \EndFor{}
+        \State{\Return{$\bot$}}
+      \EndFunction{}
+    \end{algorithmic}
+    \mode<article>{%
+    \caption{%
+      An algorithmic overview of the decryption algorithm in the \ac{ANOBE} 
+      scheme.
+    }\label{fig:DecANOBE}
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}<presentation>{ANOBE Decryption}
+  \begin{itemize}
+    \item Instead of trial-and-error decryption, we can use the tag-hint system 
+      from~\cite{ANOBE}.
+
+    \item Apply a function on the \ac{ANOBE} ciphertext and our private key, 
+      the result reveals the sub-ciphertext we can decrypt.
+
+  \end{itemize}
+\end{frame}
+
+To decrypt an \ac{ANOBE} ciphertext, we need a trial-and-error decryption 
+procedure to decide if the ciphertext was indeed intended for us.
+This is costly as it makes the decryption function complexity \(O(|S|)\).
+\citet{ANOBE} presented a tag-hint system along with their \ac{ANOBE} scheme.
+The tag-hint system reduced the complexity back to \(O(1)\).
+Each recipient needs a tag-hint public-private key-pair.
+The system works by letting the recipient do a constant-time computation on the 
+received message and the private tag-hint key which gives a value.
+If this value is not found among the sub-ciphertexts, then the recipient was 
+not among the designated recipients.
+
