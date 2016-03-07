@@ -22,9 +22,12 @@
 \usepackage{amsmath}
 % Common algorithms
 \DeclareMathOperator{\Aop}{\mathcal{A}}
-\NewDocumentCommand{\A}{o}{\ensuremath{%
+\NewDocumentCommand{\A}{s o}{\ensuremath{%
     \Aop%
-    \IfValueT{#1}{%
+    \IfBooleanT{#1}{%
+      ^*%
+    }
+    \IfValueT{#2}{%
       \mleft( #1 \mright)%
     }
   }}
@@ -42,6 +45,13 @@
 %      \mleft( #1 \mright)%
 %    }
 %  }}
+\DeclareMathOperator{\SplitGroupOp}{\mathsf{SplitGroup}}
+\NewDocumentCommand{\SplitGroup}{o}{\ensuremath{%
+    \SplitGroupOp%
+    \IfValueT{#1}{%
+      \mleft( #1 \mright)%
+    }
+  }}
 % File system
 \DeclareMathOperator{\FSop}{\mathcal{FS}}
 \NewDocumentCommand{\FS}{o}{\ensuremath{%

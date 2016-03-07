@@ -413,33 +413,180 @@ From them on Alice will publish to the two index files \(i_0\) and \(i_1\)
 separately.
 If she no longer wants to post to Bob, she will simply fade out her 
 publications in his new index.
+We summarize this algorithm in \cref{SplitGroup}.
 
-We summarize this algorithm in the following definition.
+\begin{figure}
+  \framebox{%
+    \begin{minipage}{0.96\textwidth}
+      \begin{algorithmic}
+        \Function{$\SplitGroupOp$}{$S_0, S_1$}
+          \Comment{%
+            Recipient sets $S_0, S_1$ such that $S = S_0\cup S_1$ and $S_0\cap 
+            S_1 = \emptyset$.
+          }
+          \State{%
+            $i_0\rgets \{0, 1\}^\lambda$, $i_1\rgets \{0, 1\}^\lambda$
+          }
+          \Comment{Generate outboxes, one per new group.}
+          \State{%
+            $(\SignKey{}, \VerifKey{})\gets{\Keygen{\lambda}}$
+          }
+          \Comment{%
+            Signature-verification key-pairs.
+          }
+          \State{%
+            Choose a random permutation $\pi\colon S\to S$.
+          }
 
-\begin{definition}[Split group]\label{SplitGroup}
-  \dots
-\end{definition}
+          \pause{}
+
+          \For{$s \in S$}
+            \If{$s\in S_0$}
+              \State{%
+                $c_{s}\gets{ \Enc[\PubKey{s}]{i_0, \VerifKey{}}}$
+              }
+            \Else\Comment{$s\in S_1$}
+              \State{%
+                $c_{s}\gets{ \Enc[\PubKey{s}]{i_1, \VerifKey{}}}$
+              }
+            \EndIf{}
+          \EndFor{}
+
+          \pause{}
+
+          \State{%
+            $C\gets{\mleft( c_{\pi(s)}\mright)_{s\in S}}$
+          }
+          \State{%
+            $\sigma\gets{ \Sign[\SignKey{}]{C} }$
+          }
+          \State{%
+            \Return{$(\VerifKey{}, C, \sigma)$}
+          }
+        \EndFunction{}
+      \end{algorithmic}
+    \end{minipage}
+  }
+  \caption{%
+    An algorithm splitting a subscriber set \(S\) into two new \(S_0, S_1\).
+  }\label{SplitGroup}
+\end{figure}
 
 The property we want from this algorithm is that Bob cannot determine how the 
 subscribers are divided.
 Thus he cannot know whether he is removed or not.
 We capture this in the following game.
 
-\begin{definition}[X-IND-CCA]
-  \dots
+\begin{definition}[Split-group indistinguishability]\label{SplitGroupSecurity}
+  Let \(\mathcal{E} = (\SetupOp, \KeygenOp, \EncOp, \DecOp)\) be an \ac{ANOBE} 
+  scheme.
+  We define the security of the split-group algorithm in \cref{SplitGroup} as 
+  follows:
+  \begin{description}
+    \item[Setup] The challenger runs \(\Setup{\lambda}\) of the \ac{ANOBE} 
+      scheme.
+      This generates the public and private keys for all recipients.
+      The public keys are given to the adversary.
+
+    \item[Phase 1] The adversary may corrupt recipients (request secret keys) 
+      and request decryptions of ciphertexts for any recipient (without 
+      corruption).
+
+    \item[Challenge] The adversary gives the challenger a set of uncorrupted 
+      recipients \(R = \{r_0, \ldots, r_n\}\).
+      The challenger randomly chooses \(B = (B_0, \ldots, B_n) \in \{0, 1\}^n\) 
+      and constructs \(R_0, R_1\) as follows:
+      \(R_i = \{ r_j\in R\colon B_j = i\}\), where \(i\in \{0, 1\}\).
+      The challenger then runs \(C\gets \SplitGroup[R_0, R_1]\) and gives \(C\) 
+      to the adversary.
+
+    \item[Phase 2] The adversary may continue to corrupt recipients and request 
+      decryptions under the following conditions:
+      she cannot corrupt any \(r\in R\) and not request decryptions for 
+      subciphertexts of the challenge ciphertext \(C\).
+
+    \item[Guess] The adversary outputs \(\hat{B}\) and wins if \(\hat{B} 
+        = B\).
+  \end{description}
+  We define the adversary's advantage as \[\Adv{\text{Split-IND-CCA}}{\A, 
+      \SplitGroupOp}[\lambda] = \mleft|\Pr[ \hat{B} 
+    = B ] - \frac{1}{2^n}\mright|.\]
 \end{definition}
 
 Now we prove the following theorem about the security of the split-group 
 algorithm.
 
 \begin{theorem}
-  The algorithm in \cref{SplitGroup} is X-IND-CCA provided the encryption 
-  algorithm is IND-CCA secure and the signature scheme is strongly one-time 
-  unforgeable.
+  The algorithm \(\SplitGroupOp\) is Split-IND-CCA if the encryption algorithm 
+  is ANO-IND-CCA secure.
+\end{theorem}
+
+\begin{proof}[sketch]
+  The proof is by contradiction.
+  Assume that there exists an adversary \(\A\) that can win the Split-IND-CCA 
+  game with non-negligible probability.
+  We will now describe how to construct an algorithm \(\A*\) that can win the 
+  IND-CCA game using \(\A\).
+
+  We construct a sequences of games \(0\leq k\leq n\) with the following idea.
+  In game \(0\) all recipients are in \(R_0\) and none in \(R_1\), while in 
+  game \(n\) all recipients are in \(R_1\) and none in \(R_0\).
+  If \(\A*\) uses the public key \(\PubKey{*}\) and challenge ciphertext 
+  \(c_*\) from its own challenger as one of the possible recipients, then for 
+  some game \(\A*\) will not know whether it is game \(k\) or game \(k+1\).
+  If \(\A\) can distinguish between games \(k\) and \(k+1\), then \(\A\) knows 
+  whether \(c_* = i_0\) or \(c_* = i_1\) and thus \(\A*\) can distinguish 
+  between IND-CCA ciphertexts.
+%  Game \(k\) is as follows:
+%  \begin{description}
+%    \item[Setup] \(\A*\) will generate \(n-1\) key-pairs itself and get one 
+%      public key from its challenger, \(\PubKey{*}\).
+%      \(\A*\) gives all public keys to \(\A\).
+%
+%    \item[Phase 1] \(\A*\) will just forward decryption requests from \(\A\) to 
+%      its own oracle.
+%      If \(\A\) wants the private key for \(\PubKey{*}\), then \(\A*\) quits 
+%      with failure.
+%
+%    \item[Challenge] When \(\A\) gives \(\A*\) its recipient set \(R\), \(\A*\)
+%      will construct \(R_0, R_1\) in the following way.
+%      If the recipient corresponding to \(\PubKey{*}\) is not in \(R\), then 
+%      \(\A*\) quits with failure.
+%      Otherwise, \(\A*\) sets \(B = (1, \ldots, 1, 0, \ldots, 0)\) with \(k\) 
+%      leading \(1\)'s in game \(k\).
+%      For some game \(k^\prime\) \(\A*\) will set the subciphertext \(c_k\) to 
+%      its own challenge ciphertext, for which \(\A*\) does not know the 
+%      plaintext.
+%
+%    \item[Phase 2] \(\A*\) continues to forward the requests from \(\A\) to its
+%      own oracles.
+%      However, no requests for decryptions of any of the subciphertexts of the 
+%      challenge ciphertext is allowed.
+%
+%    \item[Guess] When \(\A\) outputs its result, \(\A*\) can compute its guess 
+%      as follows.
+%      If recipient \(r_*\in R_0\) \(\A*\) outputs \(0\), otherwise if \(r_*\in 
+%        R_1\) \(\A*\) outputs \(1\).
+%  \end{description}
+  The detailed proof will go along the lines of that of Lemmas 4 in the full 
+  version of~\cite{ANOBE}.
+  \qed{}
+\end{proof}
+
+
+Now we know that Bob cannot distinguish whether everyone in the recipient sent 
+received the same message or not.
+Now it remains for us to convince ourselves that Bob cannot distinguish between
+Alice posting to two different recipient sets and Alice posting to one and 
+Carol to the other.
+
+\begin{theorem}
+  \dots
 \end{theorem}
 
 \begin{proof}
   \dots
+  \qed{}
 \end{proof}
 
 We will add the split-group algorithm (\cref{SplitGroup}) as an available 
