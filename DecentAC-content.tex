@@ -639,6 +639,22 @@ On the subscribers' side, due to the construction of \(\pget[p, S]{s}\), their
 instance \(\Pull[p, S]\) is automatically turned into \(\Pull[p, R_i]\), for 
 whichever \(i\in \{0, 1\}\) Alice put them in.
 
+\subsection{Achieving Authenticity}
+
+We now have a privacy-preserving publication protocol.
+In its current state no subscribers can verify the authenticity of any message.
+Eve could simply replace a ciphertext with any other: she has all public keys 
+and the verification key in the ciphertext is one-time and ciphertext specific.
+
+We can easily achieve authenticity by substituting \(i_p\) for \((i_p, 
+  \MACKey{p})\) and then compute a \ac{MAC} for every ciphertext.
+This allows any subscriber to publish an authenticated message as well.
+If we do not desire this property we can replace the \ac{MAC} by digital 
+signatures: we get \((i_p, \SignKey{p})\) on the publisher side, \((i_p, 
+  \VerifKey{p})\) on the subscriber side.
+This also means that \(\psplit{p}\) will generate a new \ac{MAC} key or 
+signature-verification key-pair too.
+
 
 \section{Construction and Analysis of the Push Model}
 \label{PushAnalysis}
