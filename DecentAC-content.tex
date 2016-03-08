@@ -433,7 +433,7 @@ We summarize this algorithm in \cref{SplitGroup}.
           }
           \Comment{Generate outboxes, one per new group.}
           \State{%
-            $(\SignKey{}, \VerifKey{})\gets{\Keygen{\lambda}}$
+            $(\SignKey{}, \VerifKey{})\gets{\Keygen{1^\lambda}}$
           }
           \Comment{%
             Signature-verification key-pairs.
@@ -489,7 +489,7 @@ We capture this in the following game.
   We define the security of the split-group algorithm in \cref{SplitGroup} as 
   follows:
   \begin{description}
-    \item[Setup] The challenger runs \(\Setup{\lambda}\) of the \ac{ANOBE} 
+    \item[Setup] The challenger runs \(\Setup{1^\lambda}\) of the \ac{ANOBE} 
       scheme.
       This generates the public and private keys for all recipients.
       The public keys are given to the adversary.
@@ -515,7 +515,7 @@ We capture this in the following game.
         = B\).
   \end{description}
   We define the adversary's advantage as \[\Adv{\text{Split-IND-CCA}}{\A, 
-      \SplitGroupOp}[\lambda] = \mleft|\Pr[ \hat{B} 
+      \SplitGroupOp}[1^\lambda] = \mleft|\Pr[ \hat{B} 
     = B ] - \frac{1}{2^n}\mright|.\]
 \end{definition}
 
@@ -586,8 +586,8 @@ different instances of the Pull Model: i.e.\ Alice posting to two both \(R_0\)
 and \(R_1\) or Alice posting to \(R_0\) and Carol to \(R_1\).
 We can use an information-theoretic argument for this.
 Alice used the \(\SplitGroupOp\) to turn \(R\) into \(R_0\) and \(R_1\).
-In doing this Alice randomly chooses \(i_0, i_1\in \{0, 1\}^\lambda\) and 
-\(\SignKey{0}, \SignKey{1}\rgets \Keygen{\lambda}\).
+In doing this, Alice randomly chooses \(i_0, i_1\in \{0, 1\}^\lambda\) and 
+\(\SignKey{0}, \SignKey{1}\rgets \Keygen{1^\lambda}\).
 This means that \((i_0, \SignKey{0})\) and \((i_1, \SignKey{1})\) are 
 information-theoretically independent.
 If Bob is in \(R_0\) it follows that \((i_1, \SignKey{1})\) is equally likely 
@@ -780,8 +780,8 @@ These will probably be very similar as for \ac{ANOBE}.
 Prove that with these properties the Push Model is ANO-IND-CCA\@.
 \begin{theorem}
   Something like:
-  \[\Adv{\text{ANO-IND-CCA}}{\A, \PushOp}[\lambda]\leq 
-    \Adv{\text{IND-CCA}}{\A}[\lambda] + \Adv{\text{AI-CCA}}{\A}[\lambda].\]
+  \[\Adv{\text{ANO-IND-CCA}}{\A, \PushOp}[1^\lambda]\leq 
+    \Adv{\text{IND-CCA}}{\A}[1^\lambda] + \Adv{\text{AI-CCA}}{\A}[1^\lambda].\]
 \end{theorem}
 \begin{proof}
   \dots
@@ -1844,7 +1844,7 @@ We will get back to the details about this shortly.
         $k$ to be encrypted.
       }
         \State{%
-          $(\SignKey{k}, \VerifKey{k})\gets{\Gen{\lambda}}$
+          $(\SignKey{k}, \VerifKey{k})\gets{\Gen{1^\lambda}}$
         }
         \Comment{%
           Signature-verification key-pair\mode<article>{, security parameter 
