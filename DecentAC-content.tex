@@ -1614,6 +1614,12 @@ Multiple instances of the Pull and Push models run in parallel \dots
 
 \dots
 
+It is important that any optimizations can be proven not to break any of the 
+properties.
+As could be seen in this paper, merely splitting up the \ac{ANOBE} ciphertext 
+in the step from the Pull Model to the Push Model broke the ANO-IND-CCA 
+property --- and needed considerable fixing!
+
 We do not have to consider the re-encryption problem when changing group 
 constellations: this would violate the property that jealous Bob cannot infer 
 a change in the access policy.
