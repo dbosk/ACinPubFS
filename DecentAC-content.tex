@@ -612,24 +612,41 @@ Extended Pull Model in the following definition.
 
 \begin{figure}
   \framebox{%
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}[t]{0.53\textwidth}
       \begin{algorithmic}
         \Function{$\psplit[p, S]{p}$}{$R_0, R_1$}
-          \State{Do something \dots}
+          \State{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), C\gets 
+            \SplitGroup[R_0, R_1]$}
+          \State{$\fsappend[i_p][(C, \Sign[\SignKey{p}]{C})]$}
           \State{\Return{$\Pull[p, R_0], \Pull[p, R_1]$}}
         \EndFunction{}
       \end{algorithmic}
     \end{minipage}
-    \begin{minipage}{0.48\textwidth}
+
+    \begin{minipage}[t]{0.43\textwidth}
       \begin{algorithmic}
         \Function{$\pget[p, S]{s}$}{}
-          \State{Do something \dots}
+          \State{$C = \fsread[i_p]$}
+          \State{$M\gets \emptyset$}
+          \For{$c\in C$}
+            \State{$m_c = \Dec[\PriKey{s}, \VerifKey{p}]{c}$}
+            \If{$m_c$ is new identifier}
+              \State{$(i_p, \VerifKey{p}) \gets m_c$}
+            \Else{}
+              \State{$M\gets M\cup \{m_c\}$}
+            \EndIf{}
+          \EndFor{}
+          \State{\Return{$M$}}
         \EndFunction{}
       \end{algorithmic}
     \end{minipage}
   }
   \caption{%
     The additional and modified interfaces of the Extended Pull Model.
+    Note that we implicitly let the \(\SplitGroup\) algorithm have access to 
+    the public keys of the recipients.
+    We also assume there exists a coding that can differentiate an file 
+    identifier fro an ordinary message.
   }\label{ExtPullFunctions}
 \end{figure}
 
@@ -637,25 +654,10 @@ Note that the execution of \(\psplit[p, S]{p}[R_0, R_1]\) results in two new
 instances of the Pull Model, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
 After this happens, Alice should no longer use \(\Pull[p, S]\), instead she 
 should only use these two new instances.
+
 On the subscribers' side, due to the construction of \(\pget[p, S]{s}\), their 
 instance \(\Pull[p, S]\) is automatically turned into \(\Pull[p, R_i]\), for 
 whichever \(i\in \{0, 1\}\) Alice put them in.
-
-\subsection{Achieving Authenticity}
-
-We now have a privacy-preserving publication protocol.
-In its current state no subscribers can verify the authenticity of any message.
-Eve could simply replace a ciphertext with any other: she has all public keys 
-and the verification key in the ciphertext is one-time and ciphertext specific.
-
-We can easily achieve authenticity by substituting \(i_p\) for \((i_p, 
-  \MACKey{p})\) and then compute a \ac{MAC} for every ciphertext.
-This allows any subscriber to publish an authenticated message as well.
-If we do not desire this property we can replace the \ac{MAC} by digital 
-signatures: we get \((i_p, \SignKey{p})\) on the publisher side, \((i_p, 
-  \VerifKey{p})\) on the subscriber side.
-This also means that \(\psplit{p}\) will generate a new \ac{MAC} key or 
-signature-verification key-pair too.
 
 
 \section{Construction and Analysis of the Push Model}
