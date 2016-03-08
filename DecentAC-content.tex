@@ -187,21 +187,24 @@ Then we will proceed to the details of two alternative protocols
 
 % XXX Shall we have an adversary interface for C?
 \begin{definition}[Communication model]\label{CommunicationModel}
-  Let \(\Cop\) be a \emph{\((p, S)\)-communication model} with 
+  Let \(\C[p, S]\) be a \emph{\((p, S)\)-communication model} with 
   a \emph{publisher} \(p\) and a \emph{set of subscribers} \(S\).
-  Then we have the following operations defined on \(\Cop\):
+  Then we have the following operations defined on \(\C[p, S]\):
   \begin{itemize}
-    \item Before start the publisher runs \(\csetup{p}[1^\lambda]\) and each 
-      subscriber \(s\in S\) runs \(\csetup{s}[1^\lambda]\), where \(\lambda\) 
-      is the security parameter.
-    \item The publisher \(p\) uses \(\cpub{p}[R][m]\) to publish the message 
-      \(m\) to the designated \emph{recipient set} \(R\) by making it available 
-      to all subscribers \(s\in R\subseteq S\).
-    \item Each subscriber \(s\in S\) uses \(\cget{s}[]\) to get the set \(M\) 
-      of published messages \(m\in M\) for which \(s\) was in the recipient 
-      set.
+    \item Before start the publisher runs \(\csetup[p, S]{p}[1^\lambda]\) and 
+      each subscriber \(s\in S\) runs \(\csetup[p, S]{s}[1^\lambda]\), where 
+      \(\lambda\) is the security parameter.
+    \item The publisher \(p\) uses \(\cpub[p, S]{p}[R][m]\) to publish the 
+      message \(m\) to the designated \emph{recipient set} \(R\) by making it 
+      available to all subscribers \(s\in R\subseteq S\).
+    \item Each subscriber \(s\in S\) uses \(\cget[p, S]{s}[]\) to get the set 
+      \(M\) of published messages \(m\in M\) for which \(s\) was in the 
+      recipient set.
   \end{itemize}
 \end{definition}
+
+Whenever \(p, S\) are clear from the context, we will simply omit them, e.g.\ 
+\(\csetup{p}\) and \(\csetup{s}\).
 
 In our desired scenario, Alice acts as a publisher and her friends as the 
 subscribers.
@@ -286,12 +289,13 @@ In our analysis we will use the following definition for the Pull Model.
 \begin{definition}[Pull Model]\label{PullModel}
   Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
   broadcast-encryption scheme and \(\FS\) be a public file system.
-  We denote by \(\PullOp\) the \emph{pull model protocol} implementing a \((p, 
-    S)\)-communication model through the operations
+  We denote by \(\Pull[p, S]\) the \emph{pull model protocol} implementing 
+  a \((p, S)\)-communication model through the operations
   \begin{itemize}
-    \item \(\psetup{p}[\cdot]\) and \(\psetup{s}[\cdot]\),
-    \item \(\ppub{p}[\cdot][\cdot]\), and
-    \item \(\pget{s}[\cdot]\)
+    \item \(\psetup[p, S]{p}[\cdot]\) and \(\psetup[p, S]{s}[\cdot]\) for each
+      \(s\in S\),
+    \item \(\ppub[p, S]{p}[\cdot][\cdot]\), and
+    \item \(\pget[p, S]{s}[\cdot]\) for each \(s\in S\)
   \end{itemize}
   as in \cref{PullFunctions}.
 \end{definition}
@@ -300,15 +304,16 @@ In our analysis we will use the following definition for the Pull Model.
   \framebox{%
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
-      \Function{$\psetup{p}$}{$1^\lambda$}
+      \Function{$\psetup[p, S]{p}$}{$1^\lambda$}
         \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
         \State{$i_p\rgets \{0, 1\}^{\lambda}$}
-        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull{s}$.}
+        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull[p, 
+          S][s]$.}
       \EndFunction{}
 
       \Statex{}
 
-      \Function{$\ppub{p}$}{$R, m$}
+      \Function{$\ppub[p, S]{p}$}{$R, m$}
         \State{$\sigma \gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
         \State{$\fsappend[i_p][\sigma]$}
       \EndFunction{}
@@ -316,14 +321,14 @@ In our analysis we will use the following definition for the Pull Model.
   \end{minipage}
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
-      \Function{$\psetup{s}$}{$1^\lambda$}
+      \Function{$\psetup[p, S]{s}$}{$1^\lambda$}
         \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
-        \State{Give $\PubKey{s}$ to $\Push{p}$.}
+        \State{Give $\PubKey{s}$ to $\Pull[p, S][p]$.}
       \EndFunction{}
 
       \Statex{}
 
-      \Function{$\pget{s}$}{}
+      \Function{$\pget[p, S]{s}$}{}
         \State{$C = \fsread[i_p]$}
         \State{$M\gets \emptyset$}
         \For{$\sigma\in C$}
@@ -461,7 +466,7 @@ We summarize this algorithm in \cref{SplitGroup}.
             $\sigma\gets{ \Sign[\SignKey{}]{C} }$
           }
           \State{%
-            \Return{$(\VerifKey{}, C, \sigma)$}
+            \Return{$i_0, i_1, (\VerifKey{}, C, \sigma)$}
           }
           \Comment{\Iacs{ANOBE} ciphertext.}
         \EndFunction{}
@@ -592,9 +597,47 @@ We will add the split-group algorithm (\cref{SplitGroup}) as an available
 interface in the Pull Model (\cref{PullModel}) and we summarize this as the 
 Extended Pull Model in the following definition.
 
-\begin{definition}[Extended Pull Model]
-  \dots
+\begin{definition}[Extended Pull Model]\label{ExtPullModel}
+  Let \(\Pull[p, S]\) be an instance of the Pull Model as in \cref{PullModel}.
+  Then we define the \emph{Extended Pull Model} to additionally provide the 
+  following interfaces:
+  \begin{itemize}
+    \item \(\psplit[p, S]{p}[\cdot, \cdot]\) to split the subscriber set,
+    \item A modified \(\pget[p, S]{s}[]\) to update \(i_p\) after a split,
+  \end{itemize}
+  as defined in \cref{ExtPullFunctions}.
 \end{definition}
+
+\begin{figure}
+  \framebox{%
+    \begin{minipage}{0.48\textwidth}
+      \begin{algorithmic}
+        \Function{$\psplit[p, S]{p}$}{$R_0, R_1$}
+          \State{Do something \dots}
+          \State{\Return{$\Pull[p, R_0], \Pull[p, R_1]$}}
+        \EndFunction{}
+      \end{algorithmic}
+    \end{minipage}
+    \begin{minipage}{0.48\textwidth}
+      \begin{algorithmic}
+        \Function{$\pget[p, S]{s}$}{}
+          \State{Do something \dots}
+        \EndFunction{}
+      \end{algorithmic}
+    \end{minipage}
+  }
+  \caption{%
+    The additional and modified interfaces of the Extended Pull Model.
+  }\label{ExtPullFunctions}
+\end{figure}
+
+Note that the execution of \(\psplit[p, S]{p}[R_0, R_1]\) results in two new 
+instances of the Pull Model, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
+After this happens, Alice should no longer use \(\Pull[p, S]\), instead she 
+should only use these two new instances.
+On the subscribers' side, due to the construction of \(\pget[p, S]{s}\), their 
+instance \(\Pull[p, S]\) is automatically turned into \(\Pull[p, R_i]\), for 
+whichever \(i\in \{0, 1\}\) Alice put them in.
 
 
 \section{Construction and Analysis of the Push Model}

@@ -45,6 +45,7 @@
 %      \mleft( #1 \mright)%
 %    }
 %  }}
+
 \DeclareMathOperator{\SplitGroupOp}{\mathsf{SplitGroup}}
 \NewDocumentCommand{\SplitGroup}{o}{\ensuremath{%
     \SplitGroupOp%
@@ -52,6 +53,7 @@
       \mleft( #1 \mright)%
     }
   }}
+
 % File system
 \DeclareMathOperator{\FSop}{\mathcal{FS}}
 \NewDocumentCommand{\FS}{o}{\ensuremath{%
@@ -81,29 +83,84 @@
 
 % Communication model
 \DeclareMathOperator{\Cop}{\mathcal{C}}
-\NewDocumentCommand{\C}{m o}{\ensuremath{%
-    \Cop\mleft[ #1 \mright]%
+\NewDocumentCommand{\C}{o o o}{\ensuremath{%
+    \Cop%
+    \IfValueT{#1}{%
+      _{#1}%
+    }%
     \IfValueT{#2}{%
-      .\mathsf{#2}%
+      \mleft[ #2 \mright]%
+    }%
+    \IfValueT{#3}{%
+      \relax.\mathsf{#3}%
     }
   }}
-\NewDocumentCommand{\csetup}{m o}{\ensuremath{%
-    \C{#1}[setup]%
-    \IfValueT{#2}{%
-      \mleft( #2 \mright)%
+\NewDocumentCommand{\csetup}{o m o}{\ensuremath{%
+    \C[#1][#2][setup]%
+    \IfValueT{#3}{%
+      \mleft( #3 \mright)%
     }
   }}
-\NewDocumentCommand{\cpub}{m o o}{\ensuremath{%
-    \C{#1}[publish]%
-    \IfValueT{#2}{%
-      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
+\NewDocumentCommand{\cpub}{o m o o}{\ensuremath{%
+    \C[#1][#2][publish]%
+    \IfValueT{#3}{%
+      \mleft( #3, \IfValueTF{#4}{#4}{\cdot} \mright)%
     }
   }}
-\NewDocumentCommand{\cget}{m o}{\ensuremath{%
-    \C{#1}[get]%
-    \IfValueT{#2}{%
-      \mleft( #2 \mright)%
+\NewDocumentCommand{\cget}{o m o}{\ensuremath{%
+    \C[#1][#2][get]%
+    \IfValueT{#3}{%
+      \mleft( #3 \mright)%
     }
+  }}
+
+% Pull Model
+\NewDocumentCommand{\PullOp}{}{\Cop^{\mathsf{Pull}}}
+\NewDocumentCommand{\Pull}{o o o}{\ensuremath{%
+    \PullOp%
+    \IfValueT{#1}{_{#1}}%
+    \IfValueT{#2}{%
+      \mleft[ #2 \mright]%
+    }%
+    \IfValueT{#3}{%
+      \relax.\mathsf{#3}%
+    }
+  }}
+\NewDocumentCommand{\psetup}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Pull[#1][#2][setup]%
+    }{%
+      \Pull[][#2][setup]%
+    }
+    \IfValueT{#3}{%
+      \mleft( #3 \mright)%
+    }
+  }}
+\NewDocumentCommand{\ppub}{o m o o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Pull[#1][#2][publish]%
+    }{%
+      \Pull[][#2][publish]%
+    }
+    \IfValueT{#3}{%
+      \mleft( #3, \IfValueTF{#4}{#4}{\cdot} \mright)%
+    }
+  }}
+\NewDocumentCommand{\pget}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Pull[#1][#2][fetch]%
+    }{%
+      \Pull[][#2][fetch]%
+    }
+    \IfValueT{#3}{\mleft( #3 \mright)}
+  }}
+\NewDocumentCommand{\psplit}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Pull[#1][#2][split]%
+    }{%
+      \Pull[][#2][split]%
+    }
+    \IfValueT{#3}{\mleft( #3 \mright)}
   }}
 
 % Push Model
@@ -111,7 +168,7 @@
 \NewDocumentCommand{\Push}{m o}{\ensuremath{%
     \PushOp\mleft[ #1 \mright]%
     \IfValueT{#2}{%
-      .\mathsf{#2}%
+      \relax.\mathsf{#2}%
     }
   }}
 \NewDocumentCommand{\pnsetup}{m o}{\ensuremath{%
@@ -128,30 +185,6 @@
   }}
 \NewDocumentCommand{\pnget}{m o}{\ensuremath{%
     \Push{#1}[fetch]%
-    \IfValueT{#2}{\mleft( #2 \mright)}
-  }}
-% Pull Model
-\DeclareMathOperator{\PullOp}{\mathcal{P}_1}
-\NewDocumentCommand{\Pull}{m o}{\ensuremath{%
-    \PullOp\mleft[ #1 \mright]%
-    \IfValueT{#2}{%
-      .\mathsf{#2}%
-    }
-  }}
-\NewDocumentCommand{\psetup}{m o}{\ensuremath{%
-    \Pull{#1}[setup]%
-    \IfValueT{#2}{%
-      \mleft( #2 \mright)%
-    }
-  }}
-\NewDocumentCommand{\ppub}{m o o}{\ensuremath{%
-    \Pull{#1}[publish]%
-    \IfValueT{#2}{%
-      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
-    }
-  }}
-\NewDocumentCommand{\pget}{m o}{\ensuremath{%
-    \Pull{#1}[fetch]%
     \IfValueT{#2}{\mleft( #2 \mright)}
   }}
 
