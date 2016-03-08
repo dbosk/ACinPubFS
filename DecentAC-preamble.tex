@@ -32,10 +32,13 @@
     }
   }}
 \DeclareMathOperator{\Dop}{\mathcal{D}}
-\NewDocumentCommand{\D}{o}{\ensuremath{%
+\NewDocumentCommand{\D}{s o}{\ensuremath{%
     \Dop%
-    \IfValue{#1}{%
-      \mleft( #1 \mright)%
+    \IfBooleanT{#1}{%
+      ^*%
+    }
+    \IfValue{#2}{%
+      \mleft( #2 \mright)%
     }
   }}
 %\DeclareMathOperator{\Fop}{\mathcal{F}}
