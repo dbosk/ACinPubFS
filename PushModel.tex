@@ -60,10 +60,8 @@ We base our analysis on the following definition of the Push Model.
 
       \Function{$\pnpub[p, S]{p}$}{$R, m$}
         \For{$r\in R$}
-          \State{$i_r^\prime\rgets \{0, 1\}^\lambda$}
-          \State{$c_r\gets \Enc[\PubKey{r}, \SignKey{r}]{i_r^\prime, m}$}
+          \State{$c_r\gets \Enc[\PubKey{r}, \SignKey{r}]{m}$}
           \State{$\fswrite[i_r][c_r]$}
-          \State{$i_r\gets i_r^\prime$}
         \EndFor{}
       \EndFunction{}
     \end{algorithmic}
@@ -81,16 +79,13 @@ We base our analysis on the following definition of the Push Model.
       \Function{$\pnget[p, S]{s}$}{}
         \State{$C\gets \fsread[i_s]$}
         \If{$C = \bot$}
-          \State{\Return{$\bot$}}
+          \State{\Return{$\emptyset$}}
         \EndIf{}
         \State{$M\gets \emptyset$}
         \For{$c\in C$}
-          \State{$d\gets \Dec[\PriKey{s}, \VerifKey{s}]{c}$}
-          \If{$d\neq \bot$}
-            \State{$(i_s^\prime, m_c)\gets d$}
+          \State{$m_c\gets \Dec[\PriKey{s}, \VerifKey{s}]{c}$}
+          \If{$m_c\neq \bot$}
             \State{$M\gets M\cup \{m_c\}$}
-            \State{$i_s\gets i_s^\prime$}
-            \State{$M\gets M\cup \pnget{s}[]$}
           \EndIf{}
         \EndFor{}
         \State{\Return{$M$}}
