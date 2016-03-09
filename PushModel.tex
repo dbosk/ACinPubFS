@@ -40,18 +40,20 @@ We base our analysis on the following definition.
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
       \Function{$\pnsetup[p, S]{p}$}{$1^\lambda$}
-        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
-        \State{$\forall s\in S$: give $\VerifKey{p}$ to $\Push{s}$.}
+        \For{$r\in S$}
+          \State{$(\SignKey{r}, \VerifKey{r})\rgets \Keygen{1^\lambda}$}
+          \State{Give $\VerifKey{r}$ to $\Push[p, S][r]$.}
+        \EndFor{}
       \EndFunction{}
 
       \Statex{}
 
       \Function{$\pnpub[p, S]{p}$}{$R, m$}
-        \For{$s\in R$}
-          \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
-          \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
-          \State{$\fswrite[i_s][\sigma_s]$}
-          \State{$i_s\gets i_s^\prime$}
+        \For{$r\in R$}
+          \State{$i_r^\prime\rgets \{0, 1\}^\lambda$}
+          \State{$c_r\gets \Enc[\PubKey{r}, \SignKey{r}]{i_r^\prime, m}$}
+          \State{$\fswrite[i_r][c_r]$}
+          \State{$i_r\gets i_r^\prime$}
         \EndFor{}
       \EndFunction{}
     \end{algorithmic}
@@ -61,7 +63,7 @@ We base our analysis on the following definition.
       \Function{$\pnsetup[p, S]{s}$}{$1^\lambda$}
         \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
         \State{$i_s\rgets \{0, 1\}^{\lambda}$}
-        \State{Give $(\PubKey{s}, i_s)$ to $\Push{p}$.}
+        \State{Give $(\PubKey{s}, i_s)$ to $\Push[p, S][p]$.}
       \EndFunction{}
 
       \Statex{}
@@ -72,11 +74,11 @@ We base our analysis on the following definition.
           \State{\Return{$\bot$}}
         \EndIf{}
         \State{$M\gets \emptyset$}
-        \For{$\sigma\in C$}
-          \State{$d\gets \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
+        \For{$c\in C$}
+          \State{$d\gets \Dec[\PriKey{s}, \VerifKey{s}]{c}$}
           \If{$d\neq \bot$}
-            \State{$(i_s^\prime, m_\sigma)\gets d$}
-            \State{$M\gets M\cup \{m_\sigma\}$}
+            \State{$(i_s^\prime, m_c)\gets d$}
+            \State{$M\gets M\cup \{m_c\}$}
             \State{$i_s\gets i_s^\prime$}
             \State{$M\gets M\cup \pnget{s}[]$}
           \EndIf{}
