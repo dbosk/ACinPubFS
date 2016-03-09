@@ -371,6 +371,13 @@ instances of the Pull Model, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
 After this happens, Alice should no longer use \(\Pull[p, S]\), instead she 
 should only use these two new instances.
 
+We could instead incorporate \(\psplit{p}\) into the \(ppub{p}\) interface and 
+let it keep track of the different groups (instances) in the state, this would 
+make it more similar to the definition of the ideal model 
+(\cref{CommunicationModel}).
+However, for presentation purposes, many simpler algorithms are better than 
+fewer that are more complex.
+
 On the subscribers' side, due to the construction of \(\pget[p, S]{s}\), their 
 instance \(\Pull[p, S]\) is automatically turned into \(\Pull[p, R_i]\), for 
 whichever \(i\in \{0, 1\}\) Alice put them in.
