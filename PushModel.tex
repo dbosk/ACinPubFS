@@ -1,0 +1,183 @@
+\section{Construction and Analysis of the Push Model}
+\label{PushAnalysis}
+
+The idea of the Push Model is for each subscriber to have an inbox in the file 
+system --- as opposed to the Pull Model, where the publisher has an outbox.
+This is simply a file object with a randomly chosen identifier.
+The publisher then puts all published material in the inbox of each subscriber.
+
+We can see that if we simply put the broadcast ciphertext from the Pull Model 
+in all inboxes, then Eve can relate them since they contain identical 
+ciphertexts.
+We thus have to make some more modifications.
+Assume that we instead encrypt one message (with unique ciphertext) per 
+subscriber.
+Now Eve cannot use the ciphertext to relate the recipients.
+However, after a few published messages (she has oracle access to the 
+publication interface) she has learned who has which inbox, thus she can easily 
+win the ANO-IND-CCA game (\cref{ANO-IND-CCA}).
+
+To deal with this problem, we will introduce a mix-net.
+The mix-net will not do much help in a single instance, with this construction 
+we must run several instances in parallel to achieve any security.
+We base our analysis on the following definition.
+
+\begin{definition}[Push Model]\label{PushModel}
+  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
+  encryption scheme and \(\FSop\) be a public file system.
+  We denote by \(\Push[p, S]\) the \emph{push model protocol} implementing 
+  a \((p, S)\)-communication model through the operations
+  \begin{itemize}
+    \item \(\pnsetup[p, S]{p}[\cdot]\) and \(\pnsetup[p, S]{s}[\cdot]\),
+    \item \(\pnpub[p, S]{p}[\cdot][\cdot]\), and
+    \item \(\pnget[p, S]{s}[\cdot]\)
+  \end{itemize}
+  as in \cref{PushFunctions}.
+\end{definition}
+
+\begin{figure}%[p]
+  \framebox{%
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup[p, S]{p}$}{$1^\lambda$}
+        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
+        \State{$\forall s\in S$: give $\VerifKey{p}$ to $\Push{s}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnpub[p, S]{p}$}{$R, m$}
+        \For{$s\in R$}
+          \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
+          \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
+          \State{$\fsappend[i_s][\sigma_s]$}
+          \State{$i_s\gets i_s^\prime$}
+        \EndFor{}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  \begin{minipage}[t]{0.48\textwidth}
+    \begin{algorithmic}
+      \Function{$\pnsetup[p, S]{s}$}{$1^\lambda$}
+        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
+        \State{$i_s\rgets \{0, 1\}^{\lambda}$}
+        \State{Give $(\PubKey{s}, i_s)$ to $\Push{p}$.}
+      \EndFunction{}
+
+      \Statex{}
+
+      \Function{$\pnget[p, S]{s}$}{}
+        \State{$C\gets \fsread[i_s]$}
+        \If{$C = \bot$}
+          \State{\Return{$\bot$}}
+        \EndIf{}
+        \State{$M\gets \emptyset$}
+        \For{$\sigma\in C$}
+          \State{$d\gets \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
+          \If{$d\neq \bot$}
+            \State{$(i_s^\prime, m_\sigma)\gets d$}
+            \State{$M\gets M\cup \{m_\sigma\}$}
+            \State{$i_s\gets i_s^\prime$}
+            \State{$M\gets M\cup \pnget{s}[]$}
+          \EndIf{}
+        \EndFor{}
+        \State{\Return{$M$}}
+      \EndFunction{}
+    \end{algorithmic}
+  \end{minipage}
+  }
+  \caption{%
+    Functions implementing the communication model for the Push Model protocol.
+    The publisher's interface is to the left and the subscribers' to the right.
+  }\label{PushFunctions}
+\end{figure}
+
+When Alice executes \(\pnsetup{p}\) the \(\KeygenOp\) algorithm generates 
+a signature-verification key-pair \((\SignKey{p}, \VerifKey{p})\) and gives the 
+verification key to all her friends.\footnote{%
+  Since the scheme \(\mathcal{E}\) is an authenticated encryption scheme, the 
+  key generation yields a public-private key-pair and a signature-verification 
+  key-pair --- in Alice's case (conversely for her friends) we are only 
+  interested in the authentication part, so we simply discard her encryption 
+  keys in the definition.
+}
+Each of her friends \(s\in S\), when they execute \(\pnsetup{s}\) the 
+\(\KeygenOp\) algorithm generates a public-private key-pair.
+Additionally they randomly choose a string as an identifier.
+They give the public key and the identifier to Alice.
+
+When Alice wants to send a message \(m\) to a subset \(R\subseteq S\) of her 
+friends, she uses \(\pnpub{p}\) to create the authenticated ciphertexts 
+\(\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{m}\) for each friend \(s\in R\).
+The encryption scheme simply combines the recipients public key \(\PubKey{s}\) 
+and Alice's signature key \(\SignKey{p}\).
+Then she uses \(\FS\) to append the ciphertext \(\sigma_s\) to the file with 
+identifier \(i_s\).
+
+The operation \(\pget{s}\) works similarly as in the Pull Model, however, it 
+uses a different file and since the inbox contains a pointer to the next inbox 
+it recursively calls itself upon finishing a message.
+It starts by reading the inbox from the file system.
+Then it iterates through the list of entries, decrypting each entry.
+Each entry, if successfully decrypted, is a new inbox and a message.
+It appends the message to the list of messages and sets the inbox to be the new
+inbox.
+Then it recursively calls itself to check the newly acquired inbox for 
+messages.
+
+Note that the authenticated encryption scheme \(\mathcal{E}\) can be 
+a symmetric-key scheme although we use the notation of public-key cryptography 
+in our abstraction.
+We can simply let \(\PubKey{} = \PriKey{}\) and \(\SignKey{} = \VerifKey{}\) to 
+achieve this.
+We have thus not yet limited ourselves to any properties of \(\mathcal{E}\) 
+(beyond authentication and confidentiality).
+
+% XXX Write high-level analysis of push model
+Some high-level analysis \dots
+Point out what properties we need from \(\mathcal{E}\).
+These will probably be very similar as for \ac{ANOBE}.
+(Eve can correlate all inboxes by observing equal ciphertexts.)
+
+Prove that with these properties the Push Model is ANO-IND-CCA\@.
+\begin{theorem}
+  Something like:
+  \[\Adv{\text{ANO-IND-CCA}}{\A, \PushOp}[1^\lambda]\leq 
+    \Adv{\text{IND-CCA}}{\A}[1^\lambda] + \Adv{\text{AI-CCA}}{\A}[1^\lambda].\]
+\end{theorem}
+\begin{proof}
+  \dots
+\end{proof}
+
+\subsection{Running Multiple Instances in Parallel}
+\label{ParallelPush}
+
+Multiple instances of the Push model run in parallel \dots
+
+\begin{theorem}
+  Given two instances \(\Pull[p, S]\) and \(\Pull[p^\prime, S^\prime]\), \(p\) 
+  and \(p^\prime\) are unlinkable for any adversary \(\A\).
+\end{theorem}
+
+\begin{proof}
+  We will prove this by an information-theoretic argument.
+  We have two cases: first, the two instances are unrelated, \(p\neq 
+    p^\prime\); second, the two instances are either related or unrelated while 
+  \(p = p^\prime\).
+  We focus on the latter.
+  In this case there are two possibilities, \(p\) created two instances and 
+  they are thus unrelated.
+  If they are related \(p\) must have used \(\psplit[p, S^*]{p}\) to form them 
+  from some \(S^* = S\cup S^\prime\).
+  In doing this, \(p\) randomly chooses \(i_0, i_1\in \{0, 1\}^\lambda\) and 
+  \(\SignKey{0}, \SignKey{1}\rgets \Keygen{1^\lambda}\).
+  This means that \((i_0, \SignKey{0})\) and \((i_1, \SignKey{1})\) are 
+  information-theoretically independent.
+  It follows from \cref{SplitGroupIsSecure} and the ANO-IND-CCA property of the 
+  encryption scheme that even to \(s\in S\), nothing related to 
+  \(\Pull[p^\prime, S^\prime]\) can be found.
+  Thus we could equally likely have \(p\neq p^\prime\).
+  \qed{}
+\end{proof}
+
+

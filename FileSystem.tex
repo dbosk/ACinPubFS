@@ -1,0 +1,65 @@
+% XXX Formalize the setting, the system model:
+%  - A file system: read, write, append.
+%  - Adversary is storage node, operates file system.
+%  - Adversary participates as user.
+
+\section{A General File System}\label{FileSystem}
+
+We will model our system as an abstract file system with the operations create, 
+read and append.
+The operations are defined as we intuitively expect: we can create an object, 
+then read it and also append to it.
+The file system itself provides no access control.
+
+\begin{definition}[Public file system]\label{FS}
+  A \emph{file} \(f = (i, m)\) consists of the \emph{identifier} \(i\) and the 
+  \emph{content} \(m\).
+  We define the set of files \(F = \{(i, m_i)\}\) together with the following 
+  operations to be the \emph{public file system} \(\FS\):
+  \begin{itemize}
+    \item \(\fscreate[i][m_i]\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
+      \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\).
+      Otherwise this operation has the effect of \(\fsappend[i][m_i]\).
+
+    \item \(\fsread[i] = m_i\) if \((i, m_i)\in F\), otherwise 
+      \(\fsread[i^\prime] = \bot\).
+
+    \item \(\fsappend[i][m^\prime]\) will set \((i, m)\gets (i, m\concat 
+        m^\prime)\) for \((i, m)\in F\).
+      If \(\{(i^\prime, m^\prime)\in F\mid i^\prime = i\} = \emptyset\) this 
+      operation has no effect.
+  \end{itemize}
+\end{definition}
+
+We can see in the definition that anyone can read any object in the file 
+system.
+Anyone can also create new files and append to existing files.
+
+% XXX Formalize assumptions:
+%  - Storage node cannot tell the origin of two requests apart.
+%  - Eve controls the entire storage system?
+%    - Here she can do an exhaustive search.
+%  - Eve only controls part of the network?
+%    - Can Eve do an exhaustive search in the storage?
+%
+%Assuming that Eve controls the entire storage system should be more 
+%interesting as it's a stronger adversary.  There shouldn't be any need 
+%for the weaker adversary who controls only a part of the storage system.  
+%We'll have to remove some randomness re-use from ANOBE for the 
+%implementation, but that should suffice.
+
+We will let the adversary Eve operate the file system \(\FS\) defined in 
+\cref{FS}.
+By this we mean that Eve has access to the internal state of \(\FS\) directly, 
+i.e.\ the set of files \(F\).
+She can thus read all files (same as everyone else), but she can also do 
+arbitrary searches since she does not have to use \(\fsread{\cdot}\).
+She can also modify the files (including deleting them).
+
+To be consistent with \cref{FS}, Eve cannot distinguish between Alice's and 
+Bob's requests to the operations of \(\FS\) --- in the definition there is 
+nothing to identify who used any of the operations.
+But she can record the times at which they occurred with her own clock, since 
+she executes them.
+
+
