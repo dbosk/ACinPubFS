@@ -194,12 +194,16 @@ Then we will proceed to the details of two alternative protocols
     \item Before start the publisher runs \(\csetup[p, S]{p}[1^\lambda]\) and 
       each subscriber \(s\in S\) runs \(\csetup[p, S]{s}[1^\lambda]\), where 
       \(\lambda\) is the security parameter.
-    \item The publisher \(p\) uses \(\cpub[p, S]{p}[R][m]\) to publish the 
-      message \(m\) to the designated \emph{recipient set} \(R\) by making it 
-      available to all subscribers \(s\in R\subseteq S\).
+
+    \item The publisher \(p\) uses \(\cpub[p, S]{p}[m]\) to publish the message 
+      \(m\) to all subscribers \(S\).
+
     \item Each subscriber \(s\in S\) uses \(\cget[p, S]{s}[]\) to get the set 
-      \(M\) of published messages \(m\in M\) for which \(s\) was in the 
-      recipient set.
+      \(M\) of published messages \(m\in M\).
+
+    \item The publisher can also use \(\csplit[p, S]{p}[S_0, S_1]\) to split 
+      \(S\) into disjoint sets \(S_0\) and \(S_1\) and the corresponding 
+      \(\C[p, S_0]\) and \(\C[p, S_1]\).
   \end{itemize}
 \end{definition}
 
@@ -208,42 +212,16 @@ Whenever \(p, S\) are clear from the context, we will simply omit them, e.g.\
 
 In our desired scenario, Alice acts as a publisher and her friends as the 
 subscribers.
-We note that no subscriber \(s\in S\) can use \(\cpub{s}[R][m]\) to publish 
+We note that no subscriber \(s\in S\) can use \(\cpub{s}[m]\) to publish 
 a message \(m\).
 The communication model is strictly unidirectional from publisher to 
 subscribers and they cannot access the publisher's interface.
 In the same sense, no subscriber \(s^\prime\in S\) can use \(\cget{s}\) for 
 \(s^\prime\neq s\).
 It follows too that no subscriber \(s_i\) can learn which \(s_1, \ldots, s_n\in 
-  R\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given 
+  S\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in S\) for a given 
 message \(m\).
-More formally this is captured in the following security game, which is adapted 
-from Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
-
-\begin{definition}[ANO-IND-CCA]\label{ANO-IND-CCA}
-  We define the ANO-IND-CCA game as follows:
-  \begin{description}
-    \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
-        S\) and \(\csetup{p}[1^\lambda]\).
-    \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\) and take 
-      control over their \(\cget{s}\) interface.
-    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
-      \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
-        = |R_1|\) and for all corrupted \(s\in S\) we have \(s\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      If \(s\in S_0\cap S_1\) we require \(m_0 = m_1\).
-      Then \(\A\) gives them to the challenger.
-      The challenger randomly chooses \(b\in \{0, 1\}\) and executes 
-      \(\cpub{p}[R_b][m_b]\).
-    \item[Phase 2] The adversary may continue to corrupt \(s\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      \(\A\) may corrupt \(s\in S_0\cap S_1\) only if \(m_0 = m_1\).
-    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
-      \(\hat{b} = b\).
-  \end{description}
-  We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
-      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
-\end{definition}
+We will treat this more formally when we analyse the implementations.
 
 % XXX Formalize other required (more high-level) properties:
 %  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
@@ -252,14 +230,16 @@ from Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
 %  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
 %    she shouldn't be able to tell if it's also in Bob's.
 
-However, there are some desirable privacy properties that are not captured by 
-ANO-IND-CCA\@.
+However, there are additional, desirable privacy properties that are not 
+captured above.
+%ANO-IND-CCA\@.
 Bob might become jealous if he realizes that Alice no longer includes him in 
 the recipient set for her messages.
+I.e.\ Alice used \(\csplit{p}\) to remove Bob.
 As such Bob should only be able to determine that Alice publishes content by 
 being in the recipient set himself.
-We treat this problem in \cref{Composed}, until then we will refer to this as 
-the problem of \enquote{Jealous Bob}.
+We will refer to this as the problem of \enquote{Jealous Bob}, also formally 
+treated later.
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.

@@ -86,7 +86,7 @@
 
 % Communication model
 \DeclareMathOperator{\Cop}{\mathcal{C}}
-\NewDocumentCommand{\C}{o o o}{\ensuremath{%
+\NewDocumentCommand{\C}{o o o o}{\ensuremath{%
     \Cop%
     \IfValueT{#1}{%
       _{#1}%
@@ -97,6 +97,9 @@
     \IfValueT{#3}{%
       \relax.\mathsf{#3}%
     }
+    \IfValueT{#4}{%
+      \mleft( #4 \mright)%
+    }
   }}
 \NewDocumentCommand{\csetup}{o m o}{\ensuremath{%
     \C[#1][#2][setup]%
@@ -104,16 +107,23 @@
       \mleft( #3 \mright)%
     }
   }}
-\NewDocumentCommand{\cpub}{o m o o}{\ensuremath{%
+\NewDocumentCommand{\cpub}{o m o}{\ensuremath{%
     \C[#1][#2][publish]%
     \IfValueT{#3}{%
-      \mleft( #3, \IfValueTF{#4}{#4}{\cdot} \mright)%
+      \mleft( \IfValueTF{#3}{#3}{\cdot} \mright)%
     }
   }}
 \NewDocumentCommand{\cget}{o m o}{\ensuremath{%
     \C[#1][#2][get]%
     \IfValueT{#3}{%
       \mleft( #3 \mright)%
+    }
+  }}
+\NewDocumentCommand{\csplit}{o m o}{\ensuremath{%
+    \IfValueTF{#3}{%
+      \C[#1][#2][split][#3]%
+    }{%
+      \C[#1][#2][split]%
     }
   }}
 
