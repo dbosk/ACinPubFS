@@ -206,6 +206,12 @@ Then we will proceed to the details of two alternative protocols
 Whenever \(p, S\) are clear from the context, we will simply omit them, e.g.\ 
 \(\csetup{p}\) and \(\csetup{s}\).
 
+There are two ways the adversary can gain information.
+The first is from corrupted subscribers and the second is from the public file 
+system over which the communication model is implemented.
+Hence the second is not visible in \cref{CommunicationModel}, but will be in 
+\cref{PullModel,PushModel}.
+
 In our desired scenario, Alice acts as a publisher and her friends as the 
 subscribers.
 We note that no subscriber \(s\in S\) can use \(\cpub{s}[R][m]\) to publish 
@@ -217,16 +223,19 @@ In the same sense, no subscriber \(s^\prime\in S\) can use \(\cget{s}\) for
 It follows too that no subscriber \(s_i\) can learn which \(s_1, \ldots, s_n\in 
   R\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given 
 message \(m\).
-More formally this is captured in the following security game, which is adapted 
-from Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
+This is captured formally in the following security game, which is adapted from 
+Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
 
 \begin{definition}[ANO-IND-CCA]\label{ANO-IND-CCA}
   We define the ANO-IND-CCA game as follows:
   \begin{description}
     \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
         S\) and \(\csetup{p}[1^\lambda]\).
-    \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\) and take 
-      control over their \(\cget{s}\) interface.
+
+    \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\).
+      This means that the adversary gains the entire state: private keys 
+      generated during the set-up phase etc.
+
     \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
       \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
         = |R_1|\) and for all corrupted \(s\in S\) we have \(s\notin S_0\cup 
@@ -235,11 +244,14 @@ from Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
       Then \(\A\) gives them to the challenger.
       The challenger randomly chooses \(b\in \{0, 1\}\) and executes 
       \(\cpub{p}[R_b][m_b]\).
+
     \item[Phase 2] The adversary may continue to corrupt \(s\notin S_0\cup 
         S_1\setminus (S_0\cap S_1)\).
       \(\A\) may corrupt \(s\in S_0\cap S_1\) only if \(m_0 = m_1\).
+
     \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
       \(\hat{b} = b\).
+
   \end{description}
   We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
       \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
@@ -258,7 +270,7 @@ Bob might become jealous if he realizes that Alice no longer includes him in
 the recipient set for her messages.
 As such Bob should only be able to determine that Alice publishes content by 
 being in the recipient set himself.
-We treat this problem in \cref{Composed}, until then we will refer to this as 
+We treat this problem in later sections, until then we will refer to this as 
 the problem of \enquote{Jealous Bob}.
 
 There are several ways to implement the message-passing protocol for the 
