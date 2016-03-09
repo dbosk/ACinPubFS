@@ -96,6 +96,13 @@ She appends the ciphertext to her outbox file.
 Each friend can then use \(\pget{s}\) to retrieve the ciphertexts from the file 
 system and decrypt them.
 
+Note that we can have symmetric authentication on the authenticated encryption 
+although we use the notation of asymmetric authentication (e.g.\ digital 
+signatures) in our abstraction.
+We can simply let \(\SignKey{} = \VerifKey{}\) to achieve this.
+However, this is not at the centre of our discussion, it just illustrates the 
+modularity of the scheme.
+
 As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed 
 for the Pull Model.
 We wanted to ensure that no subscriber should be able to learn who else is 
@@ -382,7 +389,7 @@ On the subscribers' side, due to the construction of \(\pget[p, S]{s}\), their
 instance \(\Pull[p, S]\) is automatically turned into \(\Pull[p, R_i]\), for 
 whichever \(i\in \{0, 1\}\) Alice put them in.
 
-\subsection{Running Multiple Instances in Parallel}
+\subsection{Running Multiple Pull Instances in Parallel}
 \label{ParallelPull}
 
 Now it remains for us to convince ourselves that Bob cannot distinguish between
