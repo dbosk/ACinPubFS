@@ -18,9 +18,19 @@ publication interface) she has learned who has which inbox, thus she can easily
 win the ANO-IND-CCA game (\cref{ANO-IND-CCA}).
 
 To deal with this problem, we will introduce a mix-net.
+
+\begin{definition}[Mix-net]
+  \dots
+\end{definition}
+
 The mix-net will not do much help in a single instance, with this construction 
 we must run several instances in parallel to achieve any security.
-We base our analysis on the following definition.
+Even then, we cannot achieve negligible probability for Eve to win (as for the 
+Pull Model).
+All we can achieve is a lower bound.
+It is a lower bound since the result depends on the behaviour in the parallel 
+instances --- which will not be uniformly random.
+We base our analysis on the following definition of the Push Model.
 
 \begin{definition}[Push Model]\label{PushModel}
   Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
@@ -140,16 +150,6 @@ Some high-level analysis \dots
 Point out what properties we need from \(\mathcal{E}\).
 These will probably be very similar as for \ac{ANOBE}.
 (Eve can correlate all inboxes by observing equal ciphertexts.)
-
-Prove that with these properties the Push Model is ANO-IND-CCA\@.
-\begin{theorem}
-  Something like:
-  \[\Adv{\text{ANO-IND-CCA}}{\A, \PushOp}[1^\lambda]\leq 
-    \Adv{\text{IND-CCA}}{\A}[1^\lambda] + \Adv{\text{AI-CCA}}{\A}[1^\lambda].\]
-\end{theorem}
-\begin{proof}
-  \dots
-\end{proof}
 
 \subsection{Running Multiple Instances in Parallel}
 \label{ParallelPush}
