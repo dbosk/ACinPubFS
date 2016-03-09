@@ -167,28 +167,52 @@
   }}
 
 % Push Model
-\DeclareMathOperator{\PushOp}{\mathcal{P}_n}
-\NewDocumentCommand{\Push}{m o}{\ensuremath{%
-    \PushOp\mleft[ #1 \mright]%
+\NewDocumentCommand{\PushOp}{}{\Cop^{\mathsf{Push}}}
+\NewDocumentCommand{\Push}{o o o}{\ensuremath{%
+    \PushOp%
+    \IfValueT{#1}{_{#1}}%
     \IfValueT{#2}{%
-      \relax.\mathsf{#2}%
+      \mleft[ #2 \mright]%
+    }%
+    \IfValueT{#3}{%
+      \relax.\mathsf{#3}%
     }
   }}
-\NewDocumentCommand{\pnsetup}{m o}{\ensuremath{%
-    \Push{#1}[setup]%
-    \IfValueT{#2}{%
-      \mleft( #2 \mright)%
+\NewDocumentCommand{\pnsetup}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Push[#1][#2][setup]%
+    }{%
+      \Push[][#2][setup]%
+    }
+    \IfValueT{#3}{%
+      \mleft( #3 \mright)%
     }
   }}
-\NewDocumentCommand{\pnpub}{m o o}{\ensuremath{%
-    \Push{#1}[publish]%
-    \IfValueT{#2}{%
-      \mleft( #2, \IfValueTF{#3}{#3}{\cdot} \mright)%
+\NewDocumentCommand{\pnpub}{o m o o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Push[#1][#2][publish]%
+    }{%
+      \Push[][#2][publish]%
+    }
+    \IfValueT{#3}{%
+      \mleft( #3, \IfValueTF{#4}{#4}{\cdot} \mright)%
     }
   }}
-\NewDocumentCommand{\pnget}{m o}{\ensuremath{%
-    \Push{#1}[fetch]%
-    \IfValueT{#2}{\mleft( #2 \mright)}
+\NewDocumentCommand{\pnget}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Push[#1][#2][fetch]%
+    }{%
+      \Push[][#2][fetch]%
+    }
+    \IfValueT{#3}{\mleft( #3 \mright)}
+  }}
+\NewDocumentCommand{\pnsplit}{o m o}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \Push[#1][#2][split]%
+    }{%
+      \Push[][#2][split]%
+    }
+    \IfValueT{#3}{\mleft( #3 \mright)}
   }}
 
 

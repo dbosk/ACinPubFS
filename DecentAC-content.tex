@@ -729,12 +729,12 @@ We base our analysis on the following definition.
 \begin{definition}[Push Model]\label{PushModel}
   Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
   encryption scheme and \(\FSop\) be a public file system.
-  We denote by \(\PushOp\) the \emph{push model protocol} implementing a \((p, 
-    S)\)-communication model through the operations
+  We denote by \(\Push[p, S]\) the \emph{push model protocol} implementing 
+  a \((p, S)\)-communication model through the operations
   \begin{itemize}
-    \item \(\pnsetup{p}[\cdot]\) and \(\pnsetup{s}[\cdot]\),
-    \item \(\pnpub{p}[\cdot][\cdot]\), and
-    \item \(\pnget{s}[\cdot]\)
+    \item \(\pnsetup[p, S]{p}[\cdot]\) and \(\pnsetup[p, S]{s}[\cdot]\),
+    \item \(\pnpub[p, S]{p}[\cdot][\cdot]\), and
+    \item \(\pnget[p, S]{s}[\cdot]\)
   \end{itemize}
   as in \cref{PushFunctions}.
 \end{definition}
@@ -743,14 +743,14 @@ We base our analysis on the following definition.
   \framebox{%
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
-      \Function{$\pnsetup{p}$}{$1^\lambda$}
+      \Function{$\pnsetup[p, S]{p}$}{$1^\lambda$}
         \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
         \State{$\forall s\in S$: give $\VerifKey{p}$ to $\Push{s}$.}
       \EndFunction{}
 
       \Statex{}
 
-      \Function{$\pnpub{p}$}{$R, m$}
+      \Function{$\pnpub[p, S]{p}$}{$R, m$}
         \For{$s\in R$}
           \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
           \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
@@ -762,7 +762,7 @@ We base our analysis on the following definition.
   \end{minipage}
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
-      \Function{$\pnsetup{s}$}{$1^\lambda$}
+      \Function{$\pnsetup[p, S]{s}$}{$1^\lambda$}
         \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
         \State{$i_s\rgets \{0, 1\}^{\lambda}$}
         \State{Give $(\PubKey{s}, i_s)$ to $\Push{p}$.}
@@ -770,7 +770,7 @@ We base our analysis on the following definition.
 
       \Statex{}
 
-      \Function{$\pnget{s}$}{}
+      \Function{$\pnget[p, S]{s}$}{}
         \State{$C\gets \fsread[i_s]$}
         \If{$C = \bot$}
           \State{\Return{$\bot$}}
