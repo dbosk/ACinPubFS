@@ -87,6 +87,13 @@ We will continue to define an ideal communication functionality in
 The we give two constructions that implement the functionality using different 
 strategies and analyse what properties their primitives must have in 
 \cref{PullAnalysis,PushAnalysis}.
+The motivation behind these two constructions is that one is optimized for 
+Alice and the other for Alice's friends.
+One requires potentially many connections for her friends, while the other 
+requires this for Alice.
+In some situations connections can be expensive, compare e.g.\ establishing 
+many Tor~\cite{Tor} circuits to transfer a little data and establishing one 
+circuit while transferring more data.
 
 
 %%% The main contribution %%%%%%%%%%%%%%%%%%%%%%%%
