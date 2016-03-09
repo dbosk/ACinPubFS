@@ -10,27 +10,7 @@ We can see that if we simply put the broadcast ciphertext from the Pull Model
 in all inboxes, then Eve can relate them since they contain identical 
 ciphertexts.
 We thus have to make some more modifications.
-Assume that we instead encrypt one message (with unique ciphertext) per 
-subscriber.
-Now Eve cannot use the ciphertext to relate the recipients.
-However, after a few published messages (she has oracle access to the 
-publication interface) she has learned who has which inbox, thus she can easily 
-win the ANO-IND-CCA game (\cref{ANO-IND-CCA}).
-
-To deal with this problem, we will introduce a mix-net.
-
-\begin{definition}[Mix-net]
-  \dots
-\end{definition}
-
-The mix-net will not do much help in a single instance, with this construction 
-we must run several instances in parallel to achieve any security.
-Even then, we cannot achieve negligible probability for Eve to win (as for the 
-Pull Model).
-All we can achieve is a lower bound.
-It is a lower bound since the result depends on the behaviour in the parallel 
-instances --- which will not be uniformly random.
-We base our analysis on the following definition of the Push Model.
+We will base our analysis on the following definition.
 
 \begin{definition}[Push Model]\label{PushModel}
   Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
@@ -100,8 +80,9 @@ We base our analysis on the following definition of the Push Model.
 \end{figure}
 
 When Alice executes \(\pnsetup{p}\) the \(\KeygenOp\) algorithm generates 
-a signature-verification key-pair \((\SignKey{p}, \VerifKey{p})\) and gives the 
-verification key to all her friends.\footnote{%
+a signature-verification key-pair \((\SignKey{s}, \VerifKey{s})\) for every 
+subscriber \(s\in S\) and gives the verification key to all her 
+friends.\footnote{%
   Since the scheme \(\mathcal{E}\) is an authenticated encryption scheme, the 
   key generation yields a public-private key-pair and a signature-verification 
   key-pair --- in Alice's case (conversely for her friends) we are only 
@@ -110,49 +91,75 @@ verification key to all her friends.\footnote{%
 }
 Each of her friends \(s\in S\), when they execute \(\pnsetup{s}\) the 
 \(\KeygenOp\) algorithm generates a public-private key-pair.
-Additionally they randomly choose a string as an identifier.
+Additionally they randomly choose a string as an identifier for their inbox.
 They give the public key and the identifier to Alice.
 
 When Alice wants to send a message \(m\) to a subset \(R\subseteq S\) of her 
 friends, she uses \(\pnpub{p}\) to create the authenticated ciphertexts 
-\(\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{m}\) for each friend \(s\in R\).
+\(c_s\gets \Enc[\PubKey{s}, \SignKey{s}]{m}\) for each friend \(s\in R\).
 The encryption scheme simply combines the recipients public key \(\PubKey{s}\) 
-and Alice's signature key \(\SignKey{p}\).
-Then she uses \(\FS\) to append the ciphertext \(\sigma_s\) to the file with 
+and Alice's friend-specific signature key \(\SignKey{s}\).
+Then she uses \(\FS\) to append the ciphertext \(c_s\) to the file with 
 identifier \(i_s\).
 
 The operation \(\pget{s}\) works similarly as in the Pull Model, however, it 
-uses a different file and since the inbox contains a pointer to the next inbox 
-it recursively calls itself upon finishing a message.
+uses a different file.
 It starts by reading the inbox from the file system.
 Then it iterates through the list of entries, decrypting each entry.
-Each entry, if successfully decrypted, is a new inbox and a message.
-It appends the message to the list of messages and sets the inbox to be the new
-inbox.
-Then it recursively calls itself to check the newly acquired inbox for 
-messages.
+Each entry, if successfully decrypted, is a new message.
+It appends the message to the list of messages which it returns upon 
+finishing.
 
-Note that the authenticated encryption scheme \(\mathcal{E}\) can be 
-a symmetric-key scheme although we use the notation of public-key cryptography 
-in our abstraction.
+Note that, similar to the Pull Model, the authenticated encryption scheme 
+\(\mathcal{E}\) can be a symmetric-key scheme although we use the notation of 
+public-key cryptography in our abstraction.
 We can simply let \(\PubKey{} = \PriKey{}\) and \(\SignKey{} = \VerifKey{}\) to 
 achieve this.
-We have thus not yet limited ourselves to any properties of \(\mathcal{E}\) 
-(beyond authentication and confidentiality).
+This makes the Push Model modular as well.
 
 % XXX Write high-level analysis of push model
-Some high-level analysis \dots
-Point out what properties we need from \(\mathcal{E}\).
-These will probably be very similar as for \ac{ANOBE}.
-(Eve can correlate all inboxes by observing equal ciphertexts.)
+Let us now look at what Eve can do in this model.
+We start by looking at the ANO-IND-CCA game (\cref{ANO-IND-CCA}).
+In the Push Model setting Eve can actually win this game with non-negligible 
+advantage:
+She starts by publishing a message (through the publication oracle) to each 
+user.
+Then she selects two sets of users, gives those to the challenger.
+When the challenger publishes the message, Eve just observes which inboxes are 
+written to and then she knows with absolute certainty which set was used.
 
-\subsection{Running Multiple Instances in Parallel}
+To deal with this problem, we will introduce a mix-net.
+
+\begin{definition}[Mix-net]\label{MixNet}
+  Let \(m_1, \ldots, m_k\) be messages from senders \(1, \ldots, k\).
+  A mix-net is a functionality \(\M\) such that on inputs \(m_1, \ldots, m_k\) 
+  the outputs \(\M[1](m_1), \ldots, \M[k](m_k)\) are unlinkable to its senders.
+  More specifically
+  \begin{equation*}
+    \Pr[i\mid \M[i](m_i)] = \Pr[i] = \frac{1}{k}.
+  \end{equation*}
+\end{definition}
+
+The mix-net will not do much help in a single instance.
+If all inputs to the mix-net are related, then so will the outputs and Eve will 
+still not have any problem winning the ANO-IND-CCA game.
+We must have one instance per input, and thus, with this construction we must 
+run several instances in parallel to achieve any security.
+
+\subsection{Running Multiple Push Instances in Parallel}
 \label{ParallelPush}
 
-Multiple instances of the Push model run in parallel \dots
+There are two issues we must consider when running the Push Model in parallel.
+First, as in the Pull Model, we must convince ourselves that Eve cannot 
+distinguish between parallel instances of the Push Model.
+Thereafter we can continue our discussion of using the mix-net to mix different
+instances together.
+
+To convince ourselves that two instances are indistinguishable we give the 
+following theorem and proof.
 
 \begin{theorem}
-  Given two instances \(\Pull[p, S]\) and \(\Pull[p^\prime, S^\prime]\), \(p\) 
+  Given two instances \(\Push[p, S]\) and \(\Push[p^\prime, S^\prime]\), \(p\) 
   and \(p^\prime\) are unlinkable for any adversary \(\A\).
 \end{theorem}
 
@@ -176,5 +183,11 @@ Multiple instances of the Push model run in parallel \dots
   Thus we could equally likely have \(p\neq p^\prime\).
   \qed{}
 \end{proof}
+
+Even then, we cannot achieve negligible probability for Eve to win (as for the 
+Pull Model).
+All we can achieve is a lower bound.
+It is a lower bound since the result depends on the behaviour in the parallel 
+instances --- which will not be uniformly random.
 
 
