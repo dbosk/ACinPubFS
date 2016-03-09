@@ -545,7 +545,8 @@ algorithm.
 \end{theorem}
 
 \begin{proof}[sketch]
-  The proof is by contradiction.
+  The proof is by contradiction and follows that of Thm.~2 and Lem.~4 and 5 of 
+  the full version of~\cite{ANOBE}, we refer to those for details.
   Assume that there exists an adversary \(\A\) that can win the Split-IND-CCA 
   game with non-negligible probability.
   We will now describe how to construct an algorithm \(\A*\) that can win the 
@@ -555,8 +556,11 @@ algorithm.
   In game \(0\) all recipients are in \(R_0\) and none in \(R_1\), while in 
   game \(n\) all recipients are in \(R_1\) and none in \(R_0\).
   If \(\A*\) uses the public key \(\PubKey{*}\) and challenge ciphertext 
-  \(c_*\) from its own challenger as one of the possible recipients, then for 
-  some game \(\A*\) will not know whether it is game \(k\) or game \(k+1\).
+  \(c_*\) (which is either \(i_0\) or \(i_1\)) from its own challenger as one 
+  of the possible recipients, then for some games, say \(k\) and \(k+1\), 
+  \(\A*\) will not know whether it is game \(k\) or game \(k+1\) that is 
+  currently played (if \(c_* = i_0\) it is game \(k\), and game \(k+1\) if 
+  \(c_* = i_1\)).
   If \(\A\) can distinguish between games \(k\) and \(k+1\), then \(\A\) knows 
   whether \(c_* = i_0\) or \(c_* = i_1\) and thus \(\A*\) can distinguish 
   between IND-CCA ciphertexts.
@@ -591,8 +595,8 @@ algorithm.
 %      If recipient \(r_*\in R_0\) \(\A*\) outputs \(0\), otherwise if \(r_*\in 
 %        R_1\) \(\A*\) outputs \(1\).
 %  \end{description}
-  The detailed proof will go along the lines of that of Lemmas 4 in the full 
-  version of~\cite{ANOBE}.
+  It follows that there cannot be any \(\A\) that can win the game with 
+  non-negligible advantage.
   \qed{}
 \end{proof}
 
@@ -709,7 +713,7 @@ The publisher then puts all published material in the inbox of each subscriber.
 We can see that if we simply put the broadcast ciphertext from the Pull Model 
 in all inboxes, then Eve can relate them since they contain identical 
 ciphertexts.
-More formally, we break the random permutaion.
+More formally, we break the random permutation.
 We thus have to make some more modifications.
 
 If Eve controls the entire file system and we don't have a delaying mix-net 
