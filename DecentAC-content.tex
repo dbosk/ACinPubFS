@@ -231,6 +231,7 @@ Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
   \begin{description}
     \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
         S\) and \(\csetup{p}[1^\lambda]\).
+      The adversary is given oracle access to the \(\cpub{p}\) interface.
 
     \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\).
       This means that the adversary gains the entire state: private keys 
@@ -431,7 +432,7 @@ recipients in \(S_0\) and to \(i_1\) for recipients in \(S_1\).
 From them on Alice will publish to the two outbox files \(i_0\) and \(i_1\) 
 separately.
 If she no longer wants to post to Bob, she will simply fade out her 
-publications in his new outbox.
+publications in her new Bob-specific outbox.
 We summarize this algorithm in \cref{SplitGroup}.
 
 \begin{figure}
@@ -701,7 +702,6 @@ We have the following result.
 \end{proof}
 
 
-
 \section{Construction and Analysis of the Push Model}
 \label{PushAnalysis}
 
@@ -713,8 +713,13 @@ The publisher then puts all published material in the inbox of each subscriber.
 We can see that if we simply put the broadcast ciphertext from the Pull Model 
 in all inboxes, then Eve can relate them since they contain identical 
 ciphertexts.
-More formally, we break the random permutation.
 We thus have to make some more modifications.
+Assume that we instead encrypt one message (with unique ciphertext) per 
+subscriber.
+Now Eve cannot use the ciphertext to relate the recipients.
+However, after a few published messages she has learned (by timing-attacks and 
+own publications) who has which inbox, thus she can easily win the ANO-IND-CCA 
+game (\cref{ANO-IND-CCA}).
 
 If Eve controls the entire file system and we don't have a delaying mix-net 
 then Eve can find out the sequence of inboxes for the recipients.
