@@ -391,43 +391,9 @@ As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed
 for the Pull Model.
 We wanted to ensure that no subscriber should be able to learn who else is 
 a subscriber.
-We can capture this formally as the following security game:
-
-\begin{definition}[ANO-IND-CCA~\cite{ANOBE}]\label{ANO-IND-CCA}
-  We define the ANO-IND-CCA game as follows:
-  \begin{description}
-    \item[Setup] The challenger runs \(\KeygenOp\) to generate keys for all 
-      possible users \(u\in U\).
-      The adversary receives the public keys (or the master public key).
-
-    \item[Phase 1] The adversary \(\A\) may request the private key for any 
-      user \(u\in U\) (corruption).
-      Additionally she may request decryptions of arbitrary ciphertexts for any 
-      user (without requesting the private key).
-
-    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
-      \(|m_0| = |m_1|\) and recipient sets \(S_0, S_1\) such that \(|S_0| 
-        = |S_1|\) and for all corrupted \(u\in U\) we have \(u\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      If \(u\in S_0\cap S_1\) we require \(m_0 = m_1\).
-      Then \(\A\) gives them to the challenger.
-      The challenger randomly chooses \(b\in \{0, 1\}\), executes \(C\gets 
-        \Enc[S_b]{m_b}\) and gives \(C\) to the adversary.
-
-    \item[Phase 2] The adversary may continue to corrupt \(u\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\) arbitrarily and \(u\in S_0\cap S_1\) only 
-      if \(m_0 = m_1\).
-      Decryption queries are allowed for any ciphertext other than \(C\).
-
-    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
-      \(\hat{b} = b\).
-  \end{description}
-  We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
-      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
-\end{definition}
-
 We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
-this game when the \ac{ANOBE} scheme is used in \cref{PullModel}.
+the game in \cref{ANO-IND-CCA} when the \ac{ANOBE} scheme is used in 
+\cref{PullModel}.
 (We will not restate their proof here, but refer to the full version of their 
 paper~\cite{ANOBE}.)
 
