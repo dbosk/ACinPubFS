@@ -314,8 +314,8 @@ In our analysis we will use the following definition for the Pull Model.
       \Statex{}
 
       \Function{$\ppub[p, S]{p}$}{$R, m$}
-        \State{$\sigma \gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
-        \State{$\fsappend[i_p][\sigma]$}
+        \State{$c\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
+        \State{$\fsappend[i_p][c]$}
       \EndFunction{}
     \end{algorithmic}
   \end{minipage}
@@ -331,9 +331,9 @@ In our analysis we will use the following definition for the Pull Model.
       \Function{$\pget[p, S]{s}$}{}
         \State{$C = \fsread[i_p]$}
         \State{$M\gets \emptyset$}
-        \For{$\sigma\in C$}
-          \State{$m_\sigma = \Dec[\PriKey{s}, \VerifKey{p}]{\sigma}$}
-          \State{$M\gets M\cup \{m\}$}
+        \For{$c\in C$}
+          \State{$m_c = \Dec[\PriKey{s}, \VerifKey{p}]{c}$}
+          \State{$M\gets M\cup \{m_c\}$}
         \EndFor{}
         \State{\Return{$M$}}
       \EndFunction{}
