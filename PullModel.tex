@@ -36,7 +36,7 @@ In our analysis we will use the following definition for the Pull Model.
 
       \Function{$\ppub[p, S]{p}$}{$R, m$}
         \State{$c\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
-        \State{$\fsappend[i_p][c]$}
+        \State{$\fswrite[i_p][c]$}
       \EndFunction{}
     \end{algorithmic}
   \end{minipage}
@@ -333,7 +333,7 @@ Extended Pull Model in the following definition.
         \Function{$\psplit[p, S]{p}$}{$R_0, R_1$}
           \State{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), C\gets 
             \SplitGroup[R_0, R_1]$}
-          \State{$\fsappend[i_p][(C, \Sign[\SignKey{p}]{C})]$}
+          \State{$\fswrite[i_p][(C, \Sign[\SignKey{p}]{C})]$}
           \State{\Return{$\Pull[p, R_0], \Pull[p, R_1]$}}
         \EndFunction{}
       \end{algorithmic}

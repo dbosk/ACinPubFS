@@ -17,17 +17,15 @@ The file system itself provides no access control.
   We define the set of files \(F = \{(i, m_i)\}\) together with the following 
   operations to be the \emph{public file system} \(\FS\):
   \begin{itemize}
-    \item \(\fscreate[i][m_i]\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
-      \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\).
-      Otherwise this operation has the effect of \(\fsappend[i][m_i]\).
+    \item \(\fswrite[i][m_i]\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
+      \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\), i.e.\ 
+      the file \(i\) does not yet exist.
+      Otherwise this operation will set \((i, m)\gets (i, m\concat m^\prime)\) 
+      for \((i, m)\in F\).
 
     \item \(\fsread[i] = m_i\) if \((i, m_i)\in F\), otherwise 
       \(\fsread[i^\prime] = \bot\).
 
-    \item \(\fsappend[i][m^\prime]\) will set \((i, m)\gets (i, m\concat 
-        m^\prime)\) for \((i, m)\in F\).
-      If \(\{(i^\prime, m^\prime)\in F\mid i^\prime = i\} = \emptyset\) this 
-      operation has no effect.
   \end{itemize}
 \end{definition}
 

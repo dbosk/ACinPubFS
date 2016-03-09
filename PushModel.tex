@@ -50,7 +50,7 @@ We base our analysis on the following definition.
         \For{$s\in R$}
           \State{$i_s^\prime\rgets \{0, 1\}^\lambda$}
           \State{$\sigma_s\gets \Enc[\PubKey{s}, \SignKey{p}]{i_s^\prime, m}$}
-          \State{$\fsappend[i_s][\sigma_s]$}
+          \State{$\fswrite[i_s][\sigma_s]$}
           \State{$i_s\gets i_s^\prime$}
         \EndFor{}
       \EndFunction{}

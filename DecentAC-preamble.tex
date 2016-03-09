@@ -65,19 +65,13 @@
       \!.\mathsf{#1}%
     }
   }}
-\NewDocumentCommand{\fscreate}{o o}{\ensuremath{%
-    \FS[create]%
-    \IfValueT{#1}{%
-      \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
-    }
-  }}
 \NewDocumentCommand{\fsread}{o}{\ensuremath{%
     \FS[read]%
     \IfValueT{#1}{%
       \mleft( #1 \mright)%
     }
   }}
-\NewDocumentCommand{\fsappend}{o o}{\ensuremath{%
+\NewDocumentCommand{\fswrite}{o o}{\ensuremath{%
     \FS[append]%
     \IfValueT{#1}{%
       \mleft( #1, \IfValueTF{#2}{#2}{\cdot} \mright)%
