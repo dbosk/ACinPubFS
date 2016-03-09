@@ -280,10 +280,10 @@ It is therefore natural to start our analysis with the Pull Model.
 \section{Construction and Analysis of the Pull Model}
 \label{PullAnalysis}
 
-In this model, each publisher has an index file in the file system.
+In this model, each publisher has an \enquote{outbox} file in the file system.
 This is simply a file object with a randomly chosen identifier.
-The publisher adds new publications to the index while subscribers pull new 
-content from the index.
+The publisher adds new publications to the outbox while subscribers pull new 
+content from the outbox.
 In our analysis we will use the following definition for the Pull Model.
 
 \begin{definition}[Pull Model]\label{PullModel}
@@ -371,25 +371,62 @@ This operation simply creates an authenticated broadcast ciphertext
 \(\sigma\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}\) by combining the 
 broadcast key \(\{\PubKey{s}\}_{s\in R}\) and the signature key 
 \(\SignKey{p}\).
-She appends the ciphertext to her index file.
+She appends the ciphertext to her outbox file.
 Each friend can then use \(\pget{s}\) to retrieve the ciphertexts from the file 
 system and decrypt them.
 
 As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed 
 for the Pull Model.
-We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
-ANO-IND-CCA (\cref{ANO-IND-CCA}) when the \ac{ANOBE} scheme is used.
-(We will not restate their proof here as the only difference is a matter of 
-notation.)
+We wanted to ensure that no subscriber should be able to learn who else is 
+a subscriber.
+We can capture this formally as the following security game:
 
-However, \ac{ANOBE} used in the Pull Model cannot yield negligible advantage to
-Jealous Bob.
-Bob can read Alice's index, conclude that there are entries which he cannot 
+\begin{definition}[ANO-IND-CCA~\cite{ANOBE}]\label{ANO-IND-CCA}
+  We define the ANO-IND-CCA game as follows:
+  \begin{description}
+    \item[Setup] The challenger runs \(\KeygenOp\) to generate keys for all 
+      possible users \(u\in U\).
+      The adversary receives the public keys (or the master public key).
+
+    \item[Phase 1] The adversary \(\A\) may request the private key for any 
+      user \(u\in U\) (corruption).
+      Additionally she may request decryptions of arbitrary ciphertexts for any 
+      user (without requesting the private key).
+
+    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
+      \(|m_0| = |m_1|\) and recipient sets \(S_0, S_1\) such that \(|S_0| 
+        = |S_1|\) and for all corrupted \(u\in U\) we have \(u\notin S_0\cup 
+        S_1\setminus (S_0\cap S_1)\).
+      If \(u\in S_0\cap S_1\) we require \(m_0 = m_1\).
+      Then \(\A\) gives them to the challenger.
+      The challenger randomly chooses \(b\in \{0, 1\}\), executes \(C\gets 
+        \Enc[S_b]{m_b}\) and gives \(C\) to the adversary.
+
+    \item[Phase 2] The adversary may continue to corrupt \(u\notin S_0\cup 
+        S_1\setminus (S_0\cap S_1)\) arbitrarily and \(u\in S_0\cap S_1\) only 
+      if \(m_0 = m_1\).
+      Decryption queries are allowed for any ciphertext other than \(C\).
+
+    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
+      \(\hat{b} = b\).
+  \end{description}
+  We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
+      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
+\end{definition}
+
+We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
+this game when the \ac{ANOBE} scheme is used in \cref{PullModel}.
+(We will not restate their proof here, but refer to the full version of their 
+paper~\cite{ANOBE}.)
+
+However, \ac{ANOBE} used in the Pull Model cannot immediately yield negligible 
+advantage to Jealous Bob.
+Bob can read Alice's outbox, conclude that there are entries which he cannot 
 decrypt and thus he can become jealous.
 (In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
 the output of \(\pget{\cdot}\).)
-One approach to prevent this is that Alice uses a unique index per friend, so 
-Bob has his own index.
+One approach to prevent this is that Alice uses a unique outbox per friend, so 
+Bob has his own outbox.
 This actually reduces the problem to the Push Model.
 Unfortunately this is not entirely trivial, which we will see in our analysis 
 in \cref{PushModel}.
@@ -406,17 +443,17 @@ construction, and thus require us to use \ac{ANOBE} in the Pull Model above.
 When Bob get jealous he goes to Eve to ask her help, this means that we must 
 prevent Eve from learning how Alice changed her policy too.
 When Alice wants to change her policy and remove Jealous Bob from the 
-subscriber set \(S\), she will update the identifier of her index file.
+subscriber set \(S\), she will update the identifier of her outbox file.
 Essentially she will divide \(S\) into two new sets \(S_0, S_1\subset S\) such 
 that \(S = S_0\cup S_1\), where Jealous Bob will be alone in one of them.
-Then she will generate two new index identifiers \(i_0, i_1\) --- one for the 
+Then she will generate two new outbox identifiers \(i_0, i_1\) --- one for the 
 recipients in \(S_0\) and one those in \(S_1\).
 She will then create a broadcast ciphertext which decrypts to \(i_0\) for 
 recipients in \(S_0\) and to \(i_1\) for recipients in \(S_1\).
-From them on Alice will publish to the two index files \(i_0\) and \(i_1\) 
+From them on Alice will publish to the two outbox files \(i_0\) and \(i_1\) 
 separately.
 If she no longer wants to post to Bob, she will simply fade out her 
-publications in his new index.
+publications in his new outbox.
 We summarize this algorithm in \cref{SplitGroup}.
 
 \begin{figure}
@@ -687,8 +724,7 @@ We have the following result.
 \label{PushAnalysis}
 
 The idea of the Push Model is for each subscriber to have an inbox in the file 
-system --- as opposed to the Pull Model, where the publisher has an 
-\enquote{outbox} (the index).
+system --- as opposed to the Pull Model, where the publisher has an outbox.
 This is simply a file object with a randomly chosen identifier.
 The publisher then puts all published material in the inbox of each subscriber.
 
