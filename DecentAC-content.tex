@@ -333,188 +333,65 @@ do not solve exactly the same problem.
 
 \section{Conclusions}\label{Conclusions}
 
-\dots
+We wanted to achieve privacy-preserving access control enforcement in a public 
+file system lacking built-in access control.
+We presented two alternatives: the Pull Model and the Push Model.
+Both implements the model of a publisher distributing a message to a set of 
+subscribers.
 
-It is important that any optimizations can be proven not to break any of the 
-properties.
-As could be seen in this paper, merely splitting up the \ac{ANOBE} ciphertext 
-in the step from the Pull Model to the Push Model broke the ANO-IND-CCA 
-property --- and needed considerable fixing!
+The Pull Model achieves strong privacy properties.
+The subscribers cannot learn who the other subscribers are even if they control 
+the entire network or the whole storage system.
+Further, if the publisher wishes to exclude any of the subscribers from future 
+publications, then all subscribers learn that there was a policy update but no 
+one learns how --- not even those excluded!
 
-We do not have to consider the re-encryption problem when changing group 
-constellations: this would violate the property that jealous Bob cannot infer 
-a change in the access policy.
+The Push Model is an interesting case.
+Conceptually, the only difference between the Push and Pull models is that we 
+distribute the message, instead of everyone fetching it.
+This seems to yield better privacy properties at first glance, but it turns out
+that we had to considerably weaken the adversary's capabilities before we could
+get any security.
+Hence the security guarantees are much weaker: for the Push Model the adversary 
+can only control a small part of the storage system, or monitor only part of 
+the network.
+However, unlike in the Pull Model, when the subscriber wants to make a policy 
+update, none of the subscribers will even be notified that there has been 
+a policy update --- let alone determine if they have been excluded.
 
-If we relax Eve's control of the public file system, i.e.\ that she only 
-controls parts of it, then we need less strict constructions for the composed 
-protocol.
+As was pointed out in \cref{RelatedWork}, we do not treat group management 
+(i.e.\ revoking the credentials for subjects) as is done in other schemes.
+If the publisher excludes a subscriber, it is only from future publications ---
+not from past!
+In fact, we can conclude from our treatment above that such functionality would 
+actually violate the privacy properties.
+Even if possible, any subject could have made a copy anyway, i.e.\ it is the 
+problem of removing something from the Web.
+However, other group changes are easily done, the most expensive one is to give
+a new subscriber access to old publications --- this requires re-encrypting or 
+resending all publications.
 
-% Group management
-Our scheme is, as are general \ac{BE} schemes, designed to broadcast a message 
-to a dynamically changing group.
-This means that we can easily change the recipient group.
-However, when a new user, say Bob, is added to the group, we might want to give 
-Bob access to old messages.
-In our scheme we have to encrypt the message key \(k_m\) for every message 
-\(m\) that we want Bob to access.
+We can thus conclude that it is important that any optimizations to the 
+constructions can be proven not to break any of the properties.
+An interesting future direction would be to explore Eve's limitations in the 
+Push Model a bit more.
+For example, if Eve is not allowed to control all the \(k\) parallel games, 
+i.e.\ that honest players play the other \(k-1\) games, would she still be able
+to win?
+At a first glance she would, but more clearly understand under what conditions 
+might give us a better solution than to weaken her capabilities.
 
-Similarly as for adding a user, when we remove a user, say Eve, from a group, 
-we might want to remove Eve's clearances for the objects.
-First, we can argue whether we should remove these or not.
-Since Eve has had access to an object, she might already keep a copy anyway.
-If we remove her clearance, then she learns that we have removed her from the 
-group.
-However, if we want to remove Eve's clearance, then we will have to re-encrypt 
-all objects she had access to.
-This is easier in the Pull Model, because in the Push Model we also need to 
-update the entries in all other users' inboxes.
+Other interesting directions are stronger deniability properties on the one 
+hand, and stronger accountability on the other.
+An example of improved deniability could be using a \ac{MAC} scheme for 
+authentication of messages, then we no longer have the non-repudiation 
+property.
+Any subscriber could publish to all subscribers in the Pull Model.
+An example of desired accountability would be that Bob wants to verify that 
+Alice received the same message, if Eve told him that she sent a copy to Alice 
+as well.
 
-%% XXX Review the conclusions
-%% - Ensure that the solution covers the needed properties.
-%% XXX Add slides for the conclusions
-%
-%% XXX Improve the problem statement
-%% - Clearly describe the problem before any solution
-%% - What functional and security properties do we want?
-%% - What properties do we need?
-%%   - Do we need anonymity?
-%%   - Can we make a trade-off which is good enough?
-%
-%% XXX Review the overview of our contributions and outline of the paper
-%% - We have simplicity, more performance?
-%% - What are the benefits of our scheme?
-%% - What is the problem that this paper solves and how?
-%% - The initial concern was performance, right?  But given the right library 
-%%   this goes away, iirc.
-%% - Needs more thinking.
-%
-%We first analysed the high-level requirements to provide hidden policies, 
-%hidden credentials and hidden decisions in our setting.
-%From these requirements we gave a high-level description of what the storage 
-%system must be like.
-%We then suggested two models for publication and subscription of content in 
-%that system --- the Pull and Push Model --- and analysed what privacy 
-%properties can be achieved and how in the different models and the requirements 
-%for the cryptographic primitives used to implement it.
-%
-%From these findings we created an \ac{AC} mechanism for a decentralized storage 
-%system, relying on minimal trust in other entities.
-%We presented an example implementation using the \ac{ANOBE} primitive.
-%Using this example we showed how to achieve different privacy properties and 
-%estimated the algorithmic complexity of the two models.
-%Asymptotically the two approaches have the same time and space complexities, 
-%but they differ by constant factors.
-%
-%\mode<presentation>{%
-%\subsection{Conclusions}
-%\begin{frame}<presentation>{Conclusions}
-%  \begin{itemize}
-%    \item We focus on the access control mechanisms in a decentralized storage 
-%      system for \acp{DOSN}.
-%
-%    \item We use only cryptographic mechanisms, we don't rely on any \acp{TTP} 
-%      as reference monitors.
-%
-%    \item We achieve Hidden-Credentials, Hidden-Policies, and Hidden-Decisions 
-%      for our scheme.
-%
-%    \item For this we use \ac{ANOBE}~\cite{ANOBE}.
-%  \end{itemize}
-%\end{frame}
-%}
-%
-%In the Pull Model we achieve the three desired properties hidden credentials, 
-%hidden decisions and hidden policies, but we reveal meta-information such as 
-%our activity in the system and we are required to use a padding scheme to hide 
-%the cardinality of the recipient set.
-%Without the padding scheme we reveal this piece of information about the 
-%policy.
-%
-%In the Push Model, we achieve the first two properties similarly as for the 
-%Pull Model..
-%For the hidden policy property we must be careful in the design of the system.
-%If Alice re-uses an inbox for several friends, then those friends learn that 
-%part of her access policy.
-%But if we ensure that we use one inbox per friend and that it is 
-%computationally infeasible to search through all objects or that we use unique 
-%randomness and signature-verification keys, then we can have policy hiding in 
-%the Push Model too.
-%
-%Although both models are asymptotically equally complex, in practice, the Push 
-%Model is probably slightly more costly for the publisher while cheaper for the 
-%subscriber.
-%But this should be investigated in details, currently they are only theoretical 
-%estimates.
-%Also, the estimates are done using \ac{ANOBE} in the implementation.
-%Another primitive might yield other results.
-%However, in the Push Model, might be able to gain some performance by replacing 
-%the robust and key-private \ac{PKE} with a symmetric cipher.
-%But it is important that the symmetric cipher has properties corresponding to 
-%robustness and key-privacy, as these properties are crucial to the security of 
-%the \ac{ANOBE} scheme.
-%
-%\subsection{Future Work}
-%% XXX Review the future work section
-%
-%\mode<presentation>{%
-%\begin{frame}{Future Work}
-%  \begin{itemize}
-%    \item Measuring an actual implementation.
-%
-%      \pause{}
-%
-%    \item A stronger Eve:
-%      \begin{itemize}
-%        \item controlling the majority of the storage nodes,
-%        \item actively malicious.
-%      \end{itemize}
-%
-%      \pause{}
-%
-%    \item Stronger deniability properties?
-%
-%      \pause{}
-%
-%    \item Accountability properties?
-%
-%  \end{itemize}
-%\end{frame}
-%}
-%
-%We can see several interesting tracks to explore from this work.
-%First, we would like to have stronger deniability properties in the scheme.
-%In the Pull Model, any deniability relies on the indistinguishability of the 
-%users, that a third party cannot distinguish between users.
-%However, Bob can prove to the third party what Alice has said, since she has 
-%signed her messages to provide authentication.
-%This could have a negative effect on free speech.
-%We should be able to fix this by using a \ac{MAC} scheme for authentication of 
-%messages, then we no longer have the non-repudiation property.
-%Since we use a \ac{MAC}, Bob cannot prove anything to the third party, since he 
-%himself holds a copy of the \ac{MAC} key.
-%In the Push Model, we can easily remove the non-repudiation property in this 
-%way.
-%But it must be extended to a larger group by sharing the \ac{MAC} key within 
-%the group in the Pull Model.
-%We would like to explore further the possibilities for Alice to deny her 
-%activities in the system.
-%
-%The second track would be the opposite direction of deniability: namely, 
-%accountability.
-%One reason for this is that Bob might want to verify that Alice received the 
-%same message, if Eve told him that she sent a copy to Alice as well.
-%
-%
-%\mode<presentation>{%
-%\begin{frame}
-%  \begin{center}
-%    Questions?
-%  \end{center}
-%\end{frame}
-%}
-%
 
-\mode<article>{%
 \subsubsection{Acknowledgements}
 
 This work was inspired by work with Benjamin Greschbach and work of Oleksandr 
@@ -523,7 +400,6 @@ We would like to thank the Swedish Foundation for Strategic Research for grant
 SSF FFL09-0086 and the Swedish Research Council for grant VR 2009-3793, which 
 funded this work.
 We would also like to thank the anonymous reviewers for valuable feedback.
-}
 
 \begin{frame}
 \printbibliography{}
