@@ -245,7 +245,7 @@ for writing and reading operations, respectively.
 The input slot is unique to each game.
 Then we get the following result.
 
-\begin{theorem}
+\begin{theorem}\label{PushNotANO-IND-CPA}
   The Push Model run in \(k\) instances in parallel using a mix-net cannot 
   yield ANO-IND-CPA security.
 \end{theorem}
@@ -273,3 +273,28 @@ Eve can publish a unique message to one user in each instance, then she simply
 requests a decryption of the resulting ciphertexts to see which inboxes belongs 
 to which instance.
 
+\subsection{Weakening the Adversary}
+
+We will now assume a weaker Eve to prove the security of the Push Model.
+So far Eve has controlled the entire file system.
+We will now change this assumption.
+This change will take us from a potentially centralized file system (e.g.\ Eve 
+being a cloud operator) or distributed setting with a network-wide adversary to 
+a distributed setting where there is no network wide adversary.
+
+We assume that the file identifiers used in \(\FS\) (\cref{FS}) indicates the 
+files location in the distributed file system.
+Let \(I\) denote the set of all possible identifiers.
+Then we can simply enumerate those identifiers for which Eve controls the 
+storage space, let us denote this set by \(I_{\A}\).
+
+If we now go back to \cref{PushNotANO-IND-CPA} we can see that Eve's winning 
+strategy no longer works.
+In fact, Eve's only chance of winning\footnote{Other than random guessing, 
+  because she does not receive any ciphertexts.
+} is if two subscribers \(s_0, s_1\in S\) have their inbox in the storage that 
+Eve controls.
+Then she can choose \(R_0\) and \(R_1\) such that \(s_0\in R_0\) and \(s_1\in 
+  R_1\) and she observes in which inbox the ciphertext occurs.
+If that of \(s_0\) she outputs \(b = 0\), otherwise \(b = 1\) if in that of 
+\(s_1\).
