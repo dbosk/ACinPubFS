@@ -164,7 +164,7 @@ More formally:
   We have the following game:
   \begin{description}
     \item[Setup] The challenger creates two instances \(\Push[p_0, S_0]\) and 
-      \(Push[p_1, S_1]\).
+      \(\Push[p_1, S_1]\).
       The adversary is given the public keys and verification keys for all 
       \(s\in S_0\cup S_1\).
 
@@ -239,14 +239,14 @@ force one game to proceed without the other \(k-1\) games.
 The game we are interested in running in parallel is ANO-IND-CPA from 
 \cref{ANO-IND-CPA}.
 We will now assume that the calls to \(\FS\) in \cref{PushFunctions} are 
-replaced with \(\M_w[\cdot](\fswrite[\cdot][\cdot])\) and 
-\(\M_r[\cdot](\fsread[\cdot])\), where \(\M_w\) and \(\M_r\) are two mix-nets 
+replaced with \[\M_w[\cdot](\fswrite[\cdot][\cdot]) \quad\text{and}\quad 
+  \M_r[\cdot](\fsread[\cdot]),\] where \(\M_w\) and \(\M_r\) are two mix-nets 
 for writing and reading operations, respectively.
 The input slot is unique to each game.
 Then we get the following result.
 
 \begin{theorem}
-  \(k\) instances of the Push Model run in parallel using a mix-net, cannot 
+  The Push Model run in \(k\) instances in parallel using a mix-net cannot 
   yield ANO-IND-CPA security.
 \end{theorem}
 
@@ -263,7 +263,8 @@ Then we get the following result.
 \end{proof}
 
 \begin{corollary}
-  The Push Model cannot yield ANO-IND-CCA security.
+  The Push Model run in \(k\) instances in parallel using a mix-net cannot 
+  yield ANO-IND-CCA security.
 \end{corollary}
 
 The corollary follows from the same argument, only here the decryption oracle 
