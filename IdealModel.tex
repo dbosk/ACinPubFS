@@ -80,6 +80,8 @@ Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
     \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\).
       This means that the adversary gains the entire state: private keys 
       generated during the set-up phase etc.
+      Additionally \(\A\) has access to a decryption oracle to decrypt 
+      arbitrary ciphertexts for any \(s\in S\).
 
     \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
       \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
@@ -93,12 +95,48 @@ Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
     \item[Phase 2] The adversary may continue to corrupt \(s\notin S_0\cup 
         S_1\setminus (S_0\cap S_1)\).
       \(\A\) may corrupt \(s\in S_0\cap S_1\) only if \(m_0 = m_1\).
+      The adversary is not allowed to use the decryption oracle on the 
+      challenge ciphertext.
 
     \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
       \(\hat{b} = b\).
 
   \end{description}
   We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
+      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
+\end{definition}
+
+We also provide the following, slightly weaker, version.
+The difference is that the adversary no longer has access to the decryption 
+oracle.
+
+\begin{definition}[ANO-IND-CPA]\label{ANO-IND-CPA}
+  We define the ANO-IND-CPA game as follows:
+  \begin{description}
+    \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
+        S\) and \(\csetup{p}[1^\lambda]\).
+      The adversary is given oracle access to the \(\cpub{p}\) interface.
+
+    \item[Phase 1] The adversary \(\A\) may do publications and observe the 
+      outcomes and perform arbitrary computations on the resulting ciphertexts.
+
+    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
+      \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
+        = |R_1|\) and for all corrupted \(s\in S\) we have \(s\notin S_0\cup 
+        S_1\setminus (S_0\cap S_1)\).
+      If \(s\in S_0\cap S_1\) we require \(m_0 = m_1\).
+      Then \(\A\) gives them to the challenger.
+      The challenger randomly chooses \(b\in \{0, 1\}\) and executes 
+      \(\cpub{p}[R_b][m_b]\).
+
+    \item[Phase 2] The adversary may continue to do publications and arbitrary 
+      computations on the ciphertexts.
+
+    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
+      \(\hat{b} = b\).
+
+  \end{description}
+  We define the adversary's advantage \(\Adv{\text{ANO-IND-CPA}}{\A, 
       \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
 \end{definition}
 
@@ -110,7 +148,7 @@ Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
 %    she shouldn't be able to tell if it's also in Bob's.
 
 However, there are some desirable privacy properties that are not captured by 
-ANO-IND-CCA\@.
+these games.
 Bob might become jealous if he realizes that Alice no longer includes him in 
 the recipient set for her messages.
 As such Bob should only be able to determine that Alice publishes content by 
