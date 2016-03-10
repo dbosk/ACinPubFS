@@ -216,7 +216,7 @@ subscribers are divided.
 Thus he cannot know whether he is removed or not.
 We capture this in the following game.
 
-\begin{definition}[Split-group indistinguishability]\label{SplitGroupSecurity}
+\begin{definition}[Split-IND-CCA]\label{SplitGroupSecurity}
   Let \(\mathcal{E} = (\SetupOp, \KeygenOp, \EncOp, \DecOp)\) be an \ac{ANOBE} 
   scheme.
   We define the security of the split-group algorithm in \cref{SplitGroup} as 
@@ -395,32 +395,69 @@ whichever \(i\in \{0, 1\}\) Alice put them in.
 Now it remains for us to convince ourselves that Bob cannot distinguish between
 different instances of the Pull Model: i.e.\ Alice posting to two both \(R_0\) 
 and \(R_1\) or Alice posting to \(R_0\) and Carol to \(R_1\).
+More formally:
+
+\begin{definition}[Pull-IND-CCA]
+  We have the following game:
+  \begin{description}
+    \item[Setup] The challenger creates two instances \(\Pull[p_0, S_0]\) and 
+      \(\Pull[p_1, S_1]\), then immediately runs \(\pnsplit[p_1, S_1]{p}[S_1^0, 
+        S_1^1]\).
+      The adversary is given the public keys and verification keys for all 
+      \(s\in S_0\cup S_1^0\cup S_1^1\).
+
+    \item[Phase 1] The adversary may request encryptions and decryptions for 
+      arbitrary plaintexts and ciphertexts for any user through oracle access.
+      However, the decryption oracle must not be used on the ciphertext written
+      to the file system in the split.
+
+    \item[Challenge] The adversary gives two messages \(m_0\) and \(m_1\) to 
+      the challenger.
+      The challenger then chooses \(b\in \{0, 1\}\).
+      If \(b = 1\) the challenger will randomly choose two recipients \(r, 
+        r^\prime\) from the sets \(S_1^i\), otherwise \(r\) from \(S_0\) and 
+      \(r^\prime\) from \(S_1^0\cup S_1^1\).
+      The challenger encrypts \(m_b\) for \(r\) and \(r^\prime\) (as in 
+      \(\pnpub{p}\)) and gives the ciphertexts \(c, c^\prime\) to the 
+      adversary.
+
+    \item[Phase 2] The adversary is allowed to continue querying the oracles, 
+      except for the challenge ciphertexts \(c\) and \(c^\prime\) and the split 
+      ciphertext from the setup.
+
+    \item[Guess] The adversary outputs \(\hat{b}\) and wins if \(\hat{b} = b\).
+  \end{description}
+  We define the advantage as \(\Adv{\text{Pull-IND-CCA}}{\A}[1^\lambda] 
+    = |\Pr[\hat{b} = b] - \frac{1}{2}|\).
+\end{definition}
+
 We have the following result.
 
-% XXX Update part about Pull-IND-CCA
 \begin{theorem}
-  Given two instances \(\Pull[p, S]\) and \(\Pull[p^\prime, S^\prime]\), \(p\) 
-  and \(p^\prime\) are unlinkable for any adversary \(\A\).
+  The Pull Model (\cref{PullModel}) yields Pull-IND-CCA security if the 
+  underlying encryption scheme is IND-CCA secure.
+  More specifically,
+  \begin{equation*}
+    \Adv{\text{Pull-IND-CCA}}{\A}[1^\lambda]\leq \Adv{\text{IND-CCA}}{\A, 
+      \mathcal{E}}[1^\lambda],
+  \end{equation*}
+  where \(\mathcal{E}\) is the encryption scheme used.
 \end{theorem}
 
-\begin{proof}
+\begin{proof}[sketch]
   We will prove this by an information-theoretic argument.
-  We have two cases: first, the two instances are unrelated, \(p\neq 
-    p^\prime\); second, the two instances are either related or unrelated while 
-  \(p = p^\prime\).
-  We focus on the latter.
-  In this case there are two possibilities, \(p\) created two instances and 
-  they are thus unrelated.
-  If they are related \(p\) must have used \(\psplit[p, S^*]{p}\) to form them 
-  from some \(S^* = S\cup S^\prime\).
-  In doing this, \(p\) randomly chooses \(i_0, i_1\in \{0, 1\}^\lambda\) and 
-  \(\SignKey{0}, \SignKey{1}\rgets \Keygen{1^\lambda}\).
-  This means that \((i_0, \SignKey{0})\) and \((i_1, \SignKey{1})\) are 
-  information-theoretically independent.
-  It follows from \cref{SplitGroupIsSecure} and the ANO-IND-CCA property of the 
-  encryption scheme that even to \(s\in S\), nothing related to 
-  \(\Pull[p^\prime, S^\prime]\) can be found.
-  Thus we could equally likely have \(p\neq p^\prime\).
+  We can see that \(\Pull[p_0, S_0]\) is information-theoretically independent 
+  from both \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\).
+  Although \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\) are coming from 
+  a split, we can see in \cref{SplitGroup} that the two instances only depends 
+  on the randomly chosen identifiers and verification keys, and the sets of 
+  users.
+  It follows that \(\Pull[p_1, S_1^0]\) is as independent from \(\Pull[p_1, 
+    S_1^1]\) as \(\Pull[p_0, S_0]\) is independent of \(\Pull[p_1, S_1^i]\), 
+  for
+  \(i\in \{0, 1\}\).
+  Thus the only way the adversary can win is by distinguishing \(m_0\) from 
+  \(m_1\).
   \qed{}
 \end{proof}
 
