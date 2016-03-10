@@ -20,23 +20,20 @@
 \mode* % required for slides to compile without non-frame text
 
 \begin{abstract}
-  Online social networks collect and store large amounts of private data.
-  Trusting third parties with too much data is a privacy risk.
-  For this reason \acp{DOSN} were proposed.
-  The current research on access control in \acp{DOSN} has been focused on 
-  efficiently achieving confidentiality for data.
   In this paper, we focus on achieving privacy-preserving access control 
-  mechanisms for the \ac{DOSN} setting, i.e.~hidden policies, 
-  hidden credentials and hidden decisions.
-  We design an access-control scheme for two models of communication, the Pull 
-  Model and the Push Model.
+  mechanisms for decentralized storage, primarily intended for message passing 
+  setting.
+  We propose two modular constructions, one using a pull strategy and the other
+  a push strategy for sharing data.
   These models yield different privacy properties and requirements on the 
   underlying system.
-  The complexity of the two approaches are asymptotically the same and differ 
-  only by constant factors.
+  We achieve hidden policies, hidden credentials and hidden decisions.
+  We additionally achieve what could be called \enquote{hidden policy-updates}, 
+  meaning that previously-authorized subjects cannot determine if they have 
+  been excluded from future updates or not.
 
   \keywords{%
-    Decentralized Online Social Networks,
+    Privacy,
     Access Control,
     Decentralized Storage,
     Anonymous Broadcast Encryption,
