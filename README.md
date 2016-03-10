@@ -4,8 +4,8 @@ Privacy-Preserving Access Control in Decentralized Storage for OSNs
 This is the source code of the paper and slides for the paper:
 ```bibtex
 @inproceedings{PPACinDecentralizedSys,
-    title={Privacy-Preserving Access Control in Decentralized Storage for 
-        Online Social Networks},
+    title={Privacy-Preserving Access Control in Publicly Readable Storage
+        Systems},
     author={Daniel Bosk and Sonja Buchegger},
     booktitle={Privacy and Identity Management --- Time for a revolution?},
     editor={Jan Camenisch and David Aspinall and Simone Fischer-Hübner and
@@ -41,5 +41,4 @@ To compile the paper or slides, first clone the submodules:
 ```
 git submodule update --init
 ```
-Then, to compile the paper, run `make anobe-paper.pdf`.  To compile the slides, 
-run `make anobe-slides.pdf`.
+Then, to compile the paper, run `make DecentAC-paper.pdf`.
