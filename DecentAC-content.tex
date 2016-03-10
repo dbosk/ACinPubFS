@@ -1085,56 +1085,17 @@ We would also like to thank the anonymous reviewers for valuable feedback.
 \appendix
 \section{\Acl{ANOBE}}\label{ANOBE}
 
-\mode<presentation>{%
-\begin{frame}<presentation>{Anonymous Broadcast Encryption}
-  \begin{figure}
-   \begin{tikzpicture}[scale=0.75]
-      \draw (0,0) circle [radius=1];
-      \draw (0,0) node []{$S$};
-      \draw (-3,-2) rectangle (3,2);
-      \draw (-2,0) node []{$U$};
-    \end{tikzpicture}
-    \mode<article>{%
-    \caption{%
-      The subset of users \(S\subseteq U\).
-    }\label{fig:SubsetS}
-    }
-  \end{figure}
-  \begin{itemize}
-    \item A \ac{BE} scheme wants to distribute a key \(k\) to a subset of users 
-      \(S\subseteq U\).
-
-    \item This results in a ciphertext \(c_k\) and a description of \(S\).
-
-      \pause{}
-
-    \item \acf{ANOBE}~\cite{ANOBE} does the same without the description of 
-      \(S\).
-
-    \item By revealing \(S\) we reveal the policy.
-  \end{itemize}
-\end{frame}
-}
-
-The main idea of \ac{ANOBE} is to distribute a key \(k\) to a subset of users, 
-such that they can decrypt the broadcast message encrypted with \(k\) but no 
-one else can.
+The main idea of \ac{ANOBE} is to distribute a key \(k\) (i.e.\ 
+key-encapsulation) to a subset of users, such that they can decrypt the 
+broadcast message encrypted with \(k\) but no one else can.
 The users who receive \(k\) should not be able to figure out who else received 
 \(k\) and who did not.
-This is a suitable mechanism for our system model as publishing a message to 
-all friends is basically a broadcast to all or a subset of friends in the 
-network.
-The \ac{ANOBE} scheme was specifically designed to hide the recipient set.
-This is an important property to achieve hidden policies as outlined in 
-\cref{HiddenPCD}.
 
-% XXX Review details on ANOBE
-% - Is ANOBE perfect as it is or does it need changes for the context?
 We will now describe how \ac{ANOBE} works.
-An overview of the encryption function is given in Fig.~\ref{fig:EncANOBE} and 
-an overview of the decryption function in Fig.~\ref{fig:DecANOBE}.
+An overview of the encryption function is given in \cref{EncANOBE} and an 
+overview of the decryption function in \cref{DecANOBE}.
 
-\subsubsection<article>{Encryption}
+\subsection{Encryption}
 
 We must first generate a signature-verification key-pair \((\SignKey{k}, 
   \VerifKey{k})\), then we choose a random permutation \(\pi\colon S\to S\).
@@ -1150,9 +1111,9 @@ correct or incorrect decryption.
 We will get back to the details about this shortly.
 
 \begin{frame}
-  \mode<presentation>{\frametitle{ANOBE Encryption}}
   \begin{figure}
-    \begin{algorithmic}[1]
+    \framebox{\begin{minipage}{0.96\textwidth}
+    \begin{algorithmic}
       \Function{$\EncOp^{\mathrm{ANOBE}}_S$}{$k$}
       \Comment{%
         Recipient set $S$,
@@ -1169,15 +1130,11 @@ We will get back to the details about this shortly.
           Choose a random permutation \(\pi\colon S\to S\).
         }
 
-        \pause{}
-
         \For{$u_i \in S$}
           \State{%
             $c_{u_i}\gets{ \Enc[\PubKey{u_i}]{k, \VerifKey{k}} }$
           }
         \EndFor{}
-
-        \pause{}
 
         \State{%
           $C\gets{( c_{\pi(u_1)}, \ldots, c_{\pi(u_{|S|})} )}$
@@ -1193,31 +1150,12 @@ We will get back to the details about this shortly.
         }
       \EndFunction{}
     \end{algorithmic}
-    \mode<article>{%
+    \end{minipage}}
     \caption{%
       An algorithmic overview of the encryption algorithm in the \ac{ANOBE} 
       scheme.
     }\label{fig:EncANOBE}
-    }
   \end{figure}
-\end{frame}
-
-\begin{frame}<presentation>{ANOBE Requirements}
-  \begin{itemize}
-    \item The encryption scheme \(\EncOp\) must be 
-      key-private~\cite{KeyPrivacy}.
-
-    \item Key-privacy ensures that a ciphertext does not reveal for which 
-      public key is was created.
-
-      \pause{}
-
-    \item The encryption scheme \(\EncOp\) further requires 
-      robustness~\cite{RobustEncryption}.
-
-    \item Robustness ensures that we cannot create one ciphertext valid for two 
-      different public keys.
-  \end{itemize}
 \end{frame}
 
 For \ac{ANOBE} to be anonymous, we require an encryption scheme which is 
@@ -1235,7 +1173,7 @@ if we have a set of possible recipients \(R\), we encrypt a message for one of
 them, \(r\in R\), then all \(r^\prime\neq r\) must decrypt the ciphertext to an 
 invalid message under their keys.
 
-\subsubsection<article>{Decryption}
+\subsection{Decryption}
 
 We now have data which we parse as the tuple \((\VerifKey{k}, C, \sigma_k)\).
 If \(\Verify[\VerifKey{k}]{ C, \sigma_k } = 0\), then we return \(\bot\) as the 
@@ -1247,24 +1185,21 @@ Otherwise, try the next \(c_i\).
 If there are no more \(c_i\) to try, then return \(\bot\).
 
 \begin{frame}
-  \mode<presentation>{\frametitle{ANOBE Decryption}}
   \begin{figure}
-    \begin{algorithmic}[1]
+    \framebox{\begin{minipage}{0.96\textwidth}
+    \begin{algorithmic}
       \Function{$\DecOp^{\mathrm{ANOBE}}_{\PriKey{u}}$}{$\VerifKey{k}, C, 
         \sigma_k$}
       \Comment{%
         Private key \(\PriKey{u}\),
         ciphertext $(\VerifKey{k}, C, \sigma_k)$.
       }
-        \pause{}
 
         \If{$\Verify[\VerifKey{k}]{ C, \sigma_k } = 0$}
           \State{%
             \Return{$\bot$}
           }
         \EndIf{}
-
-        \pause{}
 
         \For{$c_i\in C$}
           \Comment{%
@@ -1285,24 +1220,12 @@ If there are no more \(c_i\) to try, then return \(\bot\).
         \State{\Return{$\bot$}}
       \EndFunction{}
     \end{algorithmic}
-    \mode<article>{%
+    \end{minipage}}
     \caption{%
       An algorithmic overview of the decryption algorithm in the \ac{ANOBE} 
       scheme.
     }\label{fig:DecANOBE}
-    }
   \end{figure}
-\end{frame}
-
-\begin{frame}<presentation>{ANOBE Decryption}
-  \begin{itemize}
-    \item Instead of trial-and-error decryption, we can use the tag-hint system 
-      from~\cite{ANOBE}.
-
-    \item Apply a function on the \ac{ANOBE} ciphertext and our private key, 
-      the result reveals the sub-ciphertext we can decrypt.
-
-  \end{itemize}
 \end{frame}
 
 To decrypt an \ac{ANOBE} ciphertext, we need a trial-and-error decryption 
