@@ -72,25 +72,24 @@ system which does not have any built-in access control mechanisms.
 Our approach is to introduce a layer of encryption as a logical reference 
 monitor.
 Beyond the expected confidentiality, Alice wants some stronger privacy 
-properties as well:
-\begin{itemize}
-  \item \dots
-\end{itemize}
+properties as well: her friends should not be able to monitor her activity, 
+e.g.\ infer with whom else she communicates, that fact that she communicates 
+with others.
 
 We will assume a simple file system with no built-in access control.
 This system is discussed and defined in \cref{FileSystem}.
 We will continue to define an ideal communication functionality in 
-\cref{IdealCommunication}.
-The we give two constructions that implement the functionality using different 
+\cref{IdealCommunication} after which we will model our constructions.
+Then we give two constructions that implement the functionality using different 
 strategies and analyse what properties their primitives must have in 
 \cref{PullAnalysis,PushAnalysis}.
-The motivation behind these two constructions is that one is optimized for 
-Alice and the other for Alice's friends.
+The motivation behind these two strategies is that one is optimized for Alice 
+and the other for Alice's friends.
 One requires potentially many connections for her friends, while the other 
 requires this for Alice.
 In some situations connections can be expensive, compare e.g.\ establishing 
-many Tor~\cite{Tor} circuits to transfer a little data and establishing one 
-circuit while transferring more data.
+many Tor~\cite{Tor} circuits to transfer little data and establishing one 
+circuit to transfer more data.
 
 
 %%% The main contribution %%%%%%%%%%%%%%%%%%%%%%%%
