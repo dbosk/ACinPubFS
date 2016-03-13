@@ -79,29 +79,39 @@ properties as well: her friends should not be able to monitor her activity,
 e.g.\ infer with whom else she communicates, the fact that she communicates 
 with others.
 
-We will assume a simple file system with no built-in access control.
+We will present an ideal model of communication and its desired properties in 
+\cref{IdealCommunication}, this is what we want to achieve.
+Then we will present the building blocks that we will use, and their 
+accompanying assumptions, in \cref{BuildingBlocks}.
+We will also assume a simple file system with no built-in access control.
 This system is discussed and defined in \cref{FileSystem}.
-We will continue to define an ideal communication functionality in 
-\cref{IdealCommunication} after which we will model our constructions.
+
 Then we give two constructions that implement the functionality using different 
-strategies and analyse what properties their primitives must have in 
-\cref{PullAnalysis,PushAnalysis}.
-The motivation behind these two strategies is that one is optimized for Alice 
-and the other for Alice's friends.
-One requires potentially many connections for her friends, while the other 
-requires this for Alice.
-In some situations connections can be expensive, compare e.g.\ establishing 
-many Tor~\cite{Tor} circuits to transfer little data and establishing one 
-circuit to transfer more data.
-We summarize the algorithmic complexities in \cref{AlgComplexity}.
+message passing models and analyse what properties their primitives must have 
+in \cref{PullAnalysis,PushAnalysis}.
+The two message passing models are called the pull model and the push model.
+In the pull model Alice's friends pull new messages from Alice, whereas in the 
+push model Alice's pushes new messages to her friends' inboxes.
+The motivation is that the pull model is optimized for Alice and the push model 
+for Alice's friends.
+In a decentralized file system the pull model yields few connections for Alice,
+but many for her friends (if they have more friends than Alice).
+Conversely the push model yields many connections for Alice, but only one for 
+her friends (they check their inbox).
+In some situations connections can be expensive, e.g.\ establishing many 
+Tor~\cite{Tor} circuits to transfer little data and establishing one circuit to 
+transfer more data.
+
+After presenting our constructions we shortly analyse their algorithmic 
+complexity in \cref{AlgComplexity}.
 Finally we compare our results to related work in \cref{RelatedWork} and 
 conclude by summarizing the main contributions and future work in 
 \cref{Conclusions}.
 
 
 %%% The main contribution %%%%%%%%%%%%%%%%%%%%%%%%
-\input{FileSystem.tex}
 \input{IdealModel.tex}
+\input{BuildingBlocks.tex}
 \input{PullModel.tex}
 \input{PushModel.tex}
 \input{complexity.tex}

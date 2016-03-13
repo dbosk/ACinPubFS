@@ -2,8 +2,9 @@
 all: DecentAC-paper.pdf
 
 ANOBE_DEPENDS= 		DecentAC-content.tex
-ANOBE_DEPENDS+=		FileSystem.tex
 ANOBE_DEPENDS+= 	IdealModel.tex
+ANOBE_DEPENDS+= 	BuildingBlocks.tex
+ANOBE_DEPENDS+= 	FileSystem.tex
 ANOBE_DEPENDS+= 	PullModel.tex
 ANOBE_DEPENDS+= 	PushModel.tex
 ANOBE_DEPENDS+= 	libbib.sty
