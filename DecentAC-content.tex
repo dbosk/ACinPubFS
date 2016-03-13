@@ -1,5 +1,6 @@
 \title{%
   Privacy-Preserving Access Control
+  %for Asynchronous Message Passing
   %in Decentralized Storage
   in Publicly Readable Storage Systems
   %for Asynchronous Message Passing
@@ -22,8 +23,8 @@
 
 \begin{abstract}
   In this paper, we focus on achieving privacy-preserving access control 
-  mechanisms for decentralized storage, primarily intended for message passing 
-  setting.
+  mechanisms for decentralized storage, primarily intended for an asynchronous 
+  message passing setting.
   We propose two modular constructions, one using a pull strategy and the other
   a push strategy for sharing data.
   These models yield different privacy properties and requirements on the 
@@ -36,11 +37,12 @@
   \keywords{%
     Privacy,
     Access Control,
+    Cloud Storage,
     Decentralized Storage,
-    Anonymous Broadcast Encryption,
+    %Anonymous Broadcast Encryption,
     Hidden Policies,
     Hidden Credentials,
-    Hidden Decisions
+    %Hidden Decisions
   }
 \end{abstract}
 
@@ -74,7 +76,7 @@ Our approach is to introduce a layer of encryption as a logical reference
 monitor.
 Beyond the expected confidentiality, Alice wants some stronger privacy 
 properties as well: her friends should not be able to monitor her activity, 
-e.g.\ infer with whom else she communicates, that fact that she communicates 
+e.g.\ infer with whom else she communicates, the fact that she communicates 
 with others.
 
 We will assume a simple file system with no built-in access control.
@@ -264,7 +266,7 @@ Push Model a bit more.
 For example, if Eve is not allowed to control all the \(k\) parallel games, 
 i.e.\ that honest players play the other \(k-1\) games, would she still be able
 to win?
-At a first glance she would, but more clearly understand under what conditions 
+At a first glance she would, but better understanding under what conditions 
 might give us a better solution than to weaken her capabilities.
 
 Other interesting directions are stronger deniability properties on the one 
@@ -285,8 +287,8 @@ Bodriagov and Gunnar Kreitz.
 We would like to thank the Swedish Foundation for Strategic Research for grant 
 SSF FFL09-0086 and the Swedish Research Council for grant VR 2009-3793, which 
 funded this work.
-We would also like to thank the anonymous reviewers for valuable feedback.
-Finally, a special thanks to Anja Lehmann for valuable feedback.
+We would also like to thank the anonymous reviewers and especially Anja Lehmann 
+for valuable feedback.
 
 
 \printbibliography{}
