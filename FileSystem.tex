@@ -12,19 +12,19 @@ then read it and also append to it.
 The file system itself provides no access control.
 
 \begin{definition}[Public file system]\label{FS}
-  A \emph{file} \(f = (i, m)\) consists of the \emph{identifier} \(i\) and the 
-  \emph{content} \(m\).
+  A \emph{file} \(f = (i, m_i)\) consists of the \emph{identifier} \(i\) and 
+  the \emph{content} \(m_i\).
   We define the set of files \(F = \{(i, m_i)\}\) together with the following 
   operations to be the \emph{public file system} \(\FS\):
   \begin{itemize}
-    \item \(\fswrite[i][m_i]\) will set \(F\gets F\cup \{(i, m_i)\}\) if 
-      \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\), i.e.\ 
-      the file \(i\) does not yet exist.
-      Otherwise this operation will set \((i, m)\gets (i, m\concat m^\prime)\) 
+    \item \(\fswrite[i][m_i]\) will set \((i, m)\gets (i, m\concat m^\prime)\) 
       for \((i, m)\in F\).
+      If \(\{(i^\prime, m^\prime)\in F \mid i^\prime = i\} = \emptyset\), i.e.\ 
+      the file \(i\) does not yet exist, this operation will create it by 
+      setting \(F\gets F\cup \{(i, m_i)\}\).
 
-    \item \(\fsread[i] = m_i\) if \((i, m_i)\in F\), otherwise 
-      \(\fsread[i^\prime] = \bot\).
+    \item \(\fsread[i] = m_i\) if \((i, m_i)\in F\), otherwise \(\fsread[i] 
+        = \bot\).
 
   \end{itemize}
 \end{definition}
