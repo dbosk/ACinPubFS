@@ -58,87 +58,22 @@ Hence the second is not visible in \cref{CommunicationModel}, but will be in
 
 In our desired scenario, Alice acts as a publisher and her friends as the 
 subscribers.
-We note that no subscriber \(s\in S\) can use \(\cpub{s}[R][m]\) to publish 
-a message \(m\).
-The communication model is strictly unidirectional from publisher to 
-subscribers and they cannot access the publisher's interface.
-In the same sense, no subscriber \(s^\prime\in S\) can use \(\cget{s}\) for 
-\(s^\prime\neq s\).
-It follows too that no subscriber \(s_i\) can learn which \(s_1, \ldots, s_n\in 
+%We note that no subscriber \(s\in S\) can use \(\cpub{s}[R][m]\) to publish 
+%a message \(m\).
+%The communication model is strictly unidirectional from publisher to 
+%subscribers and they cannot access the publisher's interface.
+%In the same sense,
+No subscriber \(s^\prime\in S\) can use \(\cget{s}\) for \(s^\prime\neq s\).
+I.e.\ no subscriber can read the messages of any other subscriber, we call this 
+property \emph{message privacy}.
+Furthermore, we want no subscriber \(s_i\) to learn which \(s_1, \ldots, s_n\in 
   R\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given 
 message \(m\).
-This is captured formally in the following security game, which is adapted from 
-Def.\ 2 of~\cite{ANOBE} (ANO-IND-CCA).
-
-\begin{definition}[ANO-IND-CCA]\label{ANO-IND-CCA}
-  We define the ANO-IND-CCA game as follows:
-  \begin{description}
-    \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
-        S\) and \(\csetup{p}[1^\lambda]\).
-      The adversary is given oracle access to the \(\cpub{p}\) interface.
-
-    \item[Phase 1] The adversary \(\A\) may corrupt any \(s\in S\).
-      This means that the adversary gains the entire state: private keys 
-      generated during the set-up phase etc.
-      Additionally \(\A\) has access to a decryption oracle to decrypt 
-      arbitrary ciphertexts for any \(s\in S\).
-
-    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
-      \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
-        = |R_1|\) and for all corrupted \(s\in S\) we have \(s\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      If \(s\in S_0\cap S_1\) we require \(m_0 = m_1\).
-      Then \(\A\) gives them to the challenger.
-      The challenger randomly chooses \(b\in \{0, 1\}\) and executes 
-      \(\cpub{p}[R_b][m_b]\).
-
-    \item[Phase 2] The adversary may continue to corrupt \(s\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      \(\A\) may corrupt \(s\in S_0\cap S_1\) only if \(m_0 = m_1\).
-      The adversary is not allowed to use the decryption oracle on the 
-      challenge ciphertext.
-
-    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
-      \(\hat{b} = b\).
-
-  \end{description}
-  We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
-      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
-\end{definition}
-
-We also provide the following, slightly weaker, version.
-The difference is that the adversary no longer has access to the decryption 
-oracle.
-
-\begin{definition}[ANO-IND-CPA]\label{ANO-IND-CPA}
-  We define the ANO-IND-CPA game as follows:
-  \begin{description}
-    \item[Setup] The challenger runs \(\csetup{s}[1^\lambda]\) for all \(s\in 
-        S\) and \(\csetup{p}[1^\lambda]\).
-      The adversary is given oracle access to the \(\cpub{p}\) interface.
-
-    \item[Phase 1] The adversary \(\A\) may do publications and observe the 
-      outcomes and perform arbitrary computations on the resulting ciphertexts.
-
-    \item[Challenge] The adversary chooses messages \(m_0, m_1\) such that 
-      \(|m_0| = |m_1|\) and recipient sets \(R_0, R_1\) such that \(|R_0| 
-        = |R_1|\) and for all corrupted \(s\in S\) we have \(s\notin S_0\cup 
-        S_1\setminus (S_0\cap S_1)\).
-      If \(s\in S_0\cap S_1\) we require \(m_0 = m_1\).
-      Then \(\A\) gives them to the challenger.
-      The challenger randomly chooses \(b\in \{0, 1\}\) and executes 
-      \(\cpub{p}[R_b][m_b]\).
-
-    \item[Phase 2] The adversary may continue to do publications and arbitrary 
-      computations on the ciphertexts.
-
-    \item[Guess] \(\A\) outputs a bit \(\hat{b}\) and wins the game if 
-      \(\hat{b} = b\).
-
-  \end{description}
-  We define the adversary's advantage \(\Adv{\text{ANO-IND-CPA}}{\A, 
-      \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
-\end{definition}
+I.e.\ no subscriber must know who else received a message, we call this 
+property \emph{hidden policy}.
+Thus if Alice publishes a message, none of her friends know who else received 
+it and none can read the others' received messages (possibly to check if they 
+have received the same message).
 
 % XXX Formalize other required (more high-level) properties:
 %  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
@@ -147,28 +82,27 @@ oracle.
 %  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
 %    she shouldn't be able to tell if it's also in Bob's.
 
-However, there are some desirable privacy properties that are not captured by 
-these games.
+In addition to the hidden-policy property, we want something we call 
+\emph{hidden policy-updates}.
+Consider the following example:
 Bob might become jealous if he realizes that Alice no longer includes him in 
 the recipient set for her messages.
 As such Bob should only be able to determine that Alice publishes content by 
 being in the recipient set himself.
-We treat this problem in later sections, until then we will refer to this as 
-the problem of \enquote{Jealous Bob}.
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.
-We will focus on two alternative protocols which uses \(\FS\) from \cref{FS} 
-above, these are the Push Model and the Pull Model.
-The Push Model is analogous to the subscription of magazines:
+We will focus on two alternative protocols, one using the pull model and the 
+other using the push model for communication.
+The push model is analogous to the subscription of magazines:
 a subscriber contacts the publisher and signs a subscription, whenever the 
-publisher issues a new magazine it sends a copy to the subscribers mailbox.
-The Pull Model the converse of the Push Model.
+publisher issues a new magazine it sends a copy to the subscriber's mailbox.
+The pull model is the converse of the push model.
 It is analogous to the selling of magazines in kiosks:
 the publisher issues magazines and the \enquote{subscribers} come to the kiosk 
 and buy them whenever they want.
-We note that essentially all \ac{BE} schemes, including \ac{ANOBE}, are 
-designed for the Pull Model.
-It is therefore natural to start our analysis with the Pull Model.
-
-
+We can see that our ideal communication model allows both a pull and push 
+strategy for implementation.
+We will describe and analyse the pull construction in \cref{PullAnalysis} and 
+the push construction in \cref{PushAnalysis}.
+First we need to review our needed building blocks.
