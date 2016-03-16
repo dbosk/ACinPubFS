@@ -35,8 +35,8 @@ Then we will proceed to the details of two alternative protocols
   a \emph{publisher} \(p\) and a \emph{set of subscribers} \(S\).
   Then we have the following operations defined on \(\C[p, S]\):
   \begin{itemize}
-    \item Before start the publisher runs \(\csetup[p, S]{p}[1^\lambda]\) and 
-      each subscriber \(s\in S\) runs \(\csetup[p, S]{s}[1^\lambda]\), where 
+    \item The publisher first runs \(\csetup[p, S]{p}[1^\lambda]\) and each 
+      subscriber \(s\in S\) runs \(\csetup[p, S]{s}[1^\lambda]\), where 
       \(\lambda\) is the security parameter.
     \item The publisher \(p\) uses \(\cpub[p, S]{p}[R][m]\) to publish the 
       message \(m\) to the designated \emph{recipient set} \(R\) by making it 
