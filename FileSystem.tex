@@ -52,12 +52,15 @@ By this we mean that Eve has access to the internal state of \(\FS\) directly,
 i.e.\ the set of files \(F\).
 She can thus read all files (same as everyone else), but she can also do 
 arbitrary searches since she does not have to use \(\fsread{\cdot}\).
-She can also modify the files (including deleting them).
 
-To be consistent with \cref{FS}, Eve cannot distinguish between Alice's and 
-Bob's requests to the operations of \(\FS\) --- in the definition there is 
-nothing to identify who used any of the operations.
-But she can record the times at which they occurred with her own clock, since 
+Although Eve could potentially also modify or delete the files, we do not treat 
+denial-of-service attacks by Eve deleting the files.
+However, as we will see in our constructions, modifications made by Eve will be 
+detected.
+
+Eve cannot distinguish between Alice's and Bob's requests to the operations of 
+\(\FS\) --- in the definition there is nothing to identify who used any of the 
+operations, so this is consistent with the definition.
+What she can do, is to record the times at which the operations occurred, since 
 she executes them.
-
 
