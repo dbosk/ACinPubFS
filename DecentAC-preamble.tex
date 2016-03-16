@@ -50,6 +50,42 @@
 %  }}
 \DeclareMathOperator{\M}{\mathcal{M}}
 
+\NewDocumentCommand{\E}{s}{\ensuremath{%
+    \IfBooleanTF{#1}{%
+      \Scheme*{E}%
+    }{%
+      \Scheme{E}%
+    }%
+  }}
+\let\parsign\S
+\DeclareDocumentCommand{\S}{s}{\ensuremath{%
+    \IfBooleanTF{#1}{%
+      \Scheme*{S}%
+    }{%
+      \Scheme{S}%
+    }%
+  }}
+\NewDocumentCommand{\BE}{s}{\ensuremath{%
+    \IfBooleanTF{#1}{%
+      \Scheme*{BE}%
+    }{%
+      \Scheme{BE}%
+    }%
+  }}
+\NewDocumentCommand{\ANOBE}{s}{\ensuremath{%
+    \IfBooleanTF{#1}{%
+      \Scheme*{ANOBE}%
+    }{%
+      \Scheme{ANOBE}%
+    }%
+  }}
+
+
+\DeclareMathOperator{\Sop}{\mathcal{S}}
+%\NewDocumentCommand{\S}{s}{\ensuremath{%
+%    \IfBooleanTF{#1}{\overline{\Sop}}{\Sop}%
+%  }}
+
 \DeclareMathOperator{\SplitGroupOp}{\mathsf{SplitGroup}}
 \NewDocumentCommand{\SplitGroup}{o}{\ensuremath{%
     \SplitGroupOp%
