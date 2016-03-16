@@ -1,4 +1,4 @@
-\section{Construction and Analysis of the Pull Model}
+\section{Construction and Analysis of the Pull Protocol}
 \label{PullAnalysis}
 
 In this model, each publisher has an \enquote{outbox} file in the file system.
@@ -7,11 +7,13 @@ The publisher adds new publications to the outbox while subscribers pull new
 content from the outbox.
 In our analysis we will use the following definition for the Pull Model.
 
-\begin{definition}[Pull Model]\label{PullModel}
-  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
-  broadcast-encryption scheme and \(\FS\) be a public file system.
-  We denote by \(\Pull[p, S]\) the \emph{pull model protocol} implementing 
-  a \((p, S)\)-communication model through the operations
+\begin{definition}[Pull Protocol]\label{PullModel}
+  Let \(\BE = (\BE[Setup], \BE[Keygen], \BE[Enc], \BE[Dec])\) be an ANO-IND-CCA 
+  \ac{BE} scheme,
+  \(\S = (\S[Keygen], \S[Sign], \S[Verify])\) be a signature scheme and \(\FS\) 
+  be a public file system.
+  We denote by \(\Pull[p, S]\) the \emph{pull protocol} implementing a \((p, 
+    S)\)-communication model through the operations
   \begin{itemize}
     \item \(\psetup[p, S]{p}[\cdot]\) and \(\psetup[p, S]{s}[\cdot]\) for each
       \(s\in S\),
@@ -23,28 +25,31 @@ In our analysis we will use the following definition for the Pull Model.
 
 \begin{figure}%[p]
   \framebox{%
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{0.51\textwidth}
     \begin{algorithmic}
       \Function{$\psetup[p, S]{p}$}{$1^\lambda$}
-        \State{$(\SignKey{p}, \VerifKey{p})\rgets \Keygen{1^\lambda}$}
         \State{$i_p\rgets \{0, 1\}^{\lambda}$}
-        \State{$\forall s\in S$: give $(\VerifKey{p}, i_p)$ to $\Pull[p, 
-          S][s]$.}
+        \State{$(\SignKey{p}, \VerifKey{p})\rgets \S[Keygen][1^\lambda]$}
+        \State{$(MPK, MSK)\rgets \BE[Setup][1^\lambda, |S|]$}
+        \For{$s\in S$}
+          \State{$\PriKey{s}\gets \BE[Keygen][MPK, MSK, s]$}
+          \State{Give $(\PriKey{s}, \VerifKey{p}, i_p)$ to $\Pull[p, S][s]$.}
+        \EndFor{}
       \EndFunction{}
 
       \Statex{}
 
       \Function{$\ppub[p, S]{p}$}{$R, m$}
-        \State{$c\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}$}
-        \State{$\fswrite[i_p][c]$}
+        \State{$c\gets \BE[Enc][MPK, R, m]$}
+        \State{$\sigma\gets \S[Sign][\SignKey{p}, c]$}
+        \State{$\fswrite[i_p][c\concat \sigma]$}
       \EndFunction{}
     \end{algorithmic}
   \end{minipage}
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{0.45\textwidth}
     \begin{algorithmic}
       \Function{$\psetup[p, S]{s}$}{$1^\lambda$}
-        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
-        \State{Give $\PubKey{s}$ to $\Pull[p, S][p]$.}
+        \State{Receive from \(p\).}
       \EndFunction{}
 
       \Statex{}
@@ -52,9 +57,14 @@ In our analysis we will use the following definition for the Pull Model.
       \Function{$\pget[p, S]{s}$}{}
         \State{$C = \fsread[i_p]$}
         \State{$M\gets \emptyset$}
-        \For{$c\in C$}
-          \State{$m_c = \Dec[\PriKey{s}, \VerifKey{p}]{c}$}
-          \State{$M\gets M\cup \{m_c\}$}
+        \For{$(c, \sigma)\in C$}
+          \If{$\S[Verify][\VerifKey{p}, c, \sigma]\neq 1$}
+            \State{Continue with next.}
+          \EndIf{}
+          \State{$m_c\gets \BE[Dec][MPK, \PriKey{s}, c]$}
+          \If{$m_c\neq \bot$}
+            \State{$M\gets M\cup \{m_c\}$}
+          \EndIf{}
         \EndFor{}
         \State{\Return{$M$}}
       \EndFunction{}
@@ -67,110 +77,81 @@ In our analysis we will use the following definition for the Pull Model.
   }\label{PullFunctions}
 \end{figure}
 
-When Alice executes \(\psetup{p}\) the \(\KeygenOp\) algorithm generates 
-a signature-verification key-pair \((\SignKey{p}, \VerifKey{p})\).\footnote{%
-  Since the scheme \(\mathcal{E}\) is an authenticated \ac{BE} scheme, the key 
-  generation yields a proper broadcast keys for encryption and decryption in 
-  addition to a signature-verification key-pair --- in Alice's case (conversely 
-  for her friends) we are only interested in the authentication part, so we 
-  simply discard her encryption keys in the definition.
-}
+When Alice executes \(\psetup{p}\) she will create all needed keys.
 She also randomly chooses an identifier.
-Then the verification key and identifier are both given to all her friends.
-Each of her friends \(s\in S\), when they execute \(\psetup{s}\) the 
-\(\KeygenOp\) algorithm generates a public-private key-pair.\footnote{%
-  Actually this is just the notation we use.
-  It might just as well be Alice's execution that generates the broadcast keys 
-  and distributes them to her friends, while her friends' \(\psetup{s}\) does 
-  nothing.
-}
-They give their respective public key to Alice.
+Then each respective secret key, the verification key and identifier are given 
+to all her friends.
 
 When Alice wants to publish a message \(m\) to the recipient set \(R\subseteq 
   S\), she runs \(\ppub{p}[R][m]\).
-This operation simply creates an authenticated broadcast ciphertext 
-\(\sigma\gets \Enc[\{\PubKey{s}\}_{s\in R}, \SignKey{p}]{m}\) by combining the 
-broadcast key \(\{\PubKey{s}\}_{s\in R}\) and the signature key 
-\(\SignKey{p}\).
-She appends the ciphertext to her outbox file.
+This operation simply creates a \ac{BE} ciphertext and Alice appends the 
+ciphertext to her outbox file.
 Each friend can then use \(\pget{s}\) to retrieve the ciphertexts from the file 
 system and decrypt them.
 
-Note that we can have symmetric authentication on the authenticated encryption 
-although we use the notation of asymmetric authentication (e.g.\ digital 
-signatures) in our abstraction.
-We can simply let \(\SignKey{} = \VerifKey{}\) to achieve this.
+Note that we can have symmetric authentication, e.g.\ \iac{MAC} by replacing 
+\(\S\) with \iac{MAC} scheme, although we use the notation of asymmetric 
+authentication.
+This would yield different privacy properties, i.e.\ we remove the 
+non-repudiation which \(\S\) brings.
 However, this is not at the centre of our discussion, it just illustrates the 
 modularity of the scheme.
 
-As we mentioned earlier (and in \cref{PullModel}), \ac{BE} schemes are designed 
-for the Pull Model.
-We wanted to ensure that no subscriber should be able to learn who else is 
-a subscriber.
-We know from the analysis by \citet{ANOBE} that Eve has negligible advantage in 
-the game in \cref{ANO-IND-CCA} when the \ac{ANOBE} scheme is used in 
-\cref{PullModel}.
-(We will not restate their proof here, but refer to the full version of their 
-paper~\cite{ANOBE}.)
+We wanted no recipient to know who else received the message, the ANO-IND-CCA 
+property of the \ac{BE} scheme gives us this.
+So we achieve the hidden policy that we wanted.
 
-However, \ac{ANOBE} used in the Pull Model cannot immediately yield negligible 
-advantage to Jealous Bob.
+However, we cannot immediately achieve the hidden policy-update property.
 Bob can read Alice's outbox, conclude that there are entries which he cannot 
 decrypt and thus he can become jealous.
 (In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
 the output of \(\pget{\cdot}\).)
 One approach to prevent this is that Alice uses a unique outbox per friend, so 
 Bob has his own outbox.
-This actually reduces the problem to the Push Model.
-Unfortunately this is not entirely trivial, which we will see in our analysis 
-in \cref{PushModel}.
-We will instead analyse a simpler solution for the Pull Model.
+This actually reduces the problem to our push construction, which we will cover 
+later.
+We will instead analyse a simpler solution for the pull protocol now.
 
 \subsection{Changing Recipient Set in the Pull Model}
 \label{ChangingPullRecipientSet}
 
-We will now propose and analyse a solution to the problem of Jealous Bob.
+We will now propose and analyse a solution to the problem of hidden 
+policy-updates, i.e.\ Jealous Bob.
 This solution, however, is based on the intricacies of the \ac{ANOBE} 
-construction, and thus require us to use \ac{ANOBE} in the Pull Model above.
-(For convenience the \ac{ANOBE} scheme is described in \cref{ANOBE}.)
-
-When Bob get jealous he goes to Eve to ask her help, this means that we must 
-prevent Eve from learning how Alice changed her policy too.
-When Alice wants to change her policy and remove Jealous Bob from the 
-subscriber set \(S\), she will update the identifier of her outbox file.
-Essentially she will divide \(S\) into two new sets \(S_0, S_1\subset S\) such 
-that \(S = S_0\cup S_1\), where Jealous Bob will be alone in one of them.
-Then she will generate two new outbox identifiers \(i_0, i_1\) --- one for the 
-recipients in \(S_0\) and one those in \(S_1\).
-She will then create a broadcast ciphertext which decrypts to \(i_0\) for 
-recipients in \(S_0\) and to \(i_1\) for recipients in \(S_1\).
-From them on Alice will publish to the two outbox files \(i_0\) and \(i_1\) 
-separately.
-If she no longer wants to post to Bob, she will simply fade out her 
-publications in her new Bob-specific outbox.
+construction, and thus require us to use \ac{ANOBE}.
+In essence, the \ac{ANOBE} construction, described in \cref{ANOBE}, allows us 
+to create a ciphertext which decrypts to different messages.
+We will use this to encrypt a special message that updates the outbox 
+identifier \(i_p\).
+Half of the recipients will receive \(i_p^\prime\) and the other half will 
+receive \(i_p^{\prime\prime}\).
 We summarize this algorithm in \cref{SplitGroup}.
+Alice could divide her subscribers into an arbitrary number of parts, even 
+\(|S|\) for having each subscriber in their own group.
+But for simplicity we describe the algorithm for dividing the subscriber set 
+into two parts.
 
 \begin{figure}
   \framebox{%
     \begin{minipage}{0.96\textwidth}
       \begin{algorithmic}
-        \Function{$\SplitGroupOp$}{$S_0, S_1$}
+        \Function{$\SplitGroupOp$}{$MPK, S_0, S_1$}
           \Comment{%
             Recipient sets $S_0, S_1$ such that $S = S_0\cup S_1$ and $S_0\cap 
             S_1 = \emptyset$.
           }
           \State{%
             $i_0\rgets \{0, 1\}^\lambda$,
-            $(\SignKey{0}, \VerifKey{0})\rgets \Keygen{1^\lambda}$
+            $(\SignKey{0}, \VerifKey{0})\rgets \S*[Keygen][1^\lambda]$
           }
           \Comment{Generate new outbox and key-pair.}
           \State{%
             $i_1\rgets \{0, 1\}^\lambda$,
-            $(\SignKey{1}, \VerifKey{1})\rgets \Keygen{1^\lambda}$
+            $(\SignKey{1}, \VerifKey{1})\rgets \S[Keygen][1^\lambda]$
           }
           \Comment{One per new group.}
           \State{%
-            $(\SignKey{}, \VerifKey{})\gets{\Keygen{1^\lambda}}$
+            $(\SignKey{}, \VerifKey{})\gets{\S*[Keygen][1^\lambda]}$
           }
           \Comment{%
             One-time signature-verification key-pair.
@@ -182,11 +163,13 @@ We summarize this algorithm in \cref{SplitGroup}.
           \For{$s \in S$}
             \If{$s\in S_0$}
               \State{%
-                $c_{s}\gets{ \Enc[\PubKey{s}]{i_0, \VerifKey{0}, \VerifKey{}}}$
+                $c_{s}\gets{ \E*[Enc][\PubKey{s}, i_0\concat 
+                  \VerifKey{0}\concat \VerifKey{}]}$
               }
             \Else\Comment{$s\in S_1$}
               \State{%
-                $c_{s}\gets{ \Enc[\PubKey{s}]{i_1, \VerifKey{1}, \VerifKey{}}}$
+                $c_{s}\gets{ \E*[Enc][\PubKey{s}, i_1\concat 
+                  \VerifKey{1}\concat \VerifKey{}]}$
               }
             \EndIf{}
           \EndFor{}
@@ -196,7 +179,7 @@ We summarize this algorithm in \cref{SplitGroup}.
           }
           \Comment{Put all subciphertexts in random order.}
           \State{%
-            $\sigma\gets{ \Sign[\SignKey{}]{C} }$
+            $\sigma\gets{ \S*[Sign][\SignKey{}, C] }$
           }
           \State{%
             \Return{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), (\VerifKey{}, C, 
@@ -211,116 +194,23 @@ We summarize this algorithm in \cref{SplitGroup}.
   }\label{SplitGroup}
 \end{figure}
 
+We note that this solution does not hide the fact that Alice updated her 
+policy, we just hide from Bob whether he was excluded or not.
+When Bob get jealous he goes to Eve to ask her help, this means that we must 
+prevent Eve from learning how Alice changed her policy too --- so the 
+construction is secure against this strong adversary.
+
 The property we want from this algorithm is that Bob cannot determine how the 
 subscribers are divided.
 Thus he cannot know whether he is removed or not.
-We capture this in the following game.
-
-\begin{definition}[Split-IND-CCA]\label{SplitGroupSecurity}
-  Let \(\mathcal{E} = (\SetupOp, \KeygenOp, \EncOp, \DecOp)\) be an \ac{ANOBE} 
-  scheme.
-  We define the security of the split-group algorithm in \cref{SplitGroup} as 
-  follows:
-  \begin{description}
-    \item[Setup] The challenger runs \(\Setup{1^\lambda}\) of the \ac{ANOBE} 
-      scheme.
-      This generates the public and private keys for all recipients.
-      The public keys are given to the adversary.
-
-    \item[Phase 1] The adversary may corrupt recipients (request secret keys) 
-      and request decryptions of ciphertexts for any recipient (without 
-      corruption).
-
-    \item[Challenge] The adversary gives the challenger a set of uncorrupted 
-      recipients \(R = \{r_0, \ldots, r_n\}\).
-      The challenger randomly chooses \(B\rgets (B_0, \ldots, B_n) \in \{0, 
-        1\}^n\) and constructs \(R_0, R_1\) as follows:
-      \(R_i = \{ r_j\in R\colon B_j = i\}\), where \(i\in \{0, 1\}\).
-      The challenger then runs \(C\gets \SplitGroup[R_0, R_1]\) and gives \(C\) 
-      to the adversary.
-
-    \item[Phase 2] The adversary may continue to corrupt recipients and request 
-      decryptions under the following conditions:
-      she cannot corrupt any \(r\in R\) and not request decryptions for 
-      subciphertexts of the challenge ciphertext \(C\).
-
-    \item[Guess] The adversary outputs \(\hat{B}\) and wins if \(\hat{B} 
-        = B\).
-  \end{description}
-  We define the adversary's advantage as \[\Adv{\text{Split-IND-CCA}}{\A, 
-      \SplitGroupOp}[1^\lambda] = \mleft|\Pr[ \hat{B} 
-    = B ] - \frac{1}{2^n}\mright|.\]
-\end{definition}
-
-Now we prove the following theorem about the security of the split-group 
-algorithm.
-
-\begin{theorem}\label{SplitGroupIsSecure}
-  The algorithm \(\SplitGroupOp\) is Split-IND-CCA if the encryption algorithm 
-  is ANO-IND-CCA secure.
-\end{theorem}
-
-\begin{proof}[sketch]
-  The proof is by contradiction and follows that of Thm.~2 and Lem.~4 and 5 of 
-  the full version of~\cite{ANOBE}, we refer to those for details.
-  Assume that there exists an adversary \(\A\) that can win the Split-IND-CCA 
-  game with non-negligible probability.
-  We will now describe how to construct an algorithm \(\A*\) that can win the 
-  IND-CCA game using \(\A\).
-
-  We construct a sequences of games \(0\leq k\leq n\) with the following idea.
-  In game \(0\) all recipients are in \(R_0\) and none in \(R_1\), while in 
-  game \(n\) all recipients are in \(R_1\) and none in \(R_0\).
-  If \(\A*\) uses the public key \(\PubKey{*}\) and challenge ciphertext 
-  \(c_*\) (which is either \(i_0\) or \(i_1\)) from its own challenger as one 
-  of the possible recipients, then for some games, say \(k\) and \(k+1\), 
-  \(\A*\) will not know whether it is game \(k\) or game \(k+1\) that is 
-  currently played (if \(c_* = i_0\) it is game \(k\), and game \(k+1\) if 
-  \(c_* = i_1\)).
-  If \(\A\) can distinguish between games \(k\) and \(k+1\), then \(\A\) knows 
-  whether \(c_* = i_0\) or \(c_* = i_1\) and thus \(\A*\) can distinguish 
-  between IND-CCA ciphertexts.
-%  Game \(k\) is as follows:
-%  \begin{description}
-%    \item[Setup] \(\A*\) will generate \(n-1\) key-pairs itself and get one 
-%      public key from its challenger, \(\PubKey{*}\).
-%      \(\A*\) gives all public keys to \(\A\).
-%
-%    \item[Phase 1] \(\A*\) will just forward decryption requests from \(\A\) to 
-%      its own oracle.
-%      If \(\A\) wants the private key for \(\PubKey{*}\), then \(\A*\) quits 
-%      with failure.
-%
-%    \item[Challenge] When \(\A\) gives \(\A*\) its recipient set \(R\), \(\A*\)
-%      will construct \(R_0, R_1\) in the following way.
-%      If the recipient corresponding to \(\PubKey{*}\) is not in \(R\), then 
-%      \(\A*\) quits with failure.
-%      Otherwise, \(\A*\) sets \(B = (1, \ldots, 1, 0, \ldots, 0)\) with \(k\) 
-%      leading \(1\)'s in game \(k\).
-%      For some game \(k^\prime\) \(\A*\) will set the subciphertext \(c_k\) to 
-%      its own challenge ciphertext, for which \(\A*\) does not know the 
-%      plaintext.
-%
-%    \item[Phase 2] \(\A*\) continues to forward the requests from \(\A\) to its
-%      own oracles.
-%      However, no requests for decryptions of any of the subciphertexts of the 
-%      challenge ciphertext is allowed.
-%
-%    \item[Guess] When \(\A\) outputs its result, \(\A*\) can compute its guess 
-%      as follows.
-%      If recipient \(r_*\in R_0\) \(\A*\) outputs \(0\), otherwise if \(r_*\in 
-%        R_1\) \(\A*\) outputs \(1\).
-%  \end{description}
-  It follows that there cannot be any \(\A\) that can win the game with 
-  non-negligible advantage.
-  \qed{}
-\end{proof}
+This follows from the ANO-IND-CCA property of the \ac{ANOBE} scheme.
+We refer the reader to the proof of Thm.~1 in~\cite{ANOBE}.
 
 Now we know that Bob cannot distinguish whether everyone in the recipient sent 
 received the same message or not.
-We will add the split-group algorithm (\cref{SplitGroup}) as an available 
-interface in the Pull Model (\cref{PullModel}) and we summarize this as the 
-Extended Pull Model in the following definition.
+We will add the split-group algorithm (\cref{SplitGroup}) as extension to the 
+pull protocol of \cref{PullModel} and we summarize this as the Extended Pull 
+Protocol in the following definition.
 
 \begin{definition}[Extended Pull Model]\label{ExtPullModel}
   Let \(\Pull[p, S]\) be an instance of the Pull Model as in \cref{PullModel}.
@@ -339,8 +229,9 @@ Extended Pull Model in the following definition.
       \begin{algorithmic}
         \Function{$\psplit[p, S]{p}$}{$R_0, R_1$}
           \State{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), C\gets 
-            \SplitGroup[R_0, R_1]$}
-          \State{$\fswrite[i_p][(C, \Sign[\SignKey{p}]{C})]$}
+            \SplitGroup[MPK, R_0, R_1]$}
+          \State{$\sigma\gets \S[Sign][\SignKey{p}, C]$}
+          \State{$\fswrite[i_p][C\concat \sigma]$}
           \State{\Return{$\Pull[p, R_0], \Pull[p, R_1]$}}
         \EndFunction{}
       \end{algorithmic}
@@ -351,8 +242,11 @@ Extended Pull Model in the following definition.
         \Function{$\pget[p, S]{s}$}{}
           \State{$C = \fsread[i_p]$}
           \State{$M\gets \emptyset$}
-          \For{$c\in C$}
-            \State{$m_c = \Dec[\PriKey{s}, \VerifKey{p}]{c}$}
+          \For{$(c\concat \sigma)\in C$}
+            \If{$\S*[Verify][\VerifKey{p}, c, \sigma]\neq 1$}
+              \State{Continue with next.}
+            \EndIf{}
+            \State{$m_c = \E*[Dec][\PriKey{s}, c]$}
             \If{$m_c$ is new identifier}
               \State{$(i_p, \VerifKey{p}) \gets m_c$}
             \Else{}
@@ -365,11 +259,9 @@ Extended Pull Model in the following definition.
     \end{minipage}
   }
   \caption{%
-    The additional and modified interfaces of the Extended Pull Model.
-    Note that we implicitly let the \(\SplitGroup\) algorithm have access to 
-    the public keys of the recipients.
-    We also assume there exists a coding that can differentiate an file 
-    identifier fro an ordinary message.
+    The additional and modified interfaces of the Extended Pull Protocol.
+    We assume there exists a coding that can differentiate a file identifier 
+    from an ordinary message.
   }\label{ExtPullFunctions}
 \end{figure}
 
@@ -393,72 +285,21 @@ whichever \(i\in \{0, 1\}\) Alice put them in.
 \label{ParallelPull}
 
 Now it remains for us to convince ourselves that Bob cannot distinguish between
-different instances of the Pull Model: i.e.\ Alice posting to two both \(R_0\) 
-and \(R_1\) or Alice posting to \(R_0\) and Carol to \(R_1\).
-More formally:
+different instances of the pull protocol: i.e.\ Alice posting to two both 
+\(R_0\) and \(R_1\) or Alice posting to \(R_0\) and Carol to \(R_1\).
 
-\begin{definition}[Pull-IND-CCA]
-  We have the following game:
-  \begin{description}
-    \item[Setup] The challenger creates two instances \(\Pull[p_0, S_0]\) and 
-      \(\Pull[p_1, S_1]\), then immediately runs \(\pnsplit[p_1, S_1]{p}[S_1^0, 
-        S_1^1]\).
-      The adversary is given the public keys and verification keys for all 
-      \(s\in S_0\cup S_1^0\cup S_1^1\).
-
-    \item[Phase 1] The adversary may request encryptions and decryptions for 
-      arbitrary plaintexts and ciphertexts for any user through oracle access.
-      However, the decryption oracle must not be used on the ciphertext written
-      to the file system in the split.
-
-    \item[Challenge] The adversary gives two messages \(m_0\) and \(m_1\) to 
-      the challenger.
-      The challenger then chooses \(b\in \{0, 1\}\).
-      If \(b = 1\) the challenger will randomly choose two recipients \(r, 
-        r^\prime\) from the sets \(S_1^i\), otherwise \(r\) from \(S_0\) and 
-      \(r^\prime\) from \(S_1^0\cup S_1^1\).
-      The challenger encrypts \(m_b\) for \(r\) and \(r^\prime\) (as in 
-      \(\pnpub{p}\)) and gives the ciphertexts \(c, c^\prime\) to the 
-      adversary.
-
-    \item[Phase 2] The adversary is allowed to continue querying the oracles, 
-      except for the challenge ciphertexts \(c\) and \(c^\prime\) and the split 
-      ciphertext from the setup.
-
-    \item[Guess] The adversary outputs \(\hat{b}\) and wins if \(\hat{b} = b\).
-  \end{description}
-  We define the advantage as \(\Adv{\text{Pull-IND-CCA}}{\A}[1^\lambda] 
-    = |\Pr[\hat{b} = b] - \frac{1}{2}|\).
-\end{definition}
-
-We have the following result.
-
-\begin{theorem}
-  The Pull Model (\cref{PullModel}) yields Pull-IND-CCA security if the 
-  underlying encryption scheme is IND-CCA secure.
-  More specifically,
-  \begin{equation*}
-    \Adv{\text{Pull-IND-CCA}}{\A}[1^\lambda]\leq \Adv{\text{IND-CCA}}{\A, 
-      \mathcal{E}}[1^\lambda],
-  \end{equation*}
-  where \(\mathcal{E}\) is the encryption scheme used.
-\end{theorem}
-
-\begin{proof}[sketch]
-  We will prove this by an information-theoretic argument.
-  We can see that \(\Pull[p_0, S_0]\) is information-theoretically independent 
-  from both \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\).
-  Although \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\) are coming from 
-  a split, we can see in \cref{SplitGroup} that the two instances only depend 
-  on the randomly chosen identifiers and verification keys, and the sets of 
-  users.
-  It follows that \(\Pull[p_1, S_1^0]\) is as independent from \(\Pull[p_1, 
-    S_1^1]\) as \(\Pull[p_0, S_0]\) is independent of \(\Pull[p_1, S_1^i]\), 
-  for
-  \(i\in \{0, 1\}\).
-  Thus the only way the adversary can win is by distinguishing \(m_0\) from 
-  \(m_1\).
-  \qed{}
-\end{proof}
-
+We will use an information-theoretic argument.
+We can see that \(\Pull[p_0, S_0]\) is information-theoretically independent 
+from both \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\).
+Although \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\) are coming from 
+a split, we can see in \cref{SplitGroup} that the two instances only depend 
+on the randomly chosen identifiers and verification keys, and the sets of 
+users.
+The public keys can remains the same, the key-privacy property of \(\E*\) will 
+ensure this.
+It follows that \(\Pull[p_1, S_1^0]\) is as indistinguishable from \(\Pull[p_1, 
+  S_1^1]\) as \(\Pull[p_0, S_0]\) is indistinguishable from \(\Pull[p_1, 
+  S_1^i]\), for \(i\in \{0, 1\}\).
+Thus Bob's only chance is by distinguishing who received what new outbox in the 
+split message, but this is difficult given the ANO-IND-CCA property.
 
