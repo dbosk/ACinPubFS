@@ -120,7 +120,14 @@ policy-updates, i.e.\ Jealous Bob.
 This solution, however, is based on the intricacies of the \ac{ANOBE} 
 construction, and thus require us to use \ac{ANOBE}.
 In essence, the \ac{ANOBE} construction, described in \cref{ANOBE}, allows us 
-to create a ciphertext which decrypts to different messages.
+to create a ciphertext which decrypts to different messages.\footnote{%
+  If this is not possible for \iac{BE} scheme under consideration, then there 
+  is always the possibility to simply create new instance.
+  However, this might be more costly, since it requires a separate secure 
+  channel.
+  But we are not bound to the \ac{ANOBE} scheme, it simply provides some extra 
+  convenience in this case.
+}
 We will use this to encrypt a special message that updates the outbox 
 identifier \(i_p\).
 Half of the recipients will receive \(i_p^\prime\) and the other half will 
