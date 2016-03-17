@@ -5,7 +5,7 @@ In this model, each publisher has an \enquote{outbox} file in the file system.
 This is simply a file object with a randomly chosen identifier.
 The publisher adds new publications to the outbox while subscribers pull new 
 content from the outbox.
-In our analysis we will use the following definition for the Pull Model.
+In our analysis we define the protocol for the pull model as follows.
 
 \begin{definition}[Pull Protocol]\label{PullModel}
   Let \(\BE = (\BE[Setup], \BE[Keygen], \BE[Enc], \BE[Dec])\) be an ANO-IND-CCA 
@@ -72,7 +72,7 @@ In our analysis we will use the following definition for the Pull Model.
   \end{minipage}
   }
   \caption{%
-    Functions implementing the communication model for the Pull Model protocol.
+    Functions implementing the communication model for the pull protocol.
     The publisher's interface is to the left and the subscribers' to the right.
   }\label{PullFunctions}
 \end{figure}
@@ -112,7 +112,7 @@ This actually reduces the problem to our push construction, which we will cover
 later.
 We will instead analyse a simpler solution for the pull protocol now.
 
-\subsection{Changing Recipient Set in the Pull Model}
+\subsection{Changing Recipient Set in the Pull Protocol}
 \label{ChangingPullRecipientSet}
 
 We will now propose and analyse a solution to the problem of hidden 
@@ -212,7 +212,7 @@ We will add the split-group algorithm (\cref{SplitGroup}) as extension to the
 pull protocol of \cref{PullModel} and we summarize this as the Extended Pull 
 Protocol in the following definition.
 
-\begin{definition}[Extended Pull Model]\label{ExtPullModel}
+\begin{definition}[Extended Pull Protocol]\label{ExtPullModel}
   Let \(\Pull[p, S]\) be an instance of the Pull Model as in \cref{PullModel}.
   Then we define the \emph{Extended Pull Model} to additionally provide the 
   following interfaces:
@@ -266,7 +266,7 @@ Protocol in the following definition.
 \end{figure}
 
 Note that the execution of \(\psplit[p, S]{p}[R_0, R_1]\) results in two new 
-instances of the Pull Model, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
+instances of the pull protocol, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
 After this happens, Alice should no longer use \(\Pull[p, S]\), instead she 
 should only use these two new instances.
 

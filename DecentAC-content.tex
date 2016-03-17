@@ -196,7 +196,7 @@ ciphertexts they cannot decrypt.
 This can be done either by dummy requests (i.e.\ requesting objects at random) 
 or by \ac{PIR} techniques, such as \ac{OT}.
 
-We mentioned earlier the relation between the Pull Model and \ac{BE}.
+We have already high-lighted the relation between the pull model and \ac{BE}.
 The purpose of \ac{BE} is to develop methods to efficiently transmit data to 
 dynamically changing target audiences \(S\subseteq U\) who are allowed to read 
 the data, whereas the remaining users \(U\setminus S\) are not.
@@ -236,29 +236,29 @@ do not solve exactly the same problem.
 
 We wanted to achieve privacy-preserving access control enforcement in a public 
 file system lacking built-in access control.
-We presented two alternatives: the Pull Model and the Push Model.
+We presented two alternatives: the pull and the push protocols.
 Both implements the model of a publisher distributing a message to a set of 
 subscribers.
 
-The Pull Model achieves strong privacy properties.
+The protocol for the pull model achieves strong privacy properties.
 The subscribers cannot learn who the other subscribers are even if they control 
 the entire network or the whole storage system.
 Further, if the publisher wishes to exclude any of the subscribers from future 
 publications, then all subscribers learn that there was a policy update but no 
 one learns how --- not even those excluded!
 
-The Push Model is an interesting case.
-Conceptually, the only difference between the Push and Pull models is that we 
+The push model for communication is an interesting case.
+Conceptually, the only difference between the push and pull models is that we 
 distribute the message, instead of everyone fetching it.
 This seems to yield better privacy properties at first glance, but it turns out
 that we had to considerably weaken the adversary's capabilities before we could
-get any security.
-Hence the security guarantees are much weaker: for the Push Model the adversary 
-can only control a small part of the storage system, or monitor only part of 
-the network.
-However, unlike in the Pull Model, when the subscriber wants to make a policy 
-update, none of the subscribers will even be notified that there has been 
-a policy update --- let alone determine if they have been excluded.
+get any security in the push protocol.
+Hence the security guarantees are much weaker: for the push protocol the 
+adversary can only control a small part of the storage system, or monitor only 
+part of the network.
+However, unlike in the pull protocol, when the subscriber wants to make 
+a policy update, none of the subscribers will even be notified that there has 
+been a policy update --- let alone determine if they have been excluded.
 
 As was pointed out in \cref{RelatedWork}, we do not treat group management 
 (i.e.\ revoking the credentials for subjects) as is done in other schemes.
@@ -275,7 +275,7 @@ resending all publications.
 We can thus conclude that it is important that any optimizations to the 
 constructions can be proven not to break any of the properties.
 An interesting future direction would be to explore Eve's limitations in the 
-Push Model a bit more.
+push protocol a bit more.
 For example, if Eve is not allowed to control all the \(k\) parallel games, 
 i.e.\ that honest players play the other \(k-1\) games, would she still be able
 to win?
@@ -287,7 +287,7 @@ hand, and stronger accountability on the other.
 An example of improved deniability could be using a \ac{MAC} scheme for 
 authentication of messages, then we no longer have the non-repudiation 
 property.
-Any subscriber could publish to all subscribers in the Pull Model.
+Any subscriber could publish to all subscribers in the pull protocol.
 An example of desired accountability would be that Bob wants to verify that 
 Alice received the same message, if Eve told him that she sent a copy to Alice 
 as well.

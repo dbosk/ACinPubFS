@@ -22,8 +22,7 @@ An overview of the results is presented in \cref{Complexities}.
   }\label{Complexities}
   \begin{tabular}{lrr}
     Publisher
-    & Pull
-    & Push \\
+    & Pull & Push \\
     
     \toprule
 
@@ -47,7 +46,6 @@ An overview of the results is presented in \cref{Complexities}.
   \begin{tabular}{lrr}
     Subscriber
     & Pull & Push \\
-    %& \head{Pull Model} & \head{Push Model} \\
     
     \toprule
 
@@ -70,22 +68,22 @@ An overview of the results is presented in \cref{Complexities}.
   \end{tabular}
 \end{table}
 
-The space complexity for the key management is the same for both the Pull and 
-Push Model.
+The space complexity for the key management is the same for both the pull and 
+push protocols.
 If we have \(|S|\) subscribers, then we need to exchange and store \(O(|S|)\) 
 keys:
 we need one public key per friend.
 
 The space complexity for the ciphertexts are \(O(|R|)\) for both models.
-However, the Pull Model is slightly more space efficient since we need less 
+However, the pull protocol is slightly more space efficient since we need less 
 signatures.
-In the Push Model we require one signature per ciphertext, i.e.\ \(O(|R|)\), 
-whereas for the Pull Model we only need one per message.
+In the push protocol we require one signature per ciphertext, i.e.\ \(O(|R|)\), 
+whereas for the pull protocol we only need one per message.
 
 The time complexity for encryption depends on the underlying schemes.
-But we can see that in the Push Model we get a factor \(|R|\) to that of the 
-encryption scheme, whereas we have a constant factor \(1\) in the Pull 
-Model.
+But we can see that in the push protocol we get a factor \(|R|\) to that of the 
+encryption scheme, whereas we have a constant factor \(1\) in the pull 
+protocol.
 The time complexity for decryption on the other hand has a constant factor for 
 both models.
 
@@ -94,7 +92,8 @@ slightly.
 If we look at one single instance, then we get a constant number of connections
 for the subscribers.
 However, most subscribers will have to pull from several publishers, this is 
-the argued benefit of Push Model --- there is only one inbox to read.
+the argued benefit of push model of communication --- there is only one inbox 
+to read.
 
 %\subsection{Extensions}\label{sec:Extensions}
 %% XXX Write about possible extensions to improve the scheme
