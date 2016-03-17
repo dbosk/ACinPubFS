@@ -1,20 +1,22 @@
-\section{Construction and Analysis of the Push Model}
+\section{Construction and Analysis of the Push Protocol}
 \label{PushAnalysis}
 
-The idea of the Push Model is for each subscriber to have an inbox in the file 
-system --- as opposed to the Pull Model, where the publisher has an outbox.
+The idea of the push model is for each subscriber to have an inbox in the file 
+system --- as opposed to the pull model, where the publisher has an outbox.
 This is simply a file object with a randomly chosen identifier.
 The publisher then puts all published material in the inbox of each subscriber.
 
-We can see that if we simply put the broadcast ciphertext from the Pull Model 
-in all inboxes, then Eve can relate them since they contain identical 
+We can see that if we simply put the broadcast ciphertext from the pull 
+protocol in all inboxes, then Eve can relate them since they contain identical 
 ciphertexts.
 We thus have to make some more modifications.
-We will base our analysis on the following definition.
+We will use the protocol in the next definition in our analysis.
 
-\begin{definition}[Push Model]\label{PushModel}
-  Let \(\mathcal{E} = (\KeygenOp, \EncOp, \DecOp)\) be an authenticated 
-  encryption scheme and \(\FSop\) be a public file system.
+\begin{definition}[Push Protocol]\label{PushModel}
+  Let \(\E = (\E[Keygen], \E[Enc], \E[Dec])\) be an AI-CCA encryption scheme,
+  \(\S = (\S[Keygen], \S[Sign], \S[Verify])\) be a strongly unforgeable 
+  signature scheme,
+  and \(\FSop\) be a public file system.
   We denote by \(\Push[p, S]\) the \emph{push model protocol} implementing 
   a \((p, S)\)-communication model through the operations
   \begin{itemize}
@@ -31,7 +33,7 @@ We will base our analysis on the following definition.
     \begin{algorithmic}
       \Function{$\pnsetup[p, S]{p}$}{$1^\lambda$}
         \For{$r\in S$}
-          \State{$(\SignKey{r}, \VerifKey{r})\rgets \Keygen{1^\lambda}$}
+          \State{$(\SignKey{r}, \VerifKey{r})\rgets \S[Keygen][1^\lambda]$}
           \State{Give $\VerifKey{r}$ to $\Push[p, S][r]$.}
         \EndFor{}
       \EndFunction{}
@@ -40,30 +42,36 @@ We will base our analysis on the following definition.
 
       \Function{$\pnpub[p, S]{p}$}{$R, m$}
         \For{$r\in R$}
-          \State{$c_r\gets \Enc[\PubKey{r}, \SignKey{r}]{m}$}
-          \State{$\fswrite[i_r][c_r]$}
+          \State{$c_r\gets \E[Enc][\PubKey{r}, m]$}
+          \State{$\sigma_r\gets \S[Sign][\SignKey{p}, c_r]$}
+          \State{$\fswrite[i_r][c_r\concat \sigma_r]$}
         \EndFor{}
       \EndFunction{}
     \end{algorithmic}
   \end{minipage}
   \begin{minipage}[t]{0.48\textwidth}
     \begin{algorithmic}
-      \Function{$\pnsetup[p, S]{s}$}{$1^\lambda$}
-        \State{$(\PubKey{s}, \PriKey{s})\rgets \Keygen{1^\lambda}$}
-        \State{$i_s\rgets \{0, 1\}^{\lambda}$}
-        \State{Give $(\PubKey{s}, i_s)$ to $\Push[p, S][p]$.}
+      \Function{$\pnsetup[p, S]{r}$}{$1^\lambda$}
+      \Comment{$r\in S$}
+        \State{$(\PubKey{r}, \PriKey{r})\rgets \E[Keygen][1^\lambda]$}
+        \State{$i_r\rgets \{0, 1\}^{\lambda}$}
+        \State{Give $(\PubKey{r}, i_r)$ to $\Push[p, S][p]$.}
       \EndFunction{}
 
       \Statex{}
 
-      \Function{$\pnget[p, S]{s}$}{}
-        \State{$C\gets \fsread[i_s]$}
+      \Function{$\pnget[p, S]{r}$}{}
+      \Comment{$r\in S$}
+        \State{$C\gets \fsread[i_r]$}
         \If{$C = \bot$}
           \State{\Return{$\emptyset$}}
         \EndIf{}
         \State{$M\gets \emptyset$}
-        \For{$c\in C$}
-          \State{$m_c\gets \Dec[\PriKey{s}, \VerifKey{s}]{c}$}
+        \For{$(c, \sigma)\in C$}
+          \If{$\S[Verify][\VerifKey{r}, c, \sigma]\neq 1$}
+            \State{Continue with next.}
+          \EndIf{}
+          \State{$m_c\gets \E[Dec][\PriKey{r}, c]$}
           \If{$m_c\neq \bot$}
             \State{$M\gets M\cup \{m_c\}$}
           \EndIf{}
@@ -74,35 +82,26 @@ We will base our analysis on the following definition.
   \end{minipage}
   }
   \caption{%
-    Functions implementing the communication model for the Push Model protocol.
+    Functions implementing the communication model for the push model protocol.
     The publisher's interface is to the left and the subscribers' to the right.
   }\label{PushFunctions}
 \end{figure}
 
-When Alice executes \(\pnsetup{p}\) the \(\KeygenOp\) algorithm generates 
-a signature-verification key-pair \((\SignKey{s}, \VerifKey{s})\) for every 
-subscriber \(s\in S\) and gives the verification key to all her 
-friends.\footnote{%
-  Since the scheme \(\mathcal{E}\) is an authenticated encryption scheme, the 
-  key generation yields a public-private key-pair and a signature-verification 
-  key-pair --- in Alice's case (conversely for her friends) we are only 
-  interested in the authentication part, so we simply discard her encryption 
-  keys in the definition.
-}
-Each of her friends \(s\in S\), when they execute \(\pnsetup{s}\) the 
-\(\KeygenOp\) algorithm generates a public-private key-pair.
+When Alice executes \(\pnsetup{p}\) it generates a signature-verification 
+key-pair \((\SignKey{r}, \VerifKey{r})\) for every subscriber \(r\in S\) and 
+gives the verification keys to all her friends.
+Each of her friends \(r\in S\), when they execute \(\pnsetup{s}\) it generates 
+a public-private key-pair.
 Additionally they randomly choose a string as an identifier for their inbox.
 They give the public key and the identifier to Alice.
 
 When Alice wants to send a message \(m\) to a subset \(R\subseteq S\) of her 
-friends, she uses \(\pnpub{p}\) to create the authenticated ciphertexts 
-\(c_s\gets \Enc[\PubKey{s}, \SignKey{s}]{m}\) for each friend \(s\in R\).
-The encryption scheme simply combines the recipients public key \(\PubKey{s}\) 
-and Alice's friend-specific signature key \(\SignKey{s}\).
-Then she uses \(\FS\) to append the ciphertext \(c_s\) to the file with 
-identifier \(i_s\).
+friends, she uses \(\pnpub{p}\) to create a ciphertext \(c_r\) with signature 
+\(\sigma_r\) for each friend \(r\in R\).
+Then she uses \(\FS\) to append \(c_r\concat \sigma_r\) to the file with 
+identifier \(i_r\).
 
-The operation \(\pget{s}\) works similarly as in the Pull Model, however, it 
+The operation \(\pget{r}\) works similarly as in the Pull Model, however, it 
 uses a different file.
 It starts by reading the inbox from the file system.
 Then it iterates through the list of entries, decrypting each entry.
@@ -110,191 +109,116 @@ Each entry, if successfully decrypted, is a new message.
 It appends the message to the list of messages which it returns upon 
 finishing.
 
-Note that, similar to the Pull Model, the authenticated encryption scheme 
-\(\mathcal{E}\) can be a symmetric-key scheme although we use the notation of 
-public-key cryptography in our abstraction.
+Note that, similarly as for the pull protocol, the authentication scheme \(\S\) 
+can be symmetric.
+Here, the encryption scheme \(\E\) can also be a symmetric-key scheme, provided 
+it is key-private.
 We can simply let \(\PubKey{} = \PriKey{}\) and \(\SignKey{} = \VerifKey{}\) to 
 achieve this.
-This makes the Push Model modular as well.
+This would yield private group communication with few key exchanges.
+However, we use the notation of public-key cryptography in our abstraction.
+This makes the push protocol modular as well.
 
-% XXX Write high-level analysis of push model
-Let us now look at what Eve can do in this model.
-We start by looking at the ANO-IND-CCA game (\cref{ANO-IND-CCA}).
-In the Push Model setting Eve can actually win this game with non-negligible 
-advantage:
-She starts by publishing a message (through the publication oracle) to each 
-user.
-Then she selects two sets of users, gives those to the challenger.
-When the challenger publishes the message, Eve just observes which inboxes are 
-written to and then she knows with absolute certainty which set was used.
+Before we continue our analysis of what Eve can do against the push protocol, 
+let us first look back at the pull protocol.
+Imagine that Eve gets access to a publication oracle for an instance of the 
+pull protocol, and remember that she controls the entire file system.
+It is not hard to convince us that Eve cannot learn anything more from the file
+system than she can from the ciphertext alone (when playing the ANO-IND-CCA 
+game): each publication just appends the new ciphertext to the same file in the
+file system --- no matter how she changes the recipient set.
 
+Let us now look at what Eve can do in the push protocol.
+Here she can actually learn information by observing the file system.
+Whenever a message is published she learns which inboxes are used to get 
+messages from the publisher, thus she can relate several inboxes.
+Hence, for security analysis this protocol is only interesting to look at when 
+run in parallel.
+
+\subsection{Running Multiple Push Instances in Parallel}
+\label{ParallelPush}
+
+There is one issue we must consider before continuing our discussion of the 
+security of the push protocol.
+For the security discussion to make sense we must first, as for the pull 
+protocol, convince ourselves that Eve cannot distinguish between parallel 
+instances of the push protocol.
+Thereafter we can continue our discussion of the security of the push protocol 
+run in parallel.
+
+We will give an information-theoretic argument for this.
+Each encryption in \cref{PushFunctions} depends on the following:
+the public key of the recipient, the signature key for the authentication, 
+and the message.
+Both the public key and the signature key is unique per recipient.
+It follows that two encryptions of the same message are equally likely done 
+within the same instance as in two different instances.
+This follows from the security of the encryption scheme \(\E\).
+Thus, Eve's only chance is to decide from the ciphertexts that they contain the 
+same message, but since \(\E\) provides IND-CCA security this is possible only 
+with negligible advantage.
+
+Now we know that it makes sense to talk of the security when running parallel 
+instances.
+Assume that we run \(n\) instances of the push protocol in parallel.
+It is not too difficult for Eve to distinguish which inboxes are related.
+Eventually one instance will publish when no other instance is publishing.
+Then that instance can be distinguished from others when publishing at the same
+time, hence Eve can learn more and more over time --- even without using 
+anything like the publication oracle mentioned earlier.
 To deal with this problem, we will introduce a mix-net.
 
 \begin{definition}[Mix-net]\label{MixNet}
   Let \(m_1, \ldots, m_k\) be messages from senders \(1, \ldots, k\).
   A mix-net is a functionality \(\M\) such that on inputs \(m_1, \ldots, m_k\) 
   the outputs \(\M[1](m_1), \ldots, \M[k](m_k)\) are unlinkable to its senders.
-  More specifically
-  \begin{equation*}
-    \Pr[i\mid \M[i](m_i)] = \Pr[i] = \frac{1}{k}.
-  \end{equation*}
-\end{definition}
-
-The mix-net will not do much help in a single instance.
-If all inputs to the mix-net are related, then so will the outputs and Eve will 
-still not have any problem winning the ANO-IND-CCA game.
-We must have one instance per input, and thus, with this construction we must 
-run several instances in parallel to achieve any security.
-
-\subsection{Running Multiple Push Instances in Parallel}
-\label{ParallelPush}
-
-There are two issues we must consider when running the Push Model in parallel.
-First, as in the Pull Model, we must convince ourselves that Eve cannot 
-distinguish between parallel instances of the Push Model.
-Thereafter we can continue our discussion of using the mix-net to mix different
-instances together.
-
-We will now clarify what we mean by two instances being indistinguishable.
-Given two ciphertexts, the adversary should not be able to tell if they are 
-from the same or two different instances.
-More formally:
-
-\begin{definition}[Push-IND-CCA]
-  We have the following game:
-  \begin{description}
-    \item[Setup] The challenger creates two instances \(\Push[p_0, S_0]\) and 
-      \(\Push[p_1, S_1]\).
-      The adversary is given the public keys and verification keys for all 
-      \(s\in S_0\cup S_1\).
-
-    \item[Phase 1] The adversary may request encryptions and decryptions for 
-      arbitrary plaintexts and ciphertexts for any user through oracle access.
-
-    \item[Challenge] The adversary gives two messages \(m_0\) and \(m_1\) to 
-      the challenger.
-      The challenger then chooses \(b\in \{0, 1\}\).
-      If \(b = 1\) the challenger will randomly choose two recipients \(r, 
-        r^\prime\) from the same set \(S_i\), otherwise \(r\) from \(S_0\) and 
-      \(r^\prime\) from \(S_1\).
-      The challenger encrypts \(m_b\) for \(r\) and \(r^\prime\) (as in 
-      \(\pnpub{p}\)) and gives the ciphertexts \(c, c^\prime\) to the 
-      adversary.
-
-    \item[Phase 2] The adversary is allowed to continue querying the oracles, 
-      except for the challenge ciphertexts \(c\) and \(c^\prime\).
-
-    \item[Guess] The adversary outputs \(\hat{b}\) and wins if \(\hat{b} = b\).
-  \end{description}
-  We define the advantage as \(\Adv{\text{Push-IND-CCA}}{\A}[1^\lambda] 
-    = |\Pr[\hat{b} = b] - \frac{1}{2}|\).
-\end{definition}
-
-To convince ourselves that two instances indeed are indistinguishable we give 
-the following theorem and proof.
-
-\begin{theorem}
-  The Push Model (\cref{PushModel}) yields Push-IND-CCA security if the 
-  underlying encryption scheme is IND-CCA secure.
-  More specifically,
-  \begin{equation*}
-    \Adv{\text{Push-IND-CCA}}{\A}[1^\lambda]\leq \Adv{\text{IND-CCA}}{\A, 
-      \mathcal{E}}[1^\lambda],
-  \end{equation*}
-  where \(\mathcal{E}\) is the encryption scheme used.
-\end{theorem}
-
-\begin{proof}[sketch]
-  We will give an information-theoretic argument for this.
-  Each encryption in \cref{PushFunctions} depends on the following:
-  the public key of the recipient, the signature key for the authentication, 
-  and the message.
-  Both the public key and the signature key is unique per recipient.
-  It follows that two encryptions of the same message are equally likely done 
-  within the same instance as in two different instances.
-  Thus, if the adversary has non-negligible advantage, it must be able to 
-  distinguish \(m_0\) from \(m_1\).
-  \qed{}
-\end{proof}
-
-Now we know that it makes sense to use the mix-net, because the messages 
-themselves will not reveal which instance they belong to.
-We can thus resume our discussion of using the mix-net to achieve something 
-similar to the ANO-IND-CCA property for the Pull Model.
-We already concluded that we cannot achieve security in the Push Model without 
-running parallel instances.
-We will thus do that, and as a consequence we will also run the security games 
-in parallel.
-
-\begin{definition}[Parallel games]
-  Let \(\M\) be a mix-net with \(k\) input slots.
-  We can run \(k\) games in parallel if each game uses the mix-net and is 
-  assigned one input slot.
+  More specifically \(\Pr[i\mid \M[i](m_i)] = \Pr[i] = \frac{1}{k}\).
 \end{definition}
 
 We note that by definition the mix-net will not output anything until the last
-input slot has received input, thus synchronizing the games and Eve cannot 
-force one game to proceed without the other \(k-1\) games.
+input slot has received input.
 
-The game we are interested in running in parallel is ANO-IND-CPA from 
-\cref{ANO-IND-CPA}.
-We will now assume that the calls to \(\FS\) in \cref{PushFunctions} are 
-replaced with \[\M_w[\cdot](\fswrite[\cdot][\cdot]) \quad\text{and}\quad 
-  \M_r[\cdot](\fsread[\cdot]),\] where \(\M_w\) and \(\M_r\) are two mix-nets 
-for writing and reading operations, respectively.
-The input slot is unique to each game.
-Then we get the following result.
+We will now assume that the calls to \(\FS\) in the push protocol 
+(\cref{PushFunctions}) are replaced with 
+\(\M_w[\cdot](\fswrite[\cdot][\cdot])\) and \(\M_r[\cdot](\fsread[\cdot])\), 
+where \(\M_w\) and \(\M_r\) are two mix-nets for writing and reading 
+operations, respectively.
+The input slots are unique to each instance of the push protocol, instance 
+\(i\) has input slot \(\M[i](\cdot)\).
 
-\begin{theorem}\label{PushNotANO-IND-CPA}
-  The Push Model runs in \(k\) instances in parallel using a mix-net cannot 
-  yield ANO-IND-CPA security.
-\end{theorem}
+Remember that the inbox identifier is randomly chosen, this means that the 
+probability for an inbox being used by two instances is low.
+Now, even with the mix-net Eve can distinguish which inboxes are related:
+she can do this by looking at the distribution of the number of messages in the 
+files in the file systems.
+It is unlikely in practice that the behaviour of all publishers will be 
+uniform, so Eve will eventually learn the related inboxes.
+If Eve has access to a publication oracle as before, then she can do this much 
+faster by publishing many times to the same recipient set.
 
-\begin{proof}
-  In phase 1 the adversary selects one target user in each instance.
-  She publishes any message in each instance (through the mix-net) to the 
-  selected users and notes the result.
-  Now the adversary replaces one user and repeats the process.
-  The difference in result (or number of messages in the inboxes) will reveal 
-  the inboxes of the new and replaced user.
-  This can be repeated until all inboxes known.
-  Then the adversary can easily win the game.
-  \qed{}
-\end{proof}
+To destroy this distribution each subscriber can reuse the inbox across 
+instances for different publishers --- this is actually desirable for the push 
+protocol also for efficiency reasons, the subscriber has only \emph{one inbox 
+  for all} publishers.
+This has the unfortunate effect that the publisher can determine that 
+a subscriber subscribes to other publishers, i.e.\ a scenario related to 
+Jealous Bob, but this time a Jealous Alice.
+This in turn can be solved by adding noise to each inbox, thus making real 
+messages indistinguishable from noise.
+A more efficient solution would be for Bob to share an inbox with an 
+\emph{unknown} other subscriber.
+If not unknown, then Bob and the other subscriber can monitor each other's 
+receiving distribution and knowing who it belongs to.
+But Alice cannot determine if the other message are Bob's messages from Carol 
+or Dana's messages from Felix.
+This will reduce the amount of noise needed.
 
-\begin{corollary}
-  The Push Model run in \(k\) instances in parallel using a mix-net cannot 
-  yield ANO-IND-CCA security.
-\end{corollary}
+Finally we note that if Eve did not control the entire file system, she would 
+not be able to relate inboxes that are not in the part she controls.
+She would be able to read them, but the accuracy of her timing attacks would be
+reduced to how often she could read the files to detect change.
+This change of the adversary takes us from a decentralized setting with 
+a network-wide adversary (or even a centralized setting) to a distributed 
+setting where there is no network wide adversary, but an adversary controlling 
+only a part of the network.
 
-The corollary follows from the same argument, only here the decryption oracle 
-can be used to make Eve more efficient:
-Eve can publish a unique message to one user in each instance, then she simply 
-requests a decryption of the resulting ciphertexts to see which inboxes belongs 
-to which instance.
-
-\subsection{Weakening the Adversary}
-
-We will now assume a weaker Eve to prove the security of the Push Model.
-So far Eve has controlled the entire file system.
-We will now change this assumption.
-This change will take us from a potentially centralized file system (e.g.\ Eve 
-being a cloud operator) or distributed setting with a network-wide adversary to 
-a distributed setting where there is no network wide adversary.
-
-We assume that the file identifiers used in \(\FS\) (\cref{FS}) indicates the 
-files location in the distributed file system.
-Let \(I\) denote the set of all possible identifiers.
-Then we can simply enumerate those identifiers for which Eve controls the 
-storage space, let us denote this set by \(I_{\A}\).
-
-If we now go back to \cref{PushNotANO-IND-CPA} we can see that Eve's winning 
-strategy no longer works.
-In fact, Eve's only chance of winning\footnote{Other than random guessing, 
-  because she does not receive any ciphertexts.
-} is if two subscribers \(s_0, s_1\in S\) have their inbox in the storage that 
-Eve controls.
-Then she can choose \(R_0\) and \(R_1\) such that \(s_0\in R_0\) and \(s_1\in 
-  R_1\) and she observes in which inbox the ciphertext occurs.
-If that of \(s_0\) she outputs \(b = 0\), otherwise \(b = 1\) if in that of 
-\(s_1\).
