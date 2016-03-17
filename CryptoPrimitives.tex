@@ -15,25 +15,26 @@ not leak under which key it was created.
 We also need an unforgeable signature scheme \(\S = (\S[Keygen], \S[Sign], 
   \S[Verify])\).
 
-We additionally need \ac{BE} scheme \(\BE = (\BE[Setup], \BE[Keygen], \BE[Enc], 
-  \BE[Dec])\).
+We additionally need \iac{ANOBE} scheme \(\ANOBE = (\ANOBE[Setup],\allowbreak 
+  \ANOBE[Keygen],\allowbreak \ANOBE[Enc],\allowbreak \ANOBE[Dec])\), i.e.\ 
+\iac{BE} scheme which is anonymous and semantically secure under 
+chosen-ciphertext attacks (ANO-IND-CCA)~\cite{ANOBE}.
 Let \(U = \{1, \ldots, n\}\) be the universe of users.
-\(\BE[Setuo][1^\lambda, n]\) generates a master public key \(MPK\) and master 
-secret key \(MSK\) for \(n\) users.
-\(\BE[Keygen][MPK, MSK, i]\) generates the secret key \(\PriKey{i}\) for user 
-\(i\in U\).
-\(\BE[Enc][MPK, m, R]\) will encrypt a message \(m\) to a ciphertext \(c\) for 
-the set of users \(R\subseteq U\) and \(\BE[Dec][MPK, \PriKey{i}, c]\) will 
-return \(m\) if \(i\in R\).
-
-We need this scheme to be an anonymous and semantically secure 
-(ANO-IND-CCA)~\cite{ANOBE}.
-Formally we have the following game.
+\(\ANOBE[Setuo][1^\lambda, n]\) generates a master public key \(MPK\) and 
+master secret key \(MSK\) for \(n\) users.
+\(\ANOBE[Keygen][MPK, MSK, i]\) generates the secret key \(\PriKey{i}\) for 
+user \(i\in U\).
+\(\ANOBE[Enc][MPK, m, R]\) will encrypt a message \(m\) to a ciphertext \(c\) 
+for the set of users \(R\subseteq U\) and \(\ANOBE[Dec][MPK, \PriKey{i}, c]\) 
+will return \(m\) if \(i\in R\).
+Formally we define ANO-IND-CCA by the following game.
 
 % XXX Rewrite ANO-IND-CCA to original
 \begin{definition}[ANO-IND-CCA~\cite{ANOBE}]\label{ANO-IND-CCA}
-  Let \(U = \{1, \ldots, n\}\) be the universe of users.
-  We define the ANO-IND-CCA game as follows:
+  Let \(U = \{1, \ldots, n\}\) be the universe of users and \(\BE\) be \iac{BE} 
+  scheme.
+  \Iac{BE} scheme is anonymous and adaptively IND-CCA (ANO-IND-CCA) if the 
+  adversary has negligible advantage in winning the following game.
   \begin{description}
     \item[Setup] The challenger runs \(\BE[Setup][1^\lambda, n]\), where 
       \(\lambda\) is the security parameter.
@@ -69,14 +70,13 @@ Formally we have the following game.
   \end{description}
   We define the adversary's advantage \(\Adv{\text{ANO-IND-CCA}}{\A, 
       \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
-  \Iac{BE} scheme is anonymous and adaptively IND-CCA (ANO-IND-CCA) if the 
-  adversary has negligible advantage in winning the game.
 \end{definition}
 
-We will use the \ac{ANOBE} scheme by \citet{ANOBE} as an example of a \ac{BE} 
-scheme with this property.
+Throughout \(\ANOBE\) can be any \ac{BE} scheme with the ANO-IND-CCA property.
+However, we will use the \ac{ANOBE} scheme by \citet{ANOBE} as an example in 
+our discussion.
 For our description of this scheme, which follows, we need slight variants of 
-the above encryption and signature schemes.
+the above encryption (\(\E\)) and signature (\(\S\)) schemes.
 We need an encryption scheme \(\E* = (\E*[Keygen], \E*[Enc], \E*[Dec])\) which 
 is in addition to key-private also robust (ROB-CCA)~\cite{RobustEncryption}.
 For the signature scheme \(\S* = (\S*[Keygen], \S*[Sign], \S*[Verify])\), we 

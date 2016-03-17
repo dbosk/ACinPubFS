@@ -58,22 +58,21 @@ Hence the second is not visible in \cref{CommunicationModel}, but will be in
 
 In our desired scenario, Alice acts as a publisher and her friends as the 
 subscribers.
-%We note that no subscriber \(s\in S\) can use \(\cpub{s}[R][m]\) to publish 
-%a message \(m\).
-%The communication model is strictly unidirectional from publisher to 
-%subscribers and they cannot access the publisher's interface.
-%In the same sense,
-No subscriber \(s^\prime\in S\) can use \(\cget{s}\) for \(s^\prime\neq s\).
-I.e.\ no subscriber can read the messages of any other subscriber, we call this 
-property \emph{message privacy}.
-Furthermore, we want no subscriber \(s_i\) to learn which \(s_1, \ldots, s_n\in 
-  R\) beyond that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given 
-message \(m\).
-I.e.\ no subscriber must know who else received a message, we call this 
-property \emph{hidden policy}.
-Thus if Alice publishes a message, none of her friends know who else received 
-it and none can read the others' received messages (possibly to check if they 
-have received the same message).
+We want the following properties:
+\begin{description}
+  \item[Message privacy]
+    No subscriber \(s^\prime\in S\) can use \(\cget{s}\) for \(s^\prime\neq s\).
+    I.e.\ no subscriber can read the messages of any other subscriber, we call 
+    this property \emph{message privacy}.
+
+  \item[Hidden policies]
+    No subscriber \(s_i\) must learn which \(s_1, \ldots, s_n\in R\) beyond 
+    that \(i\in \{1, \ldots, n\}\) and \(s_i\in R\) for a given message \(m\).
+    I.e.\ no subscriber must know who else received a message, we call this 
+    property \emph{hidden policy}.
+    Thus if Alice publishes a message, none of her friends know who else 
+    received it and none can read the others' received messages (possibly to 
+    check if they have received the same message).
 
 % XXX Formalize other required (more high-level) properties:
 %  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
@@ -82,13 +81,15 @@ have received the same message).
 %  - Eve knows Alice's and Bob's inboxes, for any message m in Alice's, 
 %    she shouldn't be able to tell if it's also in Bob's.
 
-In addition to the hidden-policy property, we want something we call 
-\emph{hidden policy-updates}.
-Consider the following example:
-Bob might become jealous if he realizes that Alice no longer includes him in 
-the recipient set for her messages.
-As such Bob should only be able to determine that Alice publishes content by 
-being in the recipient set himself.
+  \item[Hidden policy-updates]
+    In addition to the hidden-policy property, we want something we call 
+    \emph{hidden policy-updates}.
+    Consider the following example:
+    Bob might become jealous if he realizes that Alice no longer includes him 
+    in the recipient set for her messages.
+    As such Bob should only be able to determine that Alice publishes content 
+    by being in the recipient set himself.
+\end{description}
 
 There are several ways to implement the message-passing protocol for the 
 communication model in \cref{CommunicationModel}.

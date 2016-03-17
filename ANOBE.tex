@@ -1,20 +1,21 @@
-\subsection{\Acl{ANOBE}}\label{ANOBE}
+\subsection{\Iacl{ANOBE} Scheme}\label{ANOBE}
 
-The main idea of \ac{ANOBE} is to distribute a key \(k\) (i.e.\ 
-key-encapsulation) to a subset of users, such that they can decrypt the 
-broadcast message encrypted with \(k\) but no one else can.
+We will now describe the \ac{ANOBE} scheme by \citet{ANOBE}.
+The main idea is to distribute a key \(k\) (i.e.\ key-encapsulation) to 
+a subset of users, such that they can decrypt the broadcast message encrypted 
+with \(k\) but no one else can.
 The users who receive \(k\) should not be able to figure out who else received 
 \(k\) and who did not.
 Although it is a key-encapsulation scheme, we will use the term message to not 
 confuse all the keys.
 
-We will now describe how \ac{ANOBE} works.
+The algorithms work as follows.
 \(\BE[Setup]\) generates a master public key \(MPK = (\S*, \{\PubKey{i}\}_{i\in
     U})\) and the master secret key \(MSK = \{\PriKey{i}\}_{i\in U}\), where 
 \((\PubKey{i}, \PriKey{i})\rgets \E*[Keygen][1^\lambda]\).
+\(\BE[Keygen][MPK, MSK, i]\) simply returns \(\PriKey{i}\) from \(MSK\).
 An overview of the encryption function is given in \cref{EncANOBE} and an 
 overview of the decryption function in \cref{DecANOBE}.
-\(\BE[Keygen][MPK, MSK, i]\) simply returns \(\PriKey{i}\) from \(MSK\).
 
 \subsubsection{Encryption}
 
