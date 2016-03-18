@@ -199,3 +199,23 @@ I think the strengths of your paper is that you look at an interesting
 application and propose modular constructions based on ANOBE and other
 cryptographic primitives. I'd focus on presenting that contribution in a clear
 and structured manner.
+
+
+Comments
+===============================================================================
+
+traffic analysis, mention that you're ruling out tracking of ip addresses etc.
+
+very briefly mention DOSN context to motivate the problem and to explain why    
+you use "friends"                                                               
+
+why anobe (I see later that it's mentioned in the related work, can that be
+pulled to the intro or setting?)                                               
+
+why not insert random junk in outbox, so Jealous Bob can't know if he's         
+excluded or it's filler?                                                     
+
+L: overuse of "simply", cut out where not essential                             
+
+isn't synchronizing a problem? Especially in decentralized storage?           
+
