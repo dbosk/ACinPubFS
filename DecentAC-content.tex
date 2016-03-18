@@ -186,13 +186,13 @@ ciphertext or not.
 However, if everyone only requests ciphertexts that they know they can decrypt 
 (which is the most efficient strategy), then the storage operator can easily 
 guess the decision.
-Most solutions probably suffer from this, including our constructions.
+Most constructions probably suffer from this, including ours.
 This decision together with non-anonymized users would allow the storage 
 operator to infer parts of the policy, hence breaking the hidden policy 
 property.
-To prevent this subjects could also request ciphertexts they cannot decrypt.
-This can be done either by dummy requests (i.e.\ requesting objects at random) 
-or by \ac{PIR} techniques, such as \ac{OT}.
+To prevent this subjects could also request ciphertexts they cannot decrypt 
+(dummy requests of \ac{PIR}).
+However, anonymous requests makes this a less relevant problem.
 
 %We have already high-lighted the relation between the pull model and \ac{BE}.
 %The purpose of \ac{BE} is to develop methods to efficiently transmit data to 
@@ -231,8 +231,8 @@ do not require the same properties.
 
 \section{Conclusions}\label{Conclusions}
 
-We wanted to achieve privacy-preserving access control enforcement in a public 
-file system lacking built-in access control.
+We achieve privacy-preserving access control enforcement in a public file 
+system lacking built-in access control.
 We presented two alternatives: the pull and the push protocols.
 Both implements the model of a publisher distributing a message to a set of 
 subscribers.
@@ -260,10 +260,10 @@ Eve can still compute the distributions of messages over the inboxes and relate
 them, so we need some techniques to make this estimation more difficult.
 But it is difficult to achieve any guarantees against the distribution attacks, 
 we have to resolve to techniques like differential privacy.
-However, there are benefits as well: unlike in the pull protocol, when the 
-subscriber wants to make a policy update, none of the subscribers will even be 
-notified that there has been a policy update --- let alone determine if they 
-have been excluded.
+However, there are benefits: unlike in the pull protocol, when the subscriber 
+wants to make a policy update, none of the subscribers will even be notified 
+that there has been a policy update --- let alone determine if they have been 
+excluded.
 
 As was pointed out in \cref{RelatedWork}, we do not treat group management 
 (i.e.\ revoking the credentials for subjects) as is done in other schemes.
@@ -294,7 +294,7 @@ To let all subscribers, and not only the publisher, publish messages.
 Another interesting direction would be the opposite: stronger accountability.
 An example of desired accountability would be that Bob wants to verify that 
 Carol received the same message, if Alice told him that she sent a copy to 
-Alice as well.
+Carol as well.
 Due to the privacy properties this is not possible in the current protocols.
 
 

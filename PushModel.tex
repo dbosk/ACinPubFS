@@ -89,19 +89,18 @@ We will use the protocol in the next definition in our analysis.
 
 When Alice executes \(\pnsetup{p}\) it generates a signature-verification 
 key-pair \((\SignKey{r}, \VerifKey{r})\) for every subscriber \(r\in S\) and 
-gives the verification keys to all her friends.
-Each of her friends \(r\in S\), when they execute \(\pnsetup{s}\) it generates 
+gives the respective verification keys to each subscriber.
+Each subscriber \(r\in S\), when they execute \(\pnsetup{s}\) it generates 
 a public-private key-pair.
 Additionally they randomly choose a string as an identifier for their inbox.
 They give the public key and the identifier to Alice.
 
 When Alice wants to send a message \(m\) to a subset \(R\subseteq S\) of her 
-friends, she uses \(\pnpub{p}\) to create a ciphertext \(c_r\) with signature 
-\(\sigma_r\) for each friend \(r\in R\).
+subscribers, she uses \(\pnpub{p}\) to create a ciphertext \(c_r\) with 
+signature \(\sigma_r\) for each recipient \(r\in R\).
 Then she uses \(\FS\) to append \(c_r\concat \sigma_r\) to the file with 
 identifier \(i_r\).
-
-The operation \(\pget{r}\) works similarly as in the Pull Model, however, it 
+The operation \(\pget{r}\) works similarly as in the pull protocol, however, it 
 uses a different file.
 It starts by reading the inbox from the file system.
 Then it iterates through the list of entries, decrypting each entry.
@@ -126,17 +125,18 @@ Before we continue our analysis of what Eve can do against the push protocol,
 let us first look back at the pull protocol.
 Imagine that Eve gets access to a publication oracle for an instance of the 
 pull protocol, and remember that she controls the entire file system.
-It is not hard to convince us that Eve cannot learn anything more from the file
-system than she can from the ciphertext alone (when playing the ANO-IND-CCA 
-game): each publication just appends the new ciphertext to the same file in the
+It is not hard to convince ourselves that Eve cannot learn anything more from 
+the file system than she can from the ciphertext alone (when playing the 
+ANO-IND-CCA game): each publication just appends the new ciphertext to the same 
+file in the
 file system --- no matter how she changes the recipient set.
 
 Let us now look at what Eve can do in the push protocol.
 Here she can actually learn information by observing the file system.
 Whenever a message is published she learns which inboxes are used to get 
 messages from the publisher, thus she can relate several inboxes.
-Hence, for security analysis this protocol is only interesting to look at when 
-run in parallel.
+Hence, the security analysis of this protocol is only interesting when the 
+protocol is run in parallel.
 
 \subsection{Running Multiple Push Instances in Parallel}
 \label{ParallelPush}
@@ -149,7 +149,7 @@ instances of the push protocol.
 Thereafter we can continue our discussion of the security of the push protocol 
 run in parallel.
 
-We will give an information-theoretic argument for this.
+We will give an information-theoretic argument for the indistinguishability.
 Each encryption in \cref{PushFunctions} depends on the following:
 the public key of the recipient, the signature key for the authentication, 
 and the message.
@@ -192,15 +192,15 @@ The input slots are unique to each instance of the push protocol, instance
 Remember that the inbox identifier is randomly chosen, this means that the 
 probability for an inbox being used by two instances is low (\(\approx 
   1/2^{\lambda/2}\)).
-Without the mix-net Eve can distinguish which inboxes are related:
-she can do this by looking at the distribution of the number of messages in the 
-files in the file systems.
+Without the mix-net Eve can also distinguish which inboxes are related by 
+looking at the distribution of messages in the files in the file system.
 It is unlikely in practice that the behaviour of all publishers will be 
 uniform, so Eve will eventually learn the related inboxes.
 However, due to the assumed mix-net, it will enforce a uniform number of 
 messages, \(n\) messages in yield \(n\) messages out.
-There are mix-nets that add dummy messages to improve throughput, but we refer 
-to that literature for a discussion on its security.
+There are mix-nets that add dummy messages to improve throughput --- which will
+be needed for efficiency reasons --- but we refer to that literature for 
+a discussion on its security.
 
 Another technique to distort the distribution is that each subscriber can reuse 
 the inbox across instances for different publishers --- this is actually 
@@ -215,8 +215,8 @@ A more efficient solution would be for Bob to share an inbox with an
 \emph{unknown} other subscriber.
 Bob can pick an inbox which already contains messages and use the same 
 identifier.
-This would make fetching new messages less efficient though.
-This will reduce the amount of noise needed.
+This would make fetching new messages less efficient, but will reduce the 
+amount of noise needed.
 
 Finally we note that if Eve did not control the entire file system, she would 
 not be able to relate inboxes that are not in the part she controls.

@@ -9,10 +9,8 @@ content from the outbox.
 In our analysis we define the protocol for the pull model as follows.
 
 \begin{definition}[Pull Protocol]\label{PullModel}
-  Let \(\BE = (\BE[Setup],\allowbreak \BE[Keygen],\allowbreak 
-    \BE[Enc],\allowbreak \BE[Dec])\) be an ANO-IND-CCA \ac{BE} scheme,
-  \(\S = (\S[Keygen], \S[Sign], \S[Verify])\) be a signature scheme and \(\FS\) 
-  be a public file system.
+  Let \(\BE\) be a \ac{BE} scheme, \(\S\) be a signature scheme and \(\FS\) be 
+  a public file system as defined in \cref{BuildingBlocks}.
   We denote by \(\Pull[p, S]\) the \emph{pull protocol} implementing a \((p, 
     S)\)-communication model through the operations in \cref{PullFunctions}.
 %  \begin{itemize}
@@ -84,28 +82,27 @@ to all her friends.
 
 When Alice wants to publish a message \(m\) to the recipient set \(R\subseteq 
   S\), she runs \(\ppub{p}[R][m]\).
-This operation simply creates a \ac{BE} ciphertext and Alice appends the 
-ciphertext to her outbox file.
+This operation creates a \ac{BE} ciphertext and Alice appends the ciphertext to 
+her outbox file.
 Each friend can then use \(\pget{s}\) to retrieve the ciphertexts from the file 
 system and decrypt them.
 
-Note that we can have symmetric authentication, e.g.\ \iac{MAC} by replacing 
-\(\S\) with \iac{MAC} scheme, although we use the notation of asymmetric 
-authentication.
+Note that we can have symmetric authentication, e.g.\ replacing \(\S\) with 
+\iac{MAC} scheme, although we use the notation of asymmetric authentication.
 This would yield different privacy properties, i.e.\ we remove the 
 non-repudiation which \(\S\) brings.
 However, this is not at the centre of our discussion, it just illustrates the 
 modularity of the scheme.
 
 We wanted no recipient to know who else received the message, the ANO-IND-CCA 
-property of the \ac{BE} scheme gives us this.
+property of the \ac{BE} scheme gives us exactly this.
 So we achieve the hidden policy that we wanted.
 
 However, we cannot immediately achieve the hidden policy-update property.
 Bob can read Alice's outbox, conclude that there are entries which he cannot 
 decrypt and thus he can become jealous.
-(In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in 
-the output of \(\pget{\cdot}\).)
+In \cref{PullFunctions} we see that Bob can count the number of \(\bot\) in the 
+output of \(\pget{\cdot}\).
 One approach to prevent this is that Alice uses a unique outbox per friend, so 
 Bob has his own outbox.
 This actually reduces the problem to our push construction, which we will cover 
@@ -122,7 +119,7 @@ construction, and thus require us to use \ac{ANOBE}.
 In essence, the \ac{ANOBE} construction, described in \cref{ANOBE}, allows us 
 to create a ciphertext which decrypts to different messages.\footnote{%
   If this is not possible for \iac{BE} scheme under consideration, then there 
-  is always the possibility to simply create new instance.
+  is always the possibility to create a new instance.
   However, this might be more costly, since it requires a separate secure 
   channel.
   But we are not bound to the \ac{ANOBE} scheme, it simply provides some extra 
@@ -204,20 +201,20 @@ into two parts.
 We note that this solution does not hide the fact that Alice updated her 
 policy, we just hide from Bob whether he was excluded or not.
 When Bob get jealous he goes to Eve to ask her help, this means that we must 
-prevent Eve from learning how Alice changed her policy too --- so the 
-construction is secure against this strong adversary.
+prevent Eve from learning how Alice changed her policy too --- the construction 
+is also secure against this strong adversary.
 
 The property we want from this algorithm is that Bob cannot determine how the 
 subscribers are divided.
 Thus he cannot know whether he is removed or not.
 This follows from the ANO-IND-CCA property of the \ac{ANOBE} scheme.
-We refer the reader to the proof of Thm.~1 in~\cite{ANOBE}.
+We refer the reader to the proof of Thm.~1 in the full version of~\cite{ANOBE}.
 
-Now we know that Bob cannot distinguish whether everyone in the recipient sent 
+Now we know that Bob cannot distinguish whether everyone in the recipient set 
 received the same message or not.
-We will add the split-group algorithm (\cref{SplitGroup}) as extension to the 
-pull protocol of \cref{PullModel} and we summarize this as the Extended Pull 
-Protocol in the following definition.
+We will add the split-group algorithm (\cref{SplitGroup}) as an extension to 
+the pull protocol of \cref{PullModel} and we summarize this as the Extended 
+Pull Protocol in the following definition.
 
 \begin{definition}[Extended Pull Protocol]\label{ExtPullModel}
   Let \(\Pull[p, S]\) be an instance of the Pull Model as in \cref{PullModel}.
@@ -231,11 +228,11 @@ Protocol in the following definition.
 
 \begin{figure}
   \framebox{%
-    \begin{minipage}[t]{0.53\textwidth}
+    \begin{minipage}[t]{0.52\textwidth}
       \begin{algorithmic}
         \Function{$\psplit[p, S]{p}$}{$R_0, R_1$}
-          \State{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), C\gets 
-            \SplitGroup[MPK, R_0, R_1]$}
+          \State{$(i_0, \SignKey{0}), (i_1, \SignKey{1}), C$}
+          \State{\hspace{1em}$\gets \SplitGroup[MPK, R_0, R_1]$}
           \State{$\sigma\gets \S[Sign][\SignKey{p}, C]$}
           \State{$\fswrite[i_p][C\concat \sigma]$}
           \State{\Return{$\Pull[p, R_0], \Pull[p, R_1]$}}
@@ -243,7 +240,7 @@ Protocol in the following definition.
       \end{algorithmic}
     \end{minipage}
 
-    \begin{minipage}[t]{0.43\textwidth}
+    \begin{minipage}[t]{0.44\textwidth}
       \begin{algorithmic}
         \Function{$\pget[p, S]{s}$}{}
           \State{$C = \fsread[i_p]$}
@@ -276,7 +273,7 @@ instances of the pull protocol, namely \(\Pull[p, R_0]\) and \(\Pull[p, R_1]\).
 After this happens, Alice should no longer use \(\Pull[p, S]\), instead she 
 should only use these two new instances.
 
-We could instead incorporate \(\psplit{p}\) into the \(ppub{p}\) interface and 
+We could instead incorporate \(\psplit{p}\) into the \(\ppub{p}\) interface and 
 let it keep track of the different groups (instances) in the state, this would 
 make it more similar to the definition of the ideal model 
 (\cref{CommunicationModel}).
@@ -301,7 +298,7 @@ Although \(\Pull[p_1, S_1^0]\) and \(\Pull[p_1, S_1^1]\) are coming from
 a split, we can see in \cref{SplitGroup} that the two instances only depend 
 on the randomly chosen identifiers and verification keys, and the sets of 
 users.
-The public keys can remains the same, the key-privacy property of \(\E*\) will 
+The public keys can remain the same, the key-privacy property of \(\E*\) will 
 ensure this.
 It follows that \(\Pull[p_1, S_1^0]\) is as indistinguishable from \(\Pull[p_1, 
   S_1^1]\) as \(\Pull[p_0, S_0]\) is indistinguishable from \(\Pull[p_1, 

@@ -87,13 +87,12 @@ whereas for the pull protocol we only need one per message.
 
 The time complexity for encryption depends on the underlying schemes.
 But we can see that in the push protocol we get a factor \(|R|\) to that of the 
-encryption scheme, whereas we have a constant factor \(1\) in the pull 
-protocol.
+encryption scheme, whereas we have a constant factor in the pull protocol.
 The time complexity for decryption on the other hand has a constant factor for 
 both models.
 
-Finally, the communication complexity for the different models differs 
-slightly.
+Finally, we look at the communication complexity for the different protocols, 
+which differ slightly.
 If we look at one single instance, then we get a constant number of connections
 for the subscribers.
 However, most subscribers will have to pull from several publishers, this is 
