@@ -40,8 +40,9 @@
     Cloud Storage,
     Decentralized Storage,
     %Anonymous Broadcast Encryption,
-    Hidden Policies
-    %Hidden Credentials,
+    Hidden Policies,
+    Hidden Policy-Updates,
+    Hidden Credentials,
     %Hidden Decisions
   }
 \end{abstract}
@@ -77,8 +78,8 @@ Our approach is to introduce a layer of encryption as a logical reference
 monitor.
 Beyond the expected confidentiality, Alice wants some stronger privacy 
 properties as well: her friends should not be able to monitor her activity, 
-e.g.\ infer with whom else she communicates, the fact that she communicates 
-with others.
+e.g.\ infer with whom else she communicates, even the fact that she 
+communicates with others.
 
 We will present an ideal model of communication and its desired properties in 
 \cref{IdealCommunication}, this is what we want to achieve.
@@ -86,22 +87,22 @@ Then we will present the building blocks that we will use, and their
 accompanying assumptions, in \cref{BuildingBlocks}.
 We will also assume a simple file system with no built-in access control.
 This system is discussed and defined in \cref{FileSystem}.
-We this includes our adversary model: we will let the adversary control the 
-file system.
+This includes our adversary model: we will let the adversary control the file 
+system.
 
 Then we give two constructions that implement the functionality using different 
-message passing models and analyse what properties their primitives must have 
+message-passing models and analyse what properties their primitives must have 
 in \cref{PullAnalysis,PushAnalysis}.
 The two message passing models are called the pull model and the push model.
 In the pull model Alice's friends pull new messages from Alice, whereas in the 
-push model Alice's pushes new messages to her friends' inboxes.
+push model Alice pushes new messages to her friends' inboxes.
 The motivation is that the pull model is optimized for Alice and the push model 
 for Alice's friends.
 In a decentralized file system the pull model yields few connections for Alice,
 but many for her friends (if they have more friends than Alice).
 Conversely the push model yields many connections for Alice, but only one for 
 her friends (they check their inbox).
-In some situations connections can be expensive, e.g.\ establishing many 
+In some situations connections can be expensive, cf.\ establishing many 
 Tor~\cite{Tor} circuits to transfer little data and establishing one circuit to 
 transfer more data.
 
@@ -175,8 +176,8 @@ In our case this is a cryptographic key, and as a consequence we allow the
 subject to anonymously read the ciphertext from the storage node.
 This means that the storage node cannot track which subjects are requesting 
 access to which objects.
-(If users are not anonymized, then the storage node can approximate the 
-credential, i.e.\ the subject's identity.)
+%(If users are not anonymized, then the storage node can approximate the 
+%credential, i.e.\ the subject's identity.)
 
 Hidden decisions means that no-one but the subject must learn the outcome of an 
 access request.
@@ -295,8 +296,8 @@ Due to the privacy properties this is not possible in the current protocols.
 
 \subsubsection{Acknowledgements}
 
-This work was inspired by work with Benjamin Greschbach and work of Oleksandr 
-Bodriagov and Gunnar Kreitz.
+This work was inspired by some work with Benjamin Greschbach and work of 
+Oleksandr Bodriagov and Gunnar Kreitz.
 We would like to thank the Swedish Foundation for Strategic Research for grant 
 SSF FFL09-0086 and the Swedish Research Council for grant VR 2009-3793, which 
 funded this work.
