@@ -13,14 +13,13 @@ In our analysis we define the protocol for the pull model as follows.
   \(\S = (\S[Keygen], \S[Sign], \S[Verify])\) be a signature scheme and \(\FS\) 
   be a public file system.
   We denote by \(\Pull[p, S]\) the \emph{pull protocol} implementing a \((p, 
-    S)\)-communication model through the operations
-  \begin{itemize}
-    \item \(\psetup[p, S]{p}[\cdot]\) and \(\psetup[p, S]{s}[\cdot]\) for each
-      \(s\in S\),
-    \item \(\ppub[p, S]{p}[\cdot][\cdot]\), and
-    \item \(\pget[p, S]{s}[\cdot]\) for each \(s\in S\)
-  \end{itemize}
-  as in \cref{PullFunctions}.
+    S)\)-communication model through the operations in \cref{PullFunctions}.
+%  \begin{itemize}
+%    \item \(\psetup[p, S]{p}[\cdot]\) and \(\psetup[p, S]{s}[\cdot]\) for each
+%      \(s\in S\),
+%    \item \(\ppub[p, S]{p}[\cdot][\cdot]\), and
+%    \item \(\pget[p, S]{s}[\cdot]\) for each \(s\in S\)
+%  \end{itemize}
 \end{definition}
 
 \begin{figure}%[p]
@@ -222,12 +221,11 @@ Protocol in the following definition.
 \begin{definition}[Extended Pull Protocol]\label{ExtPullModel}
   Let \(\Pull[p, S]\) be an instance of the Pull Model as in \cref{PullModel}.
   Then we define the \emph{Extended Pull Model} to additionally provide the 
-  following interfaces:
-  \begin{itemize}
-    \item \(\psplit[p, S]{p}[\cdot, \cdot]\) to split the subscriber set,
-    \item A modified \(\pget[p, S]{s}[]\) to update \(i_p\) after a split,
-  \end{itemize}
-  as defined in \cref{ExtPullFunctions}.
+  interfaces in \cref{ExtPullFunctions}.
+%  \begin{itemize}
+%    \item \(\psplit[p, S]{p}[\cdot, \cdot]\) to split the subscriber set,
+%    \item A modified \(\pget[p, S]{s}[]\) to update \(i_p\) after a split,
+%  \end{itemize}
 \end{definition}
 
 \begin{figure}
