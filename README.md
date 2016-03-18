@@ -1,9 +1,9 @@
-Privacy-Preserving Access Control in Decentralized Storage for OSNs
+Privacy-Preserving Access Control in Publicly Readable Storage
 ===============================================================================
 
 This is the source code of the paper and slides for the paper:
 ```bibtex
-@inproceedings{PPACinDecentralizedSys,
+@inproceedings{PPACinPubFS,
     title={Privacy-Preserving Access Control in Publicly Readable Storage
         Systems},
     author={Daniel Bosk and Sonja Buchegger},
@@ -17,21 +17,14 @@ This is the source code of the paper and slides for the paper:
     publisher={Springer International Publishing},
     note={Under review},
     URL={https://github.com/dbosk/anobe},
-    keywords={Decentralized Online Social Networks,
-        Access Control,
-        Decentralized Storage,
-        Anonymous Broadcast Encryption,
-        Hidden Policies,
-        Hidden Credentials,
-        Hidden Decisions},
 }
 ```
 
-You can find the [paper][1] (as submitted for post-proceedings) and the 
+You can find the [paper][1] (as accepted for post-proceedings) and the (old) 
 [slides][2] under releases.
 
-[1]: https://github.com/dbosk/anobe/releases/download/v0.1/anobe-paper.pdf
-[2]: https://github.com/dbosk/anobe/releases/download/v0.1/anobe-slides.pdf
+[1]: https://github.com/dbosk/DecentAC/releases/download/v2.1/DecentAC-paper.pdf
+[2]: https://github.com/dbosk/DecentAC/releases/download/v0.1/anobe-slides.pdf
 
 
 Compilation
