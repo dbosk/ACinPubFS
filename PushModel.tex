@@ -118,6 +118,9 @@ achieve this.
 This would yield private group communication with few key exchanges.
 However, we use the notation of public-key cryptography in our abstraction.
 This makes the push protocol modular as well.
+%Furthermore, the encryption and authentication can be replaced by authenticated
+%encryption if desired, however, to keep the similarity to the pull protocol we 
+%keep encryption and authentication separate.
 
 Before we continue our analysis of what Eve can do against the push protocol, 
 let us first look back at the pull protocol.
@@ -150,7 +153,7 @@ We will give an information-theoretic argument for this.
 Each encryption in \cref{PushFunctions} depends on the following:
 the public key of the recipient, the signature key for the authentication, 
 and the message.
-Both the public key and the signature key is unique per recipient.
+Both the public key and the signature key is unique per recipient and instance.
 It follows that two encryptions of the same message are equally likely done 
 within the same instance as in two different instances.
 This follows from the security of the encryption scheme \(\E\).
@@ -187,38 +190,40 @@ The input slots are unique to each instance of the push protocol, instance
 \(i\) has input slot \(\M[i](\cdot)\).
 
 Remember that the inbox identifier is randomly chosen, this means that the 
-probability for an inbox being used by two instances is low.
-Now, even with the mix-net Eve can distinguish which inboxes are related:
+probability for an inbox being used by two instances is low (\(\approx 
+  1/2^{\lambda/2}\)).
+Without the mix-net Eve can distinguish which inboxes are related:
 she can do this by looking at the distribution of the number of messages in the 
 files in the file systems.
 It is unlikely in practice that the behaviour of all publishers will be 
 uniform, so Eve will eventually learn the related inboxes.
-If Eve has access to a publication oracle as before, then she can do this much 
-faster by publishing many times to the same recipient set.
+However, due to the assumed mix-net, it will enforce a uniform number of 
+messages, \(n\) messages in yield \(n\) messages out.
+There are mix-nets that add dummy messages to improve throughput, but we refer 
+to that literature for a discussion on its security.
 
-To destroy this distribution each subscriber can reuse the inbox across 
-instances for different publishers --- this is actually desirable for the push 
-protocol also for efficiency reasons, the subscriber has only \emph{one inbox 
-  for all} publishers.
-This has the unfortunate effect that the publisher can determine that 
-a subscriber subscribes to other publishers, i.e.\ a scenario related to 
-Jealous Bob, but this time a Jealous Alice.
+Another technique to distort the distribution is that each subscriber can reuse 
+the inbox across instances for different publishers --- this is actually 
+desirable for the push protocol also for efficiency reasons, the subscriber has 
+only \emph{one inbox for all} publishers.
+However, this allows the publisher to determine that a subscriber subscribes to 
+other publishers, i.e.\ a scenario related to Jealous Bob, but this time 
+a Jealous Alice.
 This in turn can be solved by adding noise to each inbox, thus making real 
 messages indistinguishable from noise.
 A more efficient solution would be for Bob to share an inbox with an 
 \emph{unknown} other subscriber.
-If not unknown, then Bob and the other subscriber can monitor each other's 
-receiving distribution and knowing who it belongs to.
-But Alice cannot determine if the other message are Bob's messages from Carol 
-or Dana's messages from Felix.
+Bob can pick an inbox which already contains messages and use the same 
+identifier.
+This would make fetching new messages less efficient though.
 This will reduce the amount of noise needed.
 
 Finally we note that if Eve did not control the entire file system, she would 
 not be able to relate inboxes that are not in the part she controls.
 She would be able to read them, but the accuracy of her timing attacks would be
 reduced to how often she could read the files to detect change.
-This change of the adversary takes us from a decentralized setting with 
-a network-wide adversary (or even a centralized setting) to a distributed 
-setting where there is no network wide adversary, but an adversary controlling 
-only a part of the network.
+She could still do the message distribution attacks though.
+This change of the adversary takes us from a potentially centralized setting to 
+a distributed setting where there is no network wide adversary, but an 
+adversary controlling only a part of the network of the file system nodes.
 

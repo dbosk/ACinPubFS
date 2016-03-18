@@ -258,9 +258,12 @@ system, or monitor only part of the network, this would make Eve's timing
 attacks more difficult.
 Eve can still compute the distributions of messages over the inboxes and relate 
 them, so we need some techniques to make this estimation more difficult.
-However, unlike in the pull protocol, when the subscriber wants to make 
-a policy update, none of the subscribers will even be notified that there has 
-been a policy update --- let alone determine if they have been excluded.
+But it is difficult to achieve any guarantees against the distribution attacks, 
+we have to resolve to techniques like differential privacy.
+However, there are benefits as well: unlike in the pull protocol, when the 
+subscriber wants to make a policy update, none of the subscribers will even be 
+notified that there has been a policy update --- let alone determine if they 
+have been excluded.
 
 As was pointed out in \cref{RelatedWork}, we do not treat group management 
 (i.e.\ revoking the credentials for subjects) as is done in other schemes.
@@ -277,9 +280,10 @@ resending all publications.
 %\subsection{Future Work}
 
 An interesting future direction would be to explore Eve's limitations in the 
-push protocol a bit more.
+push protocol in more detail.
 For example, under what conditions can Eve estimate the message distributions 
-over the inboxes.
+over the inboxes, according to what distributions should the subscribers add 
+noise?
 This would help us design an efficient scheme that can distort the 
 distributions and guarantee security.
 
