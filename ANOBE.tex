@@ -1,19 +1,12 @@
 \subsection{\Iacl{ANOBE} Scheme}\label{ANOBE}
 
 We will now describe the \ac{ANOBE} scheme by \citet{ANOBE}.
-The main idea is to distribute a key \(k\) (i.e.\ key-encapsulation) to 
-a subset of users, such that they can decrypt the broadcast message encrypted 
-with \(k\) but no one else can.
-The users who receive \(k\) should not be able to figure out who else received 
-\(k\) and who did not.
-Although it is a key-encapsulation scheme, we will use the term message to not 
-confuse all the keys.
-
+We will use \(\ANOBE\) to denote this scheme.
 The algorithms work as follows.
-\(\BE[Setup]\) generates a master public key \(MPK = (\S*, \{\PubKey{i}\}_{i\in
+\(\ANOBE[Setup]\) generates a master public key \(MPK = (\S*, \{\PubKey{i}\}_{i\in
     U})\) and the master secret key \(MSK = \{\PriKey{i}\}_{i\in U}\), where 
 \((\PubKey{i}, \PriKey{i})\rgets \E*[Keygen][1^\lambda]\).
-\(\BE[Keygen][MPK, MSK, i]\) simply returns \(\PriKey{i}\) from \(MSK\).
+\(\ANOBE[Keygen][MPK, MSK, i]\) simply returns \(\PriKey{i}\) from \(MSK\).
 An overview of the encryption function is given in \cref{EncANOBE} and an 
 overview of the decryption function in \cref{DecANOBE}.
 
@@ -23,12 +16,12 @@ We must first generate a one-time signature key-pair \((\SignKey{},
   \VerifKey{})\), then we choose a random permutation \(\pi\colon R\to R\).
 Next we must encrypt the message \(m\) and the verification key \((m, 
   \VerifKey{})\) for every user \(i\in R\) in the recipient set \(R\subseteq 
-  U\) under their respective public key, \(c_{i} = \Enc[\PubKey{i}]{m, 
-    \VerifKey{}}\).
+  U\) under their respective public key, \(c_{i} = \E*[Enc][\PubKey{i}, 
+  m\concat \VerifKey{}]\).
 We let the \ac{ANOBE} ciphertext be the tuple \((\VerifKey{}, C, \sigma)\), 
 where
 \(C = ( c_{\pi(1)}, \ldots, c_{\pi({|S|})})\) and
-\(\sigma = \Sign[\SignKey{}]{ C }\).
+\(\sigma = \S*[Sign][\SignKey{}, C ]\).
 Note that the signatures does not authenticate the sender, it is used to verify 
 correct or incorrect decryption.
 We will get back to the details about this shortly.
@@ -46,7 +39,7 @@ We will get back to the details about this shortly.
           $(\SignKey{}, \VerifKey{})\rgets{\S*[Keygen][1^\lambda]}$
         }
         \Comment{%
-          Signature-verification key-pair, security parameter $\lambda$
+          Signature key-pair, security parameter $\lambda$
         }
         \State{%
           Choose a random permutation \(\pi\colon R\to R\).
@@ -93,10 +86,10 @@ If there are no more \(c\) to try, then return \(\bot\).
     \framebox{\begin{minipage}{0.96\textwidth}
     \begin{algorithmic}
       \Function{$\ANOBE[Dec]$}{$MPK, \PriKey{}, C_{\ANOBE}$}
-      \Comment{%
-        Private key \(\PriKey{}\),
-        ciphertext $C_{\ANOBE} = (\VerifKey{}, C, \sigma)$.
-      }
+%      \Comment{%
+%        Private key \(\PriKey{}\),
+%        ciphertext $C_{\ANOBE} = (\VerifKey{}, C, \sigma)$.
+%      }
 
         \If{$\S*[Verify][\VerifKey{}, C, \sigma ] = 0$}
           \State{%

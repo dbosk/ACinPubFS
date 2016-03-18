@@ -15,17 +15,17 @@ not leak under which key it was created.
 We also need an unforgeable signature scheme \(\S = (\S[Keygen], \S[Sign], 
   \S[Verify])\).
 
-We additionally need \iac{ANOBE} scheme \(\ANOBE = (\ANOBE[Setup],\allowbreak 
-  \ANOBE[Keygen],\allowbreak \ANOBE[Enc],\allowbreak \ANOBE[Dec])\), i.e.\ 
-\iac{BE} scheme which is anonymous and semantically secure under 
-chosen-ciphertext attacks (ANO-IND-CCA)~\cite{ANOBE}.
+We additionally need \iac{BE} scheme \(\BE = (\BE[Setup],\allowbreak 
+  \BE[Keygen],\allowbreak \BE[Enc],\allowbreak \BE[Dec])\) which is anonymous 
+and semantically secure under chosen-ciphertext attacks 
+(ANO-IND-CCA)~\cite{ANOBE}.
 Let \(U = \{1, \ldots, n\}\) be the universe of users.
-\(\ANOBE[Setuo][1^\lambda, n]\) generates a master public key \(MPK\) and 
+\(\BE[Setuo][1^\lambda, n]\) generates a master public key \(MPK\) and 
 master secret key \(MSK\) for \(n\) users.
-\(\ANOBE[Keygen][MPK, MSK, i]\) generates the secret key \(\PriKey{i}\) for 
+\(\BE[Keygen][MPK, MSK, i]\) generates the secret key \(\PriKey{i}\) for 
 user \(i\in U\).
-\(\ANOBE[Enc][MPK, m, R]\) will encrypt a message \(m\) to a ciphertext \(c\) 
-for the set of users \(R\subseteq U\) and \(\ANOBE[Dec][MPK, \PriKey{i}, c]\) 
+\(\BE[Enc][MPK, m, R]\) will encrypt a message \(m\) to a ciphertext \(c\) 
+for the set of users \(R\subseteq U\) and \(\BE[Dec][MPK, \PriKey{i}, c]\) 
 will return \(m\) if \(i\in R\).
 Formally we define ANO-IND-CCA by the following game.
 
@@ -72,7 +72,7 @@ Formally we define ANO-IND-CCA by the following game.
       \Cop}[1^\lambda] = |\Pr[ \hat{b} = b ] - \frac{1}{2}|\).
 \end{definition}
 
-Throughout \(\ANOBE\) can be any \ac{BE} scheme with the ANO-IND-CCA property.
+Throughout \(\BE\) can be any \ac{BE} scheme with the ANO-IND-CCA property.
 However, we will use the \ac{ANOBE} scheme by \citet{ANOBE} as an example in 
 our discussion.
 For our description of this scheme, which follows, we need slight variants of 
