@@ -34,7 +34,7 @@ We will use the protocol in the next definition in our analysis.
       \Function{$\pnsetup[p, S]{p}$}{$1^\lambda$}
         \For{$r\in S$}
           \State{$(\SignKey{r}, \VerifKey{r})\rgets \S[Keygen][1^\lambda]$}
-          \State{Give $\VerifKey{r}$ to $\Push[p, S][r]$.}
+          \State{Give $\VerifKey{r}$ to $r$.}
         \EndFor{}
       \EndFunction{}
 
@@ -55,7 +55,7 @@ We will use the protocol in the next definition in our analysis.
       \Comment{$r\in S$}
         \State{$(\PubKey{r}, \PriKey{r})\rgets \E[Keygen][1^\lambda]$}
         \State{$i_r\rgets \{0, 1\}^{\lambda}$}
-        \State{Give $(\PubKey{r}, i_r)$ to $\Push[p, S][p]$.}
+        \State{Give $(\PubKey{r}, i_r)$ to $p$.}
       \EndFunction{}
 
       \Statex{}

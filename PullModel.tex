@@ -1,15 +1,16 @@
 \section{Construction and Analysis of the Pull Protocol}
 \label{PullAnalysis}
 
-In this model, each publisher has an \enquote{outbox} file in the file system.
+In this construction, each publisher has an \enquote{outbox} file in the file 
+system.
 This is simply a file object with a randomly chosen identifier.
-The publisher adds new publications to the outbox while subscribers pull new 
+The publisher adds new publications to the outbox and subscribers pull new 
 content from the outbox.
 In our analysis we define the protocol for the pull model as follows.
 
 \begin{definition}[Pull Protocol]\label{PullModel}
-  Let \(\BE = (\BE[Setup], \BE[Keygen], \BE[Enc], \BE[Dec])\) be an ANO-IND-CCA 
-  \ac{BE} scheme,
+  Let \(\BE = (\BE[Setup],\allowbreak \BE[Keygen],\allowbreak 
+    \BE[Enc],\allowbreak \BE[Dec])\) be an ANO-IND-CCA \ac{BE} scheme,
   \(\S = (\S[Keygen], \S[Sign], \S[Verify])\) be a signature scheme and \(\FS\) 
   be a public file system.
   We denote by \(\Pull[p, S]\) the \emph{pull protocol} implementing a \((p, 
@@ -32,7 +33,7 @@ In our analysis we define the protocol for the pull model as follows.
         \State{$(MPK, MSK)\rgets \BE[Setup][1^\lambda, |S|]$}
         \For{$s\in S$}
           \State{$\PriKey{s}\gets \BE[Keygen][MPK, MSK, s]$}
-          \State{Give $(\PriKey{s}, \VerifKey{p}, i_p)$ to $\Pull[p, S][s]$.}
+          \State{Give $(\PriKey{s}, \VerifKey{p}, i_p)$ to $s$.}
         \EndFor{}
       \EndFunction{}
 
@@ -48,7 +49,7 @@ In our analysis we define the protocol for the pull model as follows.
   \begin{minipage}[t]{0.45\textwidth}
     \begin{algorithmic}
       \Function{$\psetup[p, S]{s}$}{$1^\lambda$}
-        \State{Receive from \(p\).}
+        \State{Receive from $p$.}
       \EndFunction{}
 
       \Statex{}
