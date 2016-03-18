@@ -5,15 +5,15 @@
 
 \subsection{A General File System}\label{FileSystem}
 
-We will model our system as an abstract file system with the operations create, 
-read and append.
+We will model our system as an abstract file system with the operations append 
+(which includes create) and read.
 The operations are defined as we intuitively expect: we can create an object, 
-then read it and also append to it.
+read it and also append to it.
 The file system itself provides no access control.
 
 \begin{definition}[Public file system]\label{FS}
   A \emph{file} \(f = (i, m_i)\) consists of the \emph{identifier} \(i\) and 
-  the \emph{content} \(m_i\).
+  the associated \emph{content} \(m_i\).
   We define the set of files \(F = \{(i, m_i)\}\) together with the following 
   operations to be the \emph{public file system} \(\FS\):
   \begin{itemize}
@@ -55,8 +55,8 @@ arbitrary searches since she does not have to use \(\fsread\).
 
 Although Eve could potentially also modify or delete the files, we do not treat 
 denial-of-service attacks by Eve deleting the files.
-However, as we will see in our constructions, modifications made by Eve will be 
-detected.
+However, as we will see in our constructions, modifications (but not deletions) 
+made by Eve will be detected.
 
 Eve cannot distinguish between Alice's and Bob's requests to the operations of 
 \(\FS\) --- in the definition there is nothing to identify who used any of the 
@@ -65,5 +65,5 @@ What she can do, is to record the times at which the operations occurred, since
 she executes them.
 
 This adversary would correspond to a centralized setting, e.g.\ having the file 
-system hosted by a cloud operator or a decentralized, or a decentralized 
-setting with a network wide adversary.
+system hosted by a cloud operator, or a decentralized setting where the 
+adversary can monitor the network at the file system side.

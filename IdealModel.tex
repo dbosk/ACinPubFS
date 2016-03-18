@@ -40,7 +40,7 @@ Then we will proceed to the details of two alternative protocols
       \(\lambda\) is the security parameter.
     \item The publisher \(p\) uses \(\cpub[p, S]{p}[R][m]\) to publish the 
       message \(m\) to the designated \emph{recipient set} \(R\) by making it 
-      available to all subscribers \(s\in R\subseteq S\).
+      available to all recipients \(r\in R\subseteq S\).
     \item Each subscriber \(s\in S\) uses \(\cget[p, S]{s}[]\) to get the set 
       \(M\) of published messages \(m\in M\) for which \(s\) was in the 
       recipient set.
@@ -71,8 +71,8 @@ We want the following properties:
     I.e.\ no subscriber must know who else received a message, we call this 
     property \emph{hidden policy}.
     Thus if Alice publishes a message, none of her friends know who else 
-    received it and none can read the others' received messages (possibly to 
-    check if they have received the same message).
+    received it and none can read the others' received messages to check if 
+    they have received the same message.
 
 % XXX Formalize other required (more high-level) properties:
 %  - Alice removes Bob as a friend: Bob shouldn't distinguish this or if 
@@ -106,4 +106,4 @@ We can see that our ideal communication model allows both a pull and push
 strategy for implementation.
 We will describe and analyse the pull construction in \cref{PullAnalysis} and 
 the push construction in \cref{PushAnalysis}.
-First we need to review our needed building blocks.
+But first we need to review our needed building blocks.

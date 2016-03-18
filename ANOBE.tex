@@ -22,9 +22,8 @@ We let the \ac{ANOBE} ciphertext be the tuple \((\VerifKey{}, C, \sigma)\),
 where
 \(C = ( c_{\pi(1)}, \ldots, c_{\pi({|S|})})\) and
 \(\sigma = \S*[Sign][\SignKey{}, C ]\).
-Note that the signatures does not authenticate the sender, it is used to verify 
-correct or incorrect decryption.
-We will get back to the details about this shortly.
+Note that the signature does not authenticate the sender, it ties the 
+ciphertext together and is needed for correctness.
 
 \begin{frame}
   \begin{figure}
@@ -72,8 +71,9 @@ We will get back to the details about this shortly.
 
 \subsubsection{Decryption}
 
-We now have data which we parse as the tuple \((\VerifKey{}, C, \sigma)\).
-If \(\S*[Verify][\VerifKey{}, C, \sigma ] = 0\), then we return \(\bot\) as the 
+We now have data which would like to decrypt.
+We parse it as \((\VerifKey{}, C, \sigma)\).
+If \(\S*[Verify][\VerifKey{}, C, \sigma ] = 0\), we return \(\bot\) as the 
 verification failed.
 For each \(c\) in \(C\):
 Compute \(M = \E*[Dec][\PriKey{}, c ]\).
@@ -126,6 +126,6 @@ procedure to decide if the ciphertext was indeed intended for us.
 This is costly as it makes the decryption function complexity \(O(|S|)\).
 \citet{ANOBE} presented a tag-hint system along with their \ac{ANOBE} scheme.
 The tag-hint system reduced the complexity back to \(O(1)\).
-As this is not relevant for our discussion, we refer the reader 
-to~\cite{ANOBE}.
+As this is not relevant for our discussion, we refer the reader to~\cite{ANOBE} 
+but note that it can be used.
 
