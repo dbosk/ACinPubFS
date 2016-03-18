@@ -17,8 +17,9 @@ An overview of the results is presented in \cref{Complexities}.
   \centering
   \caption{%
     The storage, communication and time complexities in the two models.
-    \(S\) is the set of friends of a user (all subscribers), \(R\) is the set 
-    of recipients of a message.
+    \(S\) is the set of all subscribers, \(R\) is the set of recipients of 
+    a message.
+    All values are \(O(\cdot)\).
   }\label{Complexities}
   \begin{tabular}{lrr}
     \toprule
@@ -29,11 +30,11 @@ An overview of the results is presented in \cref{Complexities}.
     \midrule
 
     Key-storage size
-    & \(2|S|\) & \(|S|\) \\
+    & \(|S|\) & \(|S|\) \\
 
     \pause{}%
     Ciphertext size
-    & \(2|R|\) & \(|R|\) \\
+    & \(|R|\) & \(|R|\) \\
 
     Encryption
     & \(1\) & \(|R|\) \\
@@ -54,11 +55,11 @@ An overview of the results is presented in \cref{Complexities}.
     \midrule
 
     Key-storage size
-    & \(2\) & \(1\) \\
+    & \(1\) & \(1\) \\
 
     \pause{}%
     Ciphertext size
-    & \(2|R|\) & \(1\) \\
+    & \(|R|\) & \(1\) \\
 
     Decryption
     & \(1\) & \(1\) \\
