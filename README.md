@@ -4,27 +4,31 @@ Privacy-Preserving Access Control in Publicly Readable Storage
 This is the source code of the paper and slides for the paper:
 ```bibtex
 @inproceedings{PPACinPubFS,
-    title={Privacy-Preserving Access Control in Publicly Readable Storage
-        Systems},
-    author={Daniel Bosk and Sonja Buchegger},
-    booktitle={Privacy and Identity Management --- Time for a revolution?},
-    editor={Jan Camenisch and David Aspinall and Simone Fischer-Hübner and
-        Marit Hansen and Charles Raab},
-    series={Lecture Notes in Computer Science},
-    volume={X},
-    pages={Y},
-    year={2016},
-    publisher={Springer International Publishing},
-    note={Under review},
-    URL={https://github.com/dbosk/anobe},
+  title={Privacy-Preserving Access Control in Publicly Readable Storage 
+  Systems},
+  author={Bosk, Daniel
+      and Buchegger, Sonja},
+  editor={Aspinall, David
+      and Camenisch, Jan
+      and Hansen, Marit
+      and Fischer-H{\"u}bner, Simone
+      and Raab, Charles},
+  booktitle={Privacy and Identity Management. Time for a Revolution? 10th IFIP 
+  WG 9.2, 9.5, 9.6/11.7, 11.4, 11.6/SIG 9.2.2 International Summer School, 
+  Edinburgh, UK, August 16-21, 2015, Revised Selected Papers},
+  year={2016},
+  publisher={Springer International Publishing},
+  address={Cham},
+  pages={327--342},
+  isbn={978-3-319-41763-9},
+  doi={10.1007/978-3-319-41763-9_22},
+  url={http://github.com/dbosk/access-control-in-public-file-systems/},
 }
 ```
 
-You can find the [paper][1] (as accepted for post-proceedings) and the (old) 
-[slides][2] under releases.
+You can find the [paper][1] (as accepted for the post-proceedings).
 
-[1]: https://github.com/dbosk/DecentAC/releases/download/v2.1/DecentAC-paper.pdf
-[2]: https://github.com/dbosk/DecentAC/releases/download/v0.1/anobe-slides.pdf
+[1]: https://github.com/dbosk/DecentAC/releases/download/v2.2/DecentAC-paper.pdf
 
 
 Compilation
